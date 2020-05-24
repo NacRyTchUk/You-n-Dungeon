@@ -1,0 +1,22 @@
+unit NiceInt;
+
+interface
+ uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  Vcl.StdCtrls;
+
+implementation
+
+
+function Str(i : integer) : string; overload;
+begin
+  int := IntToStr(i);
+end;
+
+function Int(s : string) : integer;
+begin
+  Int := StrToInt(s);
+end;
+
+end.

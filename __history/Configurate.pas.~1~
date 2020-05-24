@@ -1,0 +1,10 @@
+unit Configurate;
+
+interface
+
+const
+  Piddo = 1;
+
+implementation
+
+end.

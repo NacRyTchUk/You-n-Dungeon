@@ -1,0 +1,59 @@
+unit Game;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  Vcl.StdCtrls, TFieldClass, TCardClass,NiceStuff, System.ImageList, Vcl.ImgList;
+
+
+
+type
+  TGameForm = class(TForm)
+    BackGroundImage: TImage;
+    BackBtnImage: TImage;
+    CardsImagesList: TImageList;
+    CardBorderList: TImageList;
+    procedure BackBtnImageClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  GameForm: TGameForm;
+  FieldOfCards : TField;
+
+implementation
+
+{$R *.dfm}
+
+uses mainscreen, BackGround;
+
+
+
+
+
+
+procedure TGameForm.BackBtnImageClick(Sender: TObject);
+begin
+
+  MainForm.Show();
+  GameForm.free;
+end;
+
+
+
+
+
+
+procedure TGameForm.FormShow(Sender: TObject);
+begin
+FieldOfCards := TField.Create();
+InitForm(self);
+end;
+
+end.

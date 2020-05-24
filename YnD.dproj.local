@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.182,F:\OnI\DelProj\You'n'Dungeon\Unit1.pas=F:\UserData\Nadezhda\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.153,F:\OnI\DelProj\You'n'Dungeon\NiceInt.pas=</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.279,F:\OnI\DelProj\You'n'Dungeon\NiceInt.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.197,F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm=F:\OnI\DelProj\You'n'Dungeon\Game.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.706,F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm=F:\OnI\DelProj\You'n'Dungeon\SelectDifficult.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.075,F:\OnI\DelProj\You'n'Dungeon\NiceMsg.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.627,F:\OnI\DelProj\You'n'Dungeon\TPositionLib.pas=</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.421,F:\OnI\DelProj\You'n'Dungeon\TPositionLib.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.339,F:\OnI\DelProj\You'n'Dungeon\MainScreen.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit1.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.182,F:\OnI\DelProj\You'n'Dungeon\Unit1.dfm=F:\UserData\Nadezhda\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.383,F:\OnI\DelProj\You'n'Dungeon\YnD.dproj=F:\OnI\DelProj\You'n'Dungeon\YnDproj.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.041,F:\OnI\DelProj\You'n'Dungeon\YnD.dproj=F:\OnI\DelProj\You'n'Dungeon\YouAndDungeon.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.002,F:\OnI\DelProj\You'n'Dungeon\NiceStuff.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.530,F:\OnI\DelProj\You'n'Dungeon\TCard.pas=F:\OnI\DelProj\You'n'Dungeon\TCardClass.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.260,=F:\UserData\Nadezhda\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.320,F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm=F:\OnI\DelProj\You'n'Dungeon\BackGroundForm.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.339,F:\OnI\DelProj\You'n'Dungeon\MainScreen.pas=F:\OnI\DelProj\You'n'Dungeon\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.178,F:\OnI\DelProj\You'n'Dungeon\YouAndDungeon.dproj=F:\OnI\DelProj\You'n'Dungeon\YnD.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.897,F:\OnI\DelProj\You'n'Dungeon\YnDproj.dproj=F:\UserData\Nadezhda\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.029,F:\OnI\DelProj\You'n'Dungeon\TFieldClass.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.068,F:\OnI\DelProj\You'n'Dungeon\NiceMsg.pas=</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.287,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.088,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.782,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.654,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.965,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.197,F:\OnI\DelProj\You'n'Dungeon\Unit2.pas=F:\OnI\DelProj\You'n'Dungeon\Game.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.706,F:\OnI\DelProj\You'n'Dungeon\Unit2.pas=F:\OnI\DelProj\You'n'Dungeon\SelectDifficult.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.320,F:\OnI\DelProj\You'n'Dungeon\Unit2.pas=F:\OnI\DelProj\You'n'Dungeon\BackGroundForm.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.126,F:\OnI\DelProj\You'n'Dungeon\Unit2.pas=F:\OnI\DelProj\You'n'Dungeon\Configurate.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.122,F:\OnI\DelProj\You'n'Dungeon\Unit2.pas=F:\OnI\DelProj\You'n'Dungeon\TCard.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.322,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.462,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.991,F:\OnI\DelProj\You'n'Dungeon\Unit2.pas=F:\OnI\DelProj\You'n'Dungeon\TCardStatsClass.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.365,F:\OnI\DelProj\You'n'Dungeon\BackGroundForm.dfm=F:\OnI\DelProj\You'n'Dungeon\BackGround.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.365,F:\OnI\DelProj\You'n'Dungeon\BackGroundForm.pas=F:\OnI\DelProj\You'n'Dungeon\BackGround.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.661,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.000,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.727,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.120,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.995,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+  </Transactions>
+</BorlandProject>

@@ -1,0 +1,14 @@
+program YnDproj;
+
+uses
+  Vcl.Forms,
+  MainScreen in 'MainScreen.pas' {MainForm};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TMainForm, MainForm);
+  Application.Run;
+end.

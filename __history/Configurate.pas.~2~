@@ -1,0 +1,22 @@
+unit Configurate;
+
+
+
+interface
+
+
+ type
+  UIElem = record
+    TypeOfUI : string;
+    Image : timage;
+    Button : tbutton;
+    Labe : tlabel;
+  end;
+
+const
+  a=1;
+
+
+implementation
+
+end.

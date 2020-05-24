@@ -1,0 +1,50 @@
+unit TCardStatsClass;
+
+interface
+
+uses Dialogs, System.SysUtils, TPositionLib, Forms, nicestuff;
+
+
+var
+  BonusCardsStats : array[0..COUNT_OF_BONUS_CARDS] of TCardStat;
+  EnemyCardsStats : array[0..COUNT_OF_ENEMIES] of TCardStat;
+  TrapsCardsStats : array[0..COUNT_OF_TRAPS] of TCardStat;
+
+
+procedure InitCardStat();
+
+
+implementation
+
+
+procedure InitCardStat();
+begin
+  with BonusCardsStats[1] do
+  begin
+    CardIndex := 1;
+    CardName := 'Coin';
+    CardType := TItemType.bonus;
+
+
+                           {
+    HaveAValue: Boolean;
+    ValueType: string;
+    Value: integer;
+    ValueRange: integer;
+    Increaseable: Boolean;
+    IncValue: integer;
+
+    ReplaceACard: Boolean;
+    ReplacebleCardIndex: integer;
+    DropCoin: Boolean;
+    isSwapable: Boolean;
+    DontNeedbeNear: Boolean;
+    EventCard: Boolean;   }
+
+  end;
+
+
+end;
+
+
+end.

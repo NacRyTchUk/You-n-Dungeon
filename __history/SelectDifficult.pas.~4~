@@ -1,0 +1,54 @@
+unit SelectDifficult;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  nicestuff;
+
+type
+  TSelectDifficultForm = class(TForm)
+    BackGroundImage: TImage;
+    BackBtnImage: TImage;
+    LevelSelectBrn1: TImage;
+    LevelSelectBrn2: TImage;
+    LevelSelectBrn3: TImage;
+    procedure BackBtnImageClick(Sender: TObject);
+    procedure LevelSelectBrn1Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  SelectDifficultForm: TSelectDifficultForm;
+
+implementation
+
+{$R *.dfm}
+
+uses MainScreen, Game;
+
+procedure TSelectDifficultForm.BackBtnImageClick(Sender: TObject);
+begin
+  SelectDifficultForm.Hide;
+  MainForm.Show;
+end;
+
+procedure TSelectDifficultForm.FormCreate(Sender: TObject);
+begin
+
+  InitForm(self);
+end;
+
+procedure TSelectDifficultForm.LevelSelectBrn1Click(Sender: TObject);
+begin
+  GameForm.Show;
+  SelectDifficultForm.Close;
+end;
+
+end.

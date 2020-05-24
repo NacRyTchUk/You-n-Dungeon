@@ -1,0 +1,91 @@
+unit NiceStuff;
+
+interface
+uses Dialogs,System.SysUtils,TPositionLib,Forms;
+
+type
+  TPosition = record
+    X : integer;
+    Y : integer;
+  end;
+
+ procedure Msg(text : string); overload;
+procedure Msg(numb : integer); overload;
+function tStr(i : integer) : string;
+function tInt(s : string) : integer;
+function CTP(x,y : integer) : TPosition;
+procedure ReSizeResolution(oForm: TForm);
+procedure InitForm(oForm: TForm);
+
+
+type
+  AnimationIndex = (Nothing,SizeOutIndex,SizeInIndex);
+
+ const
+  MinimizeWinWight = 896;
+  MinimizeWinHeight = 504;
+
+const
+  SIZE_SPACE = 14;
+  SIZE_CARD_X = 110;
+  SIZE_CARD_Y = 145;
+  SIZE_TAB_X = 145;
+  SIZE_TAB_Y = 21;
+  FIELD_SIZE_X = 5;
+  FIELD_SIZE_Y = 3;
+
+  CARD_ANIM_COUNT = 2;
+
+var
+  iPercentage: integer;
+  AnimIndex : AnimationIndex;
+implementation
+
+procedure ReSizeResolution(oForm: TForm);
+begin
+  if Screen.Width > MinimizeWinWight then
+  begin
+    iPercentage := Round(((Screen.Width - MinimizeWinWight) / MinimizeWinWight)
+      * 100) + 100;
+    oForm.ScaleBy(iPercentage, 100);
+  end;
+end;
+
+procedure InitForm(oForm: TForm);
+begin
+  ReSizeResolution(oForm);
+  oForm.Font.Name := 'Gnomoria_rus';
+end;
+
+
+function CTP(x,y : integer) : TPosition;
+var pos : TPosition;
+begin
+  pos.x := x;
+  pos.y := y;
+  CTP := pos;
+end;
+
+
+procedure Msg(text : string); overload;
+begin
+  showmessage(text);
+end;
+
+procedure Msg(numb : integer); overload;
+begin
+   showmessage(IntToStr(numb));
+end;
+
+function tStr(i : integer) : string;
+begin
+  tStr := IntToStr(i);
+end;
+
+function tInt(s : string) : integer;
+begin
+  tInt := StrToInt(s);
+end;
+
+
+end.
