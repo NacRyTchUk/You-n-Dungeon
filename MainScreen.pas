@@ -57,9 +57,10 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
-    { Private declarations }
+    SelectPlayerIndex : Integer;
+
   public
-    { Public declarations }
+    function GetSelectedPlayerIndex() : Integer;
   end;
 
 var
@@ -173,6 +174,7 @@ procedure TMainForm.NewGameBtnImageMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 // New Game
 begin
+  SelectPlayerIndex := 0;
   SelectDifficultForm.Show;
   MainForm.hide;
 end;
@@ -197,4 +199,8 @@ begin
   showmessage('settings');
 end;
 
+function TMainForm.GetSelectedPlayerIndex() : Integer;
+begin
+  GetSelectedPlayerIndex := SelectPlayerIndex;
+end;
 end.

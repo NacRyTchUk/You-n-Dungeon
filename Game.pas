@@ -64,14 +64,22 @@ end;
 
 
 procedure TGameForm.Button1Click(Sender: TObject);
+var
+  I: Integer;
+  s : string;
 begin
-FieldOfCards.ToggleAnimOn(3,2,2,1);
+s := '';
+for I := 0 to 10 do
+  begin
+    s := s + IntToStr(Rnd(1,3,2,2)) + ';';
+  end;
+msg(s);
 end;
 
 procedure TGameForm.Button2Click(Sender: TObject);
 begin
 
-FieldOfCards.GetFieldOfCards[1,1].SetVisible(False);
+FieldOfCards.ToggleAnimOn(5,2,2,11);
 
 
 end;

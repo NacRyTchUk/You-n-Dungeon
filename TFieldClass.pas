@@ -22,7 +22,7 @@ type
     PlayerCard: TPosition;
     FieldOfCards: TFieldOfCards;
     BufferCard: TCard;
-    BaseDifficult : integer;
+    BaseDifficult: integer;
 
     CardAnimState: array [0 .. CARD_ANIM_COUNT] of bool;
     CardAnimStage: array [0 .. CARD_ANIM_COUNT] of integer;
@@ -40,7 +40,6 @@ type
     function IsCardAnimPlayed(): bool; overload;
     function IsCardAnimPlayed(AnimIndex: integer): bool; overload;
 
-
     procedure ToggleAnimOn(AnimIndex, x, y: integer); overload;
     procedure ToggleAnimOn(AnimIndex, x, y, data: integer); overload;
     procedure ToggleAnimOn(AnimIndex: integer); overload;
@@ -49,8 +48,9 @@ type
     procedure PlayAnim_SizeIn(x, y: integer);
     procedure PlayAnim_SlideFromTo(x, y, side: integer);
     procedure PlayAnim_FieldSizeIn();
+    procedure PlayAnim_ChangeCard(x, y, data: integer);
 
-    Constructor Create(BaseDifficult : integer);
+    Constructor Create(BaseDifficult: integer);
     // Destructor  Destroy;
   end;
 
@@ -71,13 +71,12 @@ begin
   GetFieldOfCards := FieldOfCards;
 end;
 
-Constructor TField.Create(BaseDifficult : integer);
+Constructor TField.Create(BaseDifficult: integer);
 var
   i, j, x, y: integer;
   cardisplayer: bool;
 begin
   Self.BaseDifficult := BaseDifficult;
-
 
   PlayerCard.x := (FIELD_SIZE_X - 1) div 2;
   PlayerCard.y := (FIELD_SIZE_Y - 1) div 2;
@@ -86,7 +85,8 @@ begin
     for j := 0 to FIELD_SIZE_Y - 1 do
     begin
       cardisplayer := ((i = PlayerCard.x) and (j = PlayerCard.y));
-      FieldOfCards[i, j] := TCard.Create(CTP(i, j), cardisplayer, BaseDifficult);
+      FieldOfCards[i, j] := TCard.Create(CTP(i, j), cardisplayer,
+        BaseDifficult);
     end;
   ToggleAnimOn(4);
 end;
@@ -100,8 +100,6 @@ function TField.IsCardAnimPlayed(AnimIndex: integer): bool;
 begin
   IsCardAnimPlayed := CardAnimState[AnimIndex];
 end;
-
-
 
 procedure TField.ToggleAnimOn(AnimIndex, x, y: integer);
 begin
@@ -146,6 +144,10 @@ begin
       CardAnimIndex[3, 3]);
   if CardAnimState[4] then
     PlayAnim_FieldSizeIn();
+  if CardAnimState[5] then
+      PlayAnim_ChangeCard(CardAnimIndex[5, 1], CardAnimIndex[5, 2],
+      CardAnimIndex[5, 3]);
+
 
 end;
 
@@ -166,6 +168,7 @@ begin
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
+    FieldOfCards[x,y].SetMinimized(true);
   end;
 end;
 
@@ -185,6 +188,7 @@ begin
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
+    FieldOfCards[x,y].SetMinimized(false);
     FieldOfCards[x, y].ReSetPosToMode(1);
   end;
 end;
@@ -260,6 +264,49 @@ begin
     for x := 0 to FIELD_SIZE_X - 1 do
       for y := 0 to FIELD_SIZE_Y - 1 do
         FieldOfCards[x, y].ReSetPosToMode(1);
+  end;
+end;
+
+procedure TField.PlayAnim_ChangeCard(x, y, data: integer);
+const
+  OneStageStepsAmount = 8;
+  FrameAmount = 6;
+  AnimID = 5;
+var
+  ChangeCardStat : TCardGen;
+begin
+
+  if AnimProc(AnimID, OneStageStepsAmount) then
+    exit;
+
+    if CardAnimFrame[AnimID] >= FrameAmount then
+  begin
+    CardAnimFrame[AnimID] := 0;
+    CardAnimState[AnimID] := false;
+    CardAnimStage[AnimID] := 0;
+  end;
+
+  if (IsCardAnimPlayed(2) = False) and (FieldOfCards[x,y].IsCardMinimized) then
+  begin
+    case (data mod 10) of
+      1 : ChangeCardStat.ItemType := TItemType.nothing;
+      2 : ChangeCardStat.ItemType := TItemType.bonus;
+      3 : ChangeCardStat.ItemType := TItemType.enemy;
+      4 : ChangeCardStat.ItemType := TItemType.trap;
+      else msg('replace anim err');
+    end;
+    ChangeCardStat.ItemIndex := data div 10;
+    FieldOfCards[x, y].Create(CTP(x, y), false, BaseDifficult, ChangeCardStat);
+    ToggleAnimOn(2, x, y);
+    CardAnimStage[AnimID] := 2;
+    CardAnimFrame[AnimID] := FrameAmount + 1;
+    exit;
+  end;
+
+  if (IsCardAnimPlayed(1) = False) and (not FieldOfCards[x,y].IsCardMinimized) then
+  begin
+    ToggleAnimOn(1, x, y);
+    exit;
   end;
 end;
 

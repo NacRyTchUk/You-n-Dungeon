@@ -42,6 +42,18 @@ type
     Y: integer;
   end;
 
+type
+  TCardGen = record
+    ItemType : TItemType;
+    ItemIndex : Integer;
+  end;
+
+type
+  TCardSendingData = record
+  IntData : Integer;
+  CardGenData : TCardGen;
+  end;
+
 procedure Msg(text: string); overload;
 procedure Msg(numb: integer); overload;
 function tStr(i: integer): string;
@@ -53,7 +65,9 @@ function CoordToVector(Coord: TPosition): integer;
 function VectorToCoord(vector: integer): TPosition;
 function Rnd(min, max: integer): integer; overload;
 function Rnd(max: integer): integer; overload;
+function Rnd(min, max, wmin, wmax: integer): integer; overload;
 function RndWWeight(var weight: array of integer): integer;
+function CGTDT(CardGen : TCardGen) : Integer;
 
 const
   MinimizeWinWight = 896;
@@ -78,7 +92,9 @@ const
   CHANCE_OF_ENEMIES = 60;
   CHANCE_OF_TRAPS = 15;
 
-  CARD_ANIM_COUNT = 4;
+  CARD_ANIM_COUNT = 5;
+
+  PLAYER_CARD_BASE_HEALTH = 10;
 
 var
   iPercentage: integer;
@@ -138,6 +154,8 @@ begin
   end;
 end;
 
+
+
 function Rnd(min, max: integer): integer;
 begin
   Rnd := Random(abs(max - min + 1)) + min;
@@ -146,6 +164,17 @@ end;
 function Rnd(max: integer): integer;
 begin
   Rnd := Random(max + 1);
+end;
+
+function Rnd(min, max, wmin, wmax: integer): integer;
+var
+  RndNumb : Integer;
+begin
+  repeat
+    RndNumb := Rnd(min, max);
+  until (RndNumb < wmin) or (RndNumb > wmax);
+  Rnd := RndNumb;
+
 end;
 
 function CTP(X, Y: integer): TPosition;
@@ -204,6 +233,23 @@ begin
     end;
   end;
 
+end;
+
+
+
+function CGTDT(CardGen : TCardGen) : Integer;
+var
+  data : Integer;
+begin
+
+data := CardGen.ItemIndex*10;
+case CardGen.ItemType of
+  nothing: data := data + 1;
+  bonus: data := data + 2;
+  enemy: data := data + 3;
+  trap: data := data + 4;
+end;
+CGTDT := data;
 end;
 
 end.

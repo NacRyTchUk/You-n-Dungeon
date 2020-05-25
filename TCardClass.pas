@@ -4,9 +4,9 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics, Vcl.StdCtrls ,
+  System.Classes, Vcl.Graphics, Vcl.StdCtrls,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
-  nicestuff, math;
+  nicestuff, math, tcardstatsclass;
 
 type
   TCard = class
@@ -22,12 +22,15 @@ type
     ValueText: tlabel;
     IsCardIsPlayer: bool;
     Value: integer;
+    HasAItem: integer;
+    ItemValue: integer;
+    IsMinimized: bool;
 
     procedure CreateImage(var Image: timage);
     procedure CreateBackImage();
     procedure CreateItemImage();
     procedure CreateBorderImage();
-    procedure CreateLabel(var Labeel: tlabel ;mode : Integer);
+    procedure CreateLabel(var Labeel: tlabel; mode: integer);
     procedure CreateValueLabel();
     procedure CreateHealthValueLabel();
 
@@ -37,12 +40,13 @@ type
     procedure ScaleImageAt(var Image: timage; ds: real);
     procedure MoveLabelOn(var Labeel: tlabel; dx, dy: integer);
     procedure MoveLabelAt(var Labeel: tlabel; dx, dy: integer);
-    procedure ScaleLabelOn(var Labeel: tlabel; ds: real; mode : Integer);
-    procedure ScaleLabelAt(var Labeel: tlabel; ds: real;mode : Integer);
+    procedure ScaleLabelOn(var Labeel: tlabel; ds: real; mode: integer);
+    procedure ScaleLabelAt(var Labeel: tlabel; ds: real; mode: integer);
     procedure ReScaleToNormal(var Image: timage);
     procedure ReScaleToNone(var Image: timage);
-    procedure ReScaleLabelToNormal(var Labeel: tlabel; mode : Integer);
+    procedure ReScaleLabelToNormal(var Labeel: tlabel; mode: integer);
     procedure ReScaleLabelToNone(var Labeel: tlabel);
+    procedure ValueRefresh();
 
     procedure ImMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
@@ -52,18 +56,26 @@ type
     procedure ImMouseLeave(Sender: TObject);
 
     function GenerateItemIndex(Difficult: integer): integer;
+
+    function ChangeHealhOn(Value: integer): integer;
+    function isTrapsFacing(trapP: TPosition): integer;
+    function CardLootGen(KilledCard: TCardGen): TCardGen;
+    function BonusPick(BonusItemPos: TPosition): integer;
+
   public
     procedure SetPosition(Position: TPosition);
     procedure SetBorderIndex(BorderIndex: integer);
     procedure SetItemIndex(ItemIndex: integer);
     procedure SetVisible(isVisible: bool);
     procedure SetCardStat(CardStat: TCard);
+    procedure SetMinimized(Min: bool);
 
     function GetCardStat(): TCard;
     function GetPosition(): TPosition;
     function GetBorderIndex(): integer;
     function GetItemIndex(): integer;
     function IsCurCardIsPlayer(): bool;
+    function IsCardMinimized(): bool;
 
     // ====
     function OnClick(SCard: TCard): integer;
@@ -75,14 +87,18 @@ type
     procedure ScaleAt(ds: real);
     procedure ReSetPosToMode(ScaleModeIndex: integer);
 
+    procedure CardCreate(Position: TPosition; IsPlayer: bool;
+      Difficult: integer);
     Constructor Create(Position: TPosition; IsPlayer: bool;
       Difficult: integer); overload;
+    Constructor Create(Position: TPosition; IsPlayer: bool; Difficult: integer;
+      CardGen: TCardGen); overload;
     // Destructor  Destroy;
   end;
 
 implementation
 
-uses Game;
+uses Game, MainScreen;
 
 procedure TCard.SetPosition(Position: TPosition);
 begin
@@ -125,6 +141,12 @@ begin
   IsCurCardIsPlayer := IsCurCardIsPlayer;
 end;
 
+function TCard.IsCardMinimized(): bool;
+begin
+  IsCardMinimized := IsMinimized;
+
+end;
+
 // ====
 function TCard.OnClick(SCard: TCard): integer;
 // var
@@ -143,32 +165,24 @@ begin
   //
 end;
 
-Constructor TCard.Create(Position: TPosition; IsPlayer: bool;
+procedure TCard.CardCreate(Position: TPosition; IsPlayer: bool;
   Difficult: integer);
 var
   RndMin, RndMax: integer;
 begin
-
-  IsCardIsPlayer := IsPlayer;
-  Self.ItemIndex := GenerateItemIndex(Difficult);
-
-  Self.Position := Position;
-
-
-
   if IsCardIsPlayer then
-    begin
-      BorderIndex := 1;
-      Self.Value := 10;
-    end
+  begin
+    BorderIndex := 1;
+    Self.Value := 10;
+  end
   else
   begin
 
-  RndMin := Round(sqrt(1 + (0.05 + Difficult / 100  ) * power(ItemIndex, 2.5)) +
-    Difficult div 2);
-  RndMax := Round(sqrt(3 + (0.1  + Difficult / 100) * power(ItemIndex, 2.5)) + 2
-    + Difficult);
-  Self.Value := Rnd(RndMin, RndMax);
+    RndMin := Round(sqrt(1 + (0.05 + Difficult / 100) * power(ItemIndex, 2.5)) +
+      Difficult div 2);
+    RndMax := Round(sqrt(3 + (0.1 + Difficult / 100) * power(ItemIndex, 2.5)) +
+      2 + Difficult);
+    Self.Value := Rnd(RndMin, RndMax);
 
     BorderIndex := 0;
   end;
@@ -180,6 +194,32 @@ begin
   CreateHealthValueLabel();
 
   ReSetPosToMode(2);
+end;
+
+Constructor TCard.Create(Position: TPosition; IsPlayer: bool;
+  Difficult: integer);
+
+begin
+
+  IsCardIsPlayer := IsPlayer;
+  Self.ItemIndex := GenerateItemIndex(Difficult);
+
+  Self.Position := Position;
+
+  CardCreate(Position, IsPlayer, Difficult);
+
+end;
+
+Constructor TCard.Create(Position: TPosition; IsPlayer: bool;
+  Difficult: integer; CardGen: TCardGen);
+begin
+
+  Self.Position := Position;
+  IsCardIsPlayer := IsPlayer;
+  Self.ItemIndex := CardGen.ItemIndex;
+  Self.ItemType := CardGen.ItemType;
+
+  CardCreate(Position, IsPlayer, Difficult);
 end;
 
 procedure TCard.CreateImage(var Image: timage);
@@ -195,7 +235,7 @@ begin
   end;
 end;
 
-procedure TCard.CreateLabel(var Labeel: tlabel;mode : Integer);
+procedure TCard.CreateLabel(var Labeel: tlabel; mode: integer);
 begin
   with Labeel do
   begin
@@ -203,11 +243,11 @@ begin
     Parent := GameForm;
 
     if (mode = 0) then
-    Font.Color := RGB(222,185,56)
+      Font.Color := RGB(222, 185, 56)
     else
-    Font.Color := RGB(105,128,156);
+      Font.Color := RGB(105, 128, 156);
 
-    Visible := False;
+    Visible := false;
     Caption := IntToStr(Value);
     BringToFront;
   end;
@@ -269,22 +309,36 @@ end;
 
 procedure TCard.CreateValueLabel();
 begin
-  CreateLabel(ValueText,1);
+  CreateLabel(ValueText, 1);
   if (ItemType = TItemType.bonus) or (ItemType = TItemType.trap) then
-      begin
-        if not ((ItemIndex = 14) and (ItemType = TItemType.bonus)) then
-            ValueText.Visible := True;
-      end;
+  begin
+    if not((ItemIndex = 14) and (ItemType = TItemType.bonus)) then
+      ValueText.Visible := true;
+  end;
 end;
 
 procedure TCard.CreateHealthValueLabel();
 begin
-  CreateLabel(HealthValueText,0);
-  if (ItemType = TItemType.enemy) or IsCardIsPlayer  then
+  CreateLabel(HealthValueText, 0);
+  if (ItemType = TItemType.enemy) or IsCardIsPlayer then
     HealthValueText.Visible := true;
   if IsCardIsPlayer then
-    HealthValueText.Caption := IntToStr(Value) + '/10';
+    HealthValueText.Caption := IntToStr(Value) + '/' +
+      IntToStr(PLAYER_CARD_BASE_HEALTH + MainForm.GetSelectedPlayerIndex * 2);
 
+end;
+
+procedure TCard.ValueRefresh();
+begin
+
+  HealthValueText.Caption := IntToStr(Value);
+  if IsCardIsPlayer then
+  begin
+    HealthValueText.Caption := HealthValueText.Caption + '/' +
+      IntToStr(PLAYER_CARD_BASE_HEALTH + MainForm.GetSelectedPlayerIndex * 2);
+  end;
+
+  ValueText.Caption := IntToStr(Value);
 end;
 
 procedure TCard.ReScaleToNormal(var Image: timage);
@@ -313,7 +367,7 @@ begin
   end;
 end;
 
-procedure TCard.ReScaleLabelToNormal(var Labeel: tlabel; mode : Integer);
+procedure TCard.ReScaleLabelToNormal(var Labeel: tlabel; mode: integer);
 begin
   with Labeel do
   begin
@@ -321,10 +375,10 @@ begin
     // Height := SIZE_CARD_Y * iPercentage div 100;
     Font.Size := 10;
     Left := CardItemIm.Left + CardItemIm.Width div 10;
-  if mode = 0 then
-  Labeel.Top := CardItemIm.Top + CardItemIm.Height div 20
-  else
-  Labeel.Top := CardItemIm.Top + 8 * CardItemIm.Height div 10;
+    if mode = 0 then
+      Labeel.Top := CardItemIm.Top + CardItemIm.Height div 20
+    else
+      Labeel.Top := CardItemIm.Top + 8 * CardItemIm.Height div 10;
   end;
 end;
 
@@ -343,8 +397,8 @@ begin
   ScaleImageOn(CardBackIm, ds);
   ScaleImageOn(CardItemIm, ds);
   ScaleImageOn(CardBorderIm, ds);
-  ScaleLabelOn(HealthValueText, ds,0);
-  ScaleLabelOn(ValueText, ds,1);
+  ScaleLabelOn(HealthValueText, ds, 0);
+  ScaleLabelOn(ValueText, ds, 1);
 end;
 
 procedure TCard.ScaleAt(ds: real);
@@ -352,8 +406,8 @@ begin
   ScaleImageAt(CardBackIm, ds);
   ScaleImageAt(CardItemIm, ds);
   ScaleImageAt(CardBorderIm, ds + ds * 0.08);
-  ScaleLabelAt(HealthValueText, 0.1,0);
-  ScaleLabelAt(ValueText, 0.1,1);
+  ScaleLabelAt(HealthValueText, 0.1, 0);
+  ScaleLabelAt(ValueText, 0.1, 1);
 end;
 
 procedure TCard.ReSetPosToMode(ScaleModeIndex: integer);
@@ -364,8 +418,8 @@ begin
         ReScaleToNormal(CardBackIm);
         ReScaleToNormal(CardItemIm);
         ReScaleToNormal(CardBorderIm);
-        ReScaleLabelToNormal(HealthValueText,0);
-        ReScaleLabelToNormal(ValueText,1);
+        ReScaleLabelToNormal(HealthValueText, 0);
+        ReScaleLabelToNormal(ValueText, 1);
 
         ScaleImageOn(CardBorderIm, 1.08);
       end;
@@ -447,32 +501,32 @@ begin
   Labeel.Top := dy;
 end;
 
-procedure TCard.ScaleLabelOn(var Labeel: tlabel; ds: real; mode : Integer);
+procedure TCard.ScaleLabelOn(var Labeel: tlabel; ds: real; mode: integer);
 var
   wMultiple, hMultiple: integer;
 begin
-  wMultiple := round(ds*10);
+  wMultiple := Round(ds * 10);
   Labeel.Font.Size := wMultiple;
   Labeel.Left := CardItemIm.Left + CardItemIm.Width div 10;
   if mode = 0 then
-  Labeel.Top := CardItemIm.Top + CardItemIm.Height div 20
+    Labeel.Top := CardItemIm.Top + CardItemIm.Height div 20
   else
-  Labeel.Top := CardItemIm.Top + 9 * CardItemIm.Height div 10;
+    Labeel.Top := CardItemIm.Top + 9 * CardItemIm.Height div 10;
 
   Labeel.BringToFront;
-  end;
+end;
 
-procedure TCard.ScaleLabelAt(var Labeel: tlabel; ds: real; mode : Integer);
+procedure TCard.ScaleLabelAt(var Labeel: tlabel; ds: real; mode: integer);
 var
   wMultiple, hMultiple: integer;
 begin
-  wMultiple := round(ds*10);
+  wMultiple := Round(ds * 10);
   Labeel.Font.Size := wMultiple;
   Labeel.Left := CardItemIm.Left + CardItemIm.Width div 10;
   if mode = 0 then
-  Labeel.Top := CardItemIm.Top + CardItemIm.Height div 20
+    Labeel.Top := CardItemIm.Top + CardItemIm.Height div 20
   else
-  Labeel.Top := CardItemIm.Top + 9 * CardItemIm.Height div 10;
+    Labeel.Top := CardItemIm.Top + 9 * CardItemIm.Height div 10;
   Labeel.BringToFront;
 end;
 
@@ -494,12 +548,18 @@ begin
   CardItemIm.Picture.Bitmap := CardStat.CardItemIm.Picture.Bitmap;
   CardBorderIm.Picture.Bitmap := CardStat.CardBorderIm.Picture.Bitmap;
   Value := CardStat.Value;
+
   ValueText.Visible := CardStat.ValueText.Visible;
   HealthValueText.Visible := CardStat.HealthValueText.Visible;
   ValueText.Caption := CardStat.ValueText.Caption;
   HealthValueText.Caption := CardStat.HealthValueText.Caption;
   IsCardIsPlayer := CardStat.IsCardIsPlayer;
   CardBorderIm.Visible := IsCardIsPlayer;
+end;
+
+procedure TCard.SetMinimized(Min: bool);
+begin
+  IsMinimized := Min;
 end;
 
 function TCard.GetCardStat(): TCard;
@@ -510,20 +570,64 @@ end;
 procedure TCard.ImMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: integer);
 var
-  dx, dy: integer;
+  dx, dy, dHP: integer;
+  plP: TPosition;
 begin
   dx := Abs(FieldOfCards.GetPlayerPos.X - Position.X);
   dy := Abs(FieldOfCards.GetPlayerPos.Y - Position.Y);
+  plP := FieldOfCards.GetPlayerPos;
   if (((dx = 1) and (dy = 0)) or ((dx = 0) and (dy = 1))) and
     not FieldOfCards.IsCardAnimPlayed(3) then
   begin
     dx := Position.X - FieldOfCards.GetPlayerPos.X;
     dy := FieldOfCards.GetPlayerPos.Y - Position.Y;
 
+    if FieldOfCards.GetFieldOfCards[FieldOfCards.GetPlayerPos.X,
+      FieldOfCards.GetPlayerPos.Y].Value <= 0 then
+    begin
+      Msg('u ded lol');
+      exit;
+    end;
+
+    case ItemType of
+      nothing:
+        ;
+      bonus:
+        if (BonusPick(Position) = 1) then
+          exit;
+      enemy:
+        begin
+          dHP := ChangeHealhOn(-Value);
+          if (dHP > 0) then
+          begin
+            Value := dHP;
+            FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
+            ValueRefresh;
+            Msg('ded');
+            exit;
+          end;
+          if dHP = -1 then
+          begin
+            FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
+            Msg('ded');
+          end;
+        end;
+
+      trap:
+        begin
+          if (isTrapsFacing(Position) = -1) or (isTrapsFacing(Position) = 1)
+          then
+            exit;
+
+        end;
+    end;
+    FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
+    ValueRefresh;
+
     FieldOfCards.ToggleAnimOn(3, FieldOfCards.GetPlayerPos.X,
       FieldOfCards.GetPlayerPos.Y, CoordToVector(CTP(dx, dy)));
     FieldOfCards.ToggleAnimOn(1, Position.X, Position.Y);
-     ///lol
+
   end;
 end;
 
@@ -586,6 +690,110 @@ begin
 
   end;
 
+end;
+
+function TCard.ChangeHealhOn(Value: integer): integer;
+var
+  plP: TPosition;
+  dVal, maxHealth: integer;
+begin
+  plP := FieldOfCards.GetPlayerPos;
+  dVal := FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value + Value;
+  maxHealth := (PLAYER_CARD_BASE_HEALTH + MainForm.GetSelectedPlayerIndex * 2);
+  if (dVal > 0) and (dVal <= maxHealth) then
+  begin
+    FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value := dVal;
+    ChangeHealhOn := 0;
+
+  end
+  else if (dVal <= 0) then
+  begin
+    ChangeHealhOn := -(FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value
+      + Value);
+    if -(FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value + Value) = 0 then
+      ChangeHealhOn := -1;
+
+    FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value := 0;
+
+  end
+  else if (dVal > maxHealth) then
+  begin
+    FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value := maxHealth;
+    ChangeHealhOn := 0;
+
+  end;
+
+end;
+
+function TCard.isTrapsFacing(trapP: TPosition): integer;
+var
+  plP: TPosition;
+  vectorTo, trapCardIndex: integer;
+begin
+  plP := FieldOfCards.GetPlayerPos;
+  vectorTo := CoordToVector(CTP(plP.X - trapP.X, plP.Y - trapP.Y));
+  trapCardIndex := FieldOfCards.GetFieldOfCards[trapP.X, trapP.Y].ItemIndex;
+
+  isTrapsFacing := TrapsFacingStats[trapCardIndex, vectorTo];
+end;
+
+function TCard.CardLootGen(KilledCard: TCardGen): TCardGen;
+var
+  LootGenCard: TCardGen;
+begin
+  if (KilledCard.ItemType = bonus) and
+    (KilledCard.ItemIndex = COUNT_OF_BONUS_CARDS) then
+  begin
+    LootGenCard.ItemType := TItemType.bonus;
+    LootGenCard.ItemIndex := Rnd(1, COUNT_OF_BONUS_CARDS - 1);
+  end;
+  if (KilledCard.ItemType = enemy) then
+  begin
+    LootGenCard.ItemType := TItemType.bonus;
+    LootGenCard.ItemIndex := Rnd(1, 3, 2, 2);
+  end;
+
+end;
+
+function TCard.BonusPick(BonusItemPos: TPosition): integer;
+var
+  BonusItemCard: TCard;
+  CardGen: TCardGen;
+  ChangeAnsw: integer;
+begin
+  BonusItemCard := FieldOfCards.GetFieldOfCards[BonusItemPos.X, BonusItemPos.Y];
+  CardGen.ItemType := BonusItemCard.ItemType;
+  CardGen.ItemIndex := BonusItemCard.ItemIndex;
+
+  case BonusTypesStats[BonusItemCard.ItemIndex] of
+    - 1:
+      begin
+        ChangeAnsw := ChangeHealhOn(-BonusItemCard.Value);
+        BonusPick := 0;
+      end;
+    0:
+      begin
+        Msg('money +' + IntToStr(BonusItemCard.Value));
+        BonusPick := 0;
+      end;
+    1:
+      begin
+        ChangeAnsw := ChangeHealhOn(BonusItemCard.Value);
+        BonusPick := 0;
+      end;
+    2:
+      begin
+        Msg('+wep');
+        BonusPick := 0;
+      end;
+    3:
+      begin
+        FieldOfCards.ToggleAnimOn(5, BonusItemPos.X, BonusItemPos.Y,
+          CGTDT(CardLootGen(CardGen)));
+        BonusPick := 1;
+      end;
+
+  end;
 end;
 
 procedure TCard.ImMouseUp(Sender: TObject; Button: TMouseButton;

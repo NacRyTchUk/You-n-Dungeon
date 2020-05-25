@@ -6,10 +6,8 @@ uses Dialogs, System.SysUtils, TPositionLib, Forms, nicestuff;
 
 
 var
-  BonusCardsStats : array[0..COUNT_OF_BONUS_CARDS] of TCardStat;
-  EnemyCardsStats : array[0..COUNT_OF_ENEMIES] of TCardStat;
-  TrapsCardsStats : array[0..COUNT_OF_TRAPS] of TCardStat;
-
+  TrapsFacingStats : array[0..COUNT_OF_TRAPS,1..4] of Integer;
+  BonusTypesStats : array[0..COUNT_OF_BONUS_CARDS] of Integer;
 const
   CHANCE_TRASH = 40;
   CHANCE_COMMON = 20;
@@ -27,117 +25,153 @@ implementation
 
 
 procedure InitCardStat();
+var
+  ItemId : Integer;
 begin
-  with BonusCardsStats[1] do
-  begin
-    CardIndex := 1;
-    CardName := 'Coin';
-    CardType := TItemType.bonus;
-    CardWeight := CHANCE_BASE;
+///Oooooooohh shit...
+ItemId := 0;
+TrapsFacingStats[ItemId,1] := 0;
+TrapsFacingStats[ItemId,2] := 0;
+TrapsFacingStats[ItemId,3] := 0;
+TrapsFacingStats[ItemId,4] := 0;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 1;
+TrapsFacingStats[ItemId,2] := 1;
+TrapsFacingStats[ItemId,3] := 1;
+TrapsFacingStats[ItemId,4] := 0;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 1;
+TrapsFacingStats[ItemId,2] := 0;
+TrapsFacingStats[ItemId,3] := 1;
+TrapsFacingStats[ItemId,4] := 1;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 1;
+TrapsFacingStats[ItemId,2] := 1;
+TrapsFacingStats[ItemId,3] := 0;
+TrapsFacingStats[ItemId,4] := 1;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 0;
+TrapsFacingStats[ItemId,2] := 1;
+TrapsFacingStats[ItemId,3] := 1;
+TrapsFacingStats[ItemId,4] := 1;
+
+Inc(ItemId);                    //5
+TrapsFacingStats[ItemId,1] := 1;
+TrapsFacingStats[ItemId,2] := 0;
+TrapsFacingStats[ItemId,3] := 0;
+TrapsFacingStats[ItemId,4] := 1;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 0;
+TrapsFacingStats[ItemId,2] := 0;
+TrapsFacingStats[ItemId,3] := 1;
+TrapsFacingStats[ItemId,4] := 1;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 0;
+TrapsFacingStats[ItemId,2] := 1;
+TrapsFacingStats[ItemId,3] := 1;
+TrapsFacingStats[ItemId,4] := 0;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 1;
+TrapsFacingStats[ItemId,2] := 1;
+TrapsFacingStats[ItemId,3] := 0;
+TrapsFacingStats[ItemId,4] := 0;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 0;
+TrapsFacingStats[ItemId,2] := 1;
+TrapsFacingStats[ItemId,3] := 0;
+TrapsFacingStats[ItemId,4] := 1;
+
+Inc(ItemId);                     //10
+TrapsFacingStats[ItemId,1] := -1;
+TrapsFacingStats[ItemId,2] := -1;
+TrapsFacingStats[ItemId,3] := -1;
+TrapsFacingStats[ItemId,4] := -1;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 1;
+TrapsFacingStats[ItemId,2] := 0;
+TrapsFacingStats[ItemId,3] := 1;
+TrapsFacingStats[ItemId,4] := 0;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 1;
+TrapsFacingStats[ItemId,2] := 1;
+TrapsFacingStats[ItemId,3] := 1;
+TrapsFacingStats[ItemId,4] := 1;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 0;
+TrapsFacingStats[ItemId,2] := 0;
+TrapsFacingStats[ItemId,3] := 0;
+TrapsFacingStats[ItemId,4] := 0;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 0;
+TrapsFacingStats[ItemId,2] := 1;
+TrapsFacingStats[ItemId,3] := 0;
+TrapsFacingStats[ItemId,4] := 0;
+
+Inc(ItemId);                    //15
+TrapsFacingStats[ItemId,1] := 1;
+TrapsFacingStats[ItemId,2] := 0;
+TrapsFacingStats[ItemId,3] := 0;
+TrapsFacingStats[ItemId,4] := 0;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 0;
+TrapsFacingStats[ItemId,2] := 0;
+TrapsFacingStats[ItemId,3] := 1;
+TrapsFacingStats[ItemId,4] := 0;
+
+Inc(ItemId);
+TrapsFacingStats[ItemId,1] := 0;
+TrapsFacingStats[ItemId,2] := 0;
+TrapsFacingStats[ItemId,3] := 0;
+TrapsFacingStats[ItemId,4] := 1;
 
 
-    HaveAValue := true;
-    ValueType := 'B';
-    BaseValue :=  3;
-    ValueRange := 2;
-    Increaseable := True;
-    IncValue := 2;
+////////////////////////////////////////
 
-    OneClick := True;
-  end;
+ItemId := 0;
 
-  with BonusCardsStats[2] do
-  begin
-    CardIndex := 2;
-    CardName := 'Ruby';
-    CardType := TItemType.bonus;
-    CardWeight := CHANCE_RARE;
-
-
-    HaveAValue := true;
-    ValueType := 'B';
-    BaseValue :=  6;
-    ValueRange := 5;
-    Increaseable := True;
-    IncValue := 5;
-
-    OneClick := True;
-  end;
-
-
-
-
-
-
-
-
-  with EnemyCardsStats[1] do
-  begin
-    CardIndex := 1;
-    CardName := 'Mouse';
-    CardType := TItemType.enemy;
-    CardWeight := CHANCE_BASE;
+Inc(ItemId);
+BonusTypesStats[ItemId] := 0;
+Inc(ItemId);
+BonusTypesStats[ItemId] := 1;
+Inc(ItemId);
+BonusTypesStats[ItemId] := 0;
+Inc(ItemId);
+BonusTypesStats[ItemId] := -1;
+Inc(ItemId);
+BonusTypesStats[ItemId] := 2;
+Inc(ItemId);
+BonusTypesStats[ItemId] := 2;
+Inc(ItemId);
+BonusTypesStats[ItemId] := 2;
+Inc(ItemId);
+BonusTypesStats[ItemId] := 2;
+Inc(ItemId);
+BonusTypesStats[ItemId] := -1;
+Inc(ItemId);
+BonusTypesStats[ItemId] := 1;
+Inc(ItemId);
+BonusTypesStats[ItemId] := 2;
+Inc(ItemId);
+BonusTypesStats[ItemId] := 2;
+Inc(ItemId);
+BonusTypesStats[ItemId] := 2;
+Inc(ItemId);
+BonusTypesStats[ItemId] := 3;
 
 
-    HaveAValue := true;
-    ValueType := 'H';
-    BaseValue :=  3;
-    ValueRange := 2;
-    Increaseable := True;
-    IncValue := 2;
-    DropCoin := true;
-
-  end;
-
-
-
-    {
-
-
-    CardName: string;
-    CardType: TItemType;
-    CardIndex: integer;
-    CardWeight : Integer;
-
-    MinDifToBe: integer;
-
-    HaveAValue: Boolean;
-    ValueType: string;
-    BaseValue: integer;
-    ValueRange: integer;
-    Increaseable: Boolean;
-    IncValue: integer;
-
-    ReplaceACard: Boolean;
-    ReplacebleCardIndex: integer;
-    DropCoin: Boolean;
-    isSwapable: Boolean;
-    DontNeedbeNear: Boolean;
-    EventCard: Boolean;
-    OneClick : Boolean;
-
-    }
-
-
-
-
-  with TrapsCardsStats[1] do
-  begin
-    CardIndex := 1;
-    CardName := 'Coin';
-    CardType := TItemType.bonus;
-    CardWeight := CHANCE_BASE;
-
-
-    HaveAValue := true;
-    ValueType := 'B';
-    BaseValue :=  3;
-    ValueRange := 2;
-    Increaseable := True;
-    IncValue := 2;
-
-    OneClick := True;
-  end;
 
 end;
 
