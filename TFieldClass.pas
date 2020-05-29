@@ -23,6 +23,7 @@ type
     FieldOfCards: TFieldOfCards;
     BufferCard: TCard;
     BaseDifficult: integer;
+    RecivedMoney: integer;
 
     CardAnimState: array [0 .. CARD_ANIM_COUNT] of bool;
     CardAnimStage: array [0 .. CARD_ANIM_COUNT] of integer;
@@ -33,10 +34,12 @@ type
   public
 
     procedure SetFieldVisible(isVisible: bool);
+    procedure AddMoneyOn(count: integer);
 
     function GetFieldSize(): TPosition;
     function GetPlayerPos(): TPosition;
     function GetFieldOfCards(): TFieldOfCards;
+    function GetMoneyRecived(): Integer;
     function IsCardAnimPlayed(): bool; overload;
     function IsCardAnimPlayed(AnimIndex: integer): bool; overload;
 
@@ -70,6 +73,12 @@ function TField.GetFieldOfCards(): TFieldOfCards;
 begin
   GetFieldOfCards := FieldOfCards;
 end;
+
+
+    function TField.GetMoneyRecived(): Integer;
+    begin
+      GetMoneyRecived := RecivedMoney;
+    end;
 
 Constructor TField.Create(BaseDifficult: integer);
 var
@@ -145,9 +154,8 @@ begin
   if CardAnimState[4] then
     PlayAnim_FieldSizeIn();
   if CardAnimState[5] then
-      PlayAnim_ChangeCard(CardAnimIndex[5, 1], CardAnimIndex[5, 2],
+    PlayAnim_ChangeCard(CardAnimIndex[5, 1], CardAnimIndex[5, 2],
       CardAnimIndex[5, 3]);
-
 
 end;
 
@@ -168,7 +176,7 @@ begin
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
-    FieldOfCards[x,y].SetMinimized(true);
+    FieldOfCards[x, y].SetMinimized(true);
   end;
 end;
 
@@ -188,7 +196,7 @@ begin
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
-    FieldOfCards[x,y].SetMinimized(false);
+    FieldOfCards[x, y].SetMinimized(false);
     FieldOfCards[x, y].ReSetPosToMode(1);
   end;
 end;
@@ -273,27 +281,32 @@ const
   FrameAmount = 6;
   AnimID = 5;
 var
-  ChangeCardStat : TCardGen;
+  ChangeCardStat: TCardGen;
 begin
 
   if AnimProc(AnimID, OneStageStepsAmount) then
     exit;
 
-    if CardAnimFrame[AnimID] >= FrameAmount then
+  if CardAnimFrame[AnimID] >= FrameAmount then
   begin
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
   end;
 
-  if (IsCardAnimPlayed(2) = False) and (FieldOfCards[x,y].IsCardMinimized) then
+  if (IsCardAnimPlayed(2) = false) and (FieldOfCards[x, y].IsCardMinimized) then
   begin
     case (data mod 10) of
-      1 : ChangeCardStat.ItemType := TItemType.nothing;
-      2 : ChangeCardStat.ItemType := TItemType.bonus;
-      3 : ChangeCardStat.ItemType := TItemType.enemy;
-      4 : ChangeCardStat.ItemType := TItemType.trap;
-      else msg('replace anim err');
+      1:
+        ChangeCardStat.ItemType := TItemType.nothing;
+      2:
+        ChangeCardStat.ItemType := TItemType.bonus;
+      3:
+        ChangeCardStat.ItemType := TItemType.enemy;
+      4:
+        ChangeCardStat.ItemType := TItemType.trap;
+    else
+      msg('replace anim err');
     end;
     ChangeCardStat.ItemIndex := data div 10;
     FieldOfCards[x, y].Create(CTP(x, y), false, BaseDifficult, ChangeCardStat);
@@ -303,7 +316,8 @@ begin
     exit;
   end;
 
-  if (IsCardAnimPlayed(1) = False) and (not FieldOfCards[x,y].IsCardMinimized) then
+  if (IsCardAnimPlayed(1) = false) and (not FieldOfCards[x, y].IsCardMinimized)
+  then
   begin
     ToggleAnimOn(1, x, y);
     exit;
@@ -341,6 +355,11 @@ begin
     begin
       FieldOfCards[i, j].SetVisible(isVisible);
     end;
+end;
+
+procedure TField.AddMoneyOn(count: integer);
+begin
+  RecivedMoney := RecivedMoney + count;
 end;
 
 end.

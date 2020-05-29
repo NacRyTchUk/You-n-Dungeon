@@ -662,6 +662,10 @@ begin
     FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
     ValueRefresh;
 
+    if (ItemType = TItemType.bonus) and ((ItemIndex = 1) or (ItemIndex = 4)) then
+    FieldOfCards.AddMoneyOn(Value);
+
+
     FieldOfCards.ToggleAnimOn(3, FieldOfCards.GetPlayerPos.X,
       FieldOfCards.GetPlayerPos.Y, CoordToVector(CTP(dx, dy)));
     FieldOfCards.ToggleAnimOn(1, Position.X, Position.Y);

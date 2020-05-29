@@ -1003,15 +1003,15 @@ object MainForm: TMainForm
     Caption = #1043#1077#1088#1086#1081
   end
   object AbilityLabel: TLabel
-    Left = 474
+    Left = 502
     Top = 176
-    Width = 77
+    Width = 38
     Height = 16
     Anchors = [akTop, akRight]
-    Caption = #1057#1087#1086#1089#1086#1073#1085#1086#1089#1090#1100
+    Caption = #1053#1072#1074#1099#1082
   end
   object CoinImage: TImage
-    Left = 404
+    Left = 420
     Top = 142
     Width = 28
     Height = 28
@@ -1031,8 +1031,8 @@ object MainForm: TMainForm
     Stretch = True
   end
   object CoinCountLabel: TLabel
-    Left = 438
-    Top = 145
+    Left = 454
+    Top = 146
     Width = 21
     Height = 16
     Anchors = [akLeft, akTop, akBottom]

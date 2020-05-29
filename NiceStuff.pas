@@ -10,6 +10,8 @@ type
 type
   TItemType = (nothing, bonus, enemy, trap);
 
+
+
 type
   TCardStat = record
     CardName: string;
@@ -54,6 +56,14 @@ type
   CardGenData : TCardGen;
   end;
 
+
+type
+  TSaveData = record
+  Money : Integer;
+  HeroSelected : Integer;
+  AbilitySelected : Integer;
+  end;
+
 procedure Msg(text: string); overload;
 procedure Msg(numb: integer); overload;
 function tStr(i: integer): string;
@@ -68,6 +78,11 @@ function Rnd(max: integer): integer; overload;
 function Rnd(min, max, wmin, wmax: integer): integer; overload;
 function RndWWeight(var weight: array of integer): integer;
 function CGTDT(CardGen : TCardGen) : Integer;
+
+procedure SaveGameData();  overload;
+procedure SaveGameData(path : string); overload;
+procedure LoadGameDataFrom(); overload;
+procedure LoadGameDataFrom(path : string); overload;
 
 const
   MinimizeWinWight = 896;
@@ -252,5 +267,30 @@ case CardGen.ItemType of
 end;
 CGTDT := data;
 end;
+
+
+
+
+
+procedure SaveGameData();
+begin
+//
+end;
+
+procedure SaveGameData(path : string);
+begin
+//
+end;
+
+procedure LoadGameDataFrom();
+begin
+//
+end;
+
+procedure LoadGameDataFrom(path : string);
+begin
+//
+end;
+
 
 end.

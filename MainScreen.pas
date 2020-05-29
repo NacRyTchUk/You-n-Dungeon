@@ -65,6 +65,7 @@ type
 
 var
   MainForm: TMainForm;
+  GameData : TSaveData;
 
 implementation
 
@@ -129,6 +130,7 @@ procedure TMainForm.FormCreate(Sender: TObject);
 begin
   InitForm(self);
   MainForm.font.Color := RGB(222, 185, 56);
+
 end;
 
 procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
@@ -148,6 +150,7 @@ end;
 procedure TMainForm.FormShow(Sender: TObject);
 begin
   // BackGroundForm.Show();
+  CoinCountLabel.Caption := IntToStr(GameData.Money);
   AbilityLabel.Width := 200;
   AbilityLabel.Height := 200;
   HeroLabel.Width := 200;

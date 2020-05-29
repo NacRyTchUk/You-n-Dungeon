@@ -24,6 +24,8 @@ type
     CardEnemyImageList: TImageList;
     CardBonusImageList: TImageList;
     CardTrapsImageList: TImageList;
+    CoinImage: TImage;
+    CoinCountLabel: TLabel;
     procedure BackBtnImageClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
@@ -53,7 +55,7 @@ uses mainscreen, BackGround;
 
 procedure TGameForm.BackBtnImageClick(Sender: TObject);
 begin
-
+  GameData.Money := GameData.Money + FieldOfCards.GetMoneyRecived;
   MainForm.Show();
   GameForm.free;
 end;
@@ -96,6 +98,8 @@ procedure TGameForm.FormShow(Sender: TObject);
 begin
 InitForm(self);
 FieldOfCards := TField.Create(BaseDifficult);
+
+font.Color := RGB(222, 185, 56);
 end;
 
 
