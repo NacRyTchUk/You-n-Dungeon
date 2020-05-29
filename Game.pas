@@ -79,7 +79,7 @@ end;
 procedure TGameForm.Button2Click(Sender: TObject);
 begin
 
-FieldOfCards.ToggleAnimOn(5,2,2,11);
+FieldOfCards.ToggleAnimOn(5,2,2,142);
 
 
 end;

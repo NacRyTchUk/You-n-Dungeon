@@ -147,6 +147,8 @@ BonusTypesStats[ItemId] := 0;
 Inc(ItemId);
 BonusTypesStats[ItemId] := 1;
 Inc(ItemId);
+BonusTypesStats[ItemId] := 3;
+Inc(ItemId);
 BonusTypesStats[ItemId] := 0;
 Inc(ItemId);
 BonusTypesStats[ItemId] := -1;
@@ -168,8 +170,7 @@ Inc(ItemId);
 BonusTypesStats[ItemId] := 2;
 Inc(ItemId);
 BonusTypesStats[ItemId] := 2;
-Inc(ItemId);
-BonusTypesStats[ItemId] := 3;
+
 
 
 

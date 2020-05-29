@@ -88,9 +88,10 @@ const
   COUNTS_OF_CARDS = COUNT_OF_BONUS_CARDS + COUNT_OF_ENEMIES + COUNT_OF_TRAPS;
 
   CHANCE_OF_NOTHING = 5;
-  CHANCE_OF_BONUS = 20;
+  CHANCE_OF_BONUS = 40;
   CHANCE_OF_ENEMIES = 60;
   CHANCE_OF_TRAPS = 15;
+  CHEST_INDEX = 3;
 
   CARD_ANIM_COUNT = 5;
 
@@ -241,7 +242,7 @@ function CGTDT(CardGen : TCardGen) : Integer;
 var
   data : Integer;
 begin
-
+data := 0;
 data := CardGen.ItemIndex*10;
 case CardGen.ItemType of
   nothing: data := data + 1;

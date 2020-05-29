@@ -54,6 +54,9 @@ type
       Shift: TShiftState; X, Y: integer);
     procedure ImMouseEnter(Sender: TObject);
     procedure ImMouseLeave(Sender: TObject);
+    procedure DeadMessageShow(mode: integer);
+
+    function IsDeadAfterDamage(Damage: integer): bool;
 
     function GenerateItemIndex(Difficult: integer): integer;
 
@@ -184,6 +187,9 @@ begin
       2 + Difficult);
     Self.Value := Rnd(RndMin, RndMax);
 
+    if (ItemType = TItemType.bonus) and (ItemIndex = 3) then
+      Self.Value := Self.Value * 2;
+
     BorderIndex := 0;
   end;
 
@@ -192,7 +198,7 @@ begin
   CreateItemImage();
   CreateValueLabel();
   CreateHealthValueLabel();
-
+  ValueRefresh;
   ReSetPosToMode(2);
 end;
 
@@ -219,7 +225,11 @@ begin
   Self.ItemIndex := CardGen.ItemIndex;
   Self.ItemType := CardGen.ItemType;
 
+  if (ItemType = TItemType.bonus) then
+    Value := Round(Value * Rnd(15, 20) / 10);
+
   CardCreate(Position, IsPlayer, Difficult);
+
 end;
 
 procedure TCard.CreateImage(var Image: timage);
@@ -312,7 +322,7 @@ begin
   CreateLabel(ValueText, 1);
   if (ItemType = TItemType.bonus) or (ItemType = TItemType.trap) then
   begin
-    if not((ItemIndex = 14) and (ItemType = TItemType.bonus)) then
+    if not((ItemIndex = CHEST_INDEX) and (ItemType = TItemType.bonus)) then
       ValueText.Visible := true;
   end;
 end;
@@ -322,6 +332,8 @@ begin
   CreateLabel(HealthValueText, 0);
   if (ItemType = TItemType.enemy) or IsCardIsPlayer then
     HealthValueText.Visible := true;
+
+  HealthValueText.Caption := IntToStr(Value);
   if IsCardIsPlayer then
     HealthValueText.Caption := IntToStr(Value) + '/' +
       IntToStr(PLAYER_CARD_BASE_HEALTH + MainForm.GetSelectedPlayerIndex * 2);
@@ -336,6 +348,7 @@ begin
   begin
     HealthValueText.Caption := HealthValueText.Caption + '/' +
       IntToStr(PLAYER_CARD_BASE_HEALTH + MainForm.GetSelectedPlayerIndex * 2);
+
   end;
 
   ValueText.Caption := IntToStr(Value);
@@ -567,6 +580,37 @@ begin
   GetCardStat := Self;
 end;
 
+function TCard.IsDeadAfterDamage(Damage: integer): bool;
+var
+  dHP: integer;
+  plP: TPosition;
+begin
+  dHP := ChangeHealhOn(-Damage);
+  if (dHP > 0) then
+  begin
+    Value := dHP;
+    ValueRefresh;
+    IsDeadAfterDamage := true;
+    exit;
+  end;
+  if dHP = -1 then
+  begin
+    IsDeadAfterDamage := true;
+    exit;
+  end;
+  IsDeadAfterDamage := false;
+end;
+
+procedure TCard.DeadMessageShow(mode: integer);
+begin
+  case mode of
+    1:
+      msg('rip');
+    2:
+      msg('u ded lol');
+  end;
+end;
+
 procedure TCard.ImMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: integer);
 var
@@ -582,10 +626,9 @@ begin
     dx := Position.X - FieldOfCards.GetPlayerPos.X;
     dy := FieldOfCards.GetPlayerPos.Y - Position.Y;
 
-    if FieldOfCards.GetFieldOfCards[FieldOfCards.GetPlayerPos.X,
-      FieldOfCards.GetPlayerPos.Y].Value <= 0 then
+    if FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value <= 0 then
     begin
-      Msg('u ded lol');
+      DeadMessageShow(2);
       exit;
     end;
 
@@ -596,29 +639,24 @@ begin
         if (BonusPick(Position) = 1) then
           exit;
       enemy:
+        if IsDeadAfterDamage(Value) then
         begin
-          dHP := ChangeHealhOn(-Value);
-          if (dHP > 0) then
-          begin
-            Value := dHP;
-            FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
-            ValueRefresh;
-            Msg('ded');
-            exit;
-          end;
-          if dHP = -1 then
-          begin
-            FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
-            Msg('ded');
-          end;
+
+          FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
+          DeadMessageShow(1);
+          exit;
         end;
 
       trap:
         begin
-          if (isTrapsFacing(Position) = -1) or (isTrapsFacing(Position) = 1)
-          then
-            exit;
+          if (isTrapsFacing(Position) = 1) then
 
+            if IsDeadAfterDamage(Value) then
+            begin
+              FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
+              DeadMessageShow(1);
+              exit;
+            end;
         end;
     end;
     FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
@@ -673,19 +711,19 @@ begin
     else if (CO_EN <= randomR) and (randomR <= CO_TR) then
       ItemType := TItemType.trap
     else
-      Msg('rand ind err');
+      msg('rand ind err');
 
     case ItemType of
       nothing:
         GenerateItemIndex := 0;
       bonus:
-        GenerateItemIndex := Rnd(1, COUNT_OF_BONUS_CARDS);
+        GenerateItemIndex := Rnd(1, round(COUNT_OF_BONUS_CARDS * Difficult / 30) + 7);
       enemy:
-        GenerateItemIndex := Rnd(1, COUNT_OF_ENEMIES);
+        GenerateItemIndex := Rnd(1, COUNT_OF_ENEMIES - 15 + Difficult);
       trap:
         GenerateItemIndex := Rnd(1, COUNT_OF_TRAPS);
     else
-      Msg('rand ind err');
+      msg('rand ind err');
     end;
 
   end;
@@ -731,7 +769,7 @@ var
   vectorTo, trapCardIndex: integer;
 begin
   plP := FieldOfCards.GetPlayerPos;
-  vectorTo := CoordToVector(CTP(plP.X - trapP.X, plP.Y - trapP.Y));
+  vectorTo := CoordToVector(CTP(plP.X - trapP.X, trapP.Y - plP.Y));
   trapCardIndex := FieldOfCards.GetFieldOfCards[trapP.X, trapP.Y].ItemIndex;
 
   isTrapsFacing := TrapsFacingStats[trapCardIndex, vectorTo];
@@ -741,18 +779,18 @@ function TCard.CardLootGen(KilledCard: TCardGen): TCardGen;
 var
   LootGenCard: TCardGen;
 begin
-  if (KilledCard.ItemType = bonus) and
-    (KilledCard.ItemIndex = COUNT_OF_BONUS_CARDS) then
+  if (KilledCard.ItemType = TItemType.bonus) and
+    (KilledCard.ItemIndex = CHEST_INDEX) then
   begin
     LootGenCard.ItemType := TItemType.bonus;
-    LootGenCard.ItemIndex := Rnd(1, COUNT_OF_BONUS_CARDS - 1);
+    LootGenCard.ItemIndex := Rnd(1, COUNT_OF_BONUS_CARDS,CHEST_INDEX,CHEST_INDEX);
   end;
-  if (KilledCard.ItemType = enemy) then
+  if (KilledCard.ItemType = TItemType.enemy) then
   begin
     LootGenCard.ItemType := TItemType.bonus;
     LootGenCard.ItemIndex := Rnd(1, 3, 2, 2);
   end;
-
+  CardLootGen := LootGenCard;
 end;
 
 function TCard.BonusPick(BonusItemPos: TPosition): integer;
@@ -764,7 +802,6 @@ begin
   BonusItemCard := FieldOfCards.GetFieldOfCards[BonusItemPos.X, BonusItemPos.Y];
   CardGen.ItemType := BonusItemCard.ItemType;
   CardGen.ItemIndex := BonusItemCard.ItemIndex;
-
   case BonusTypesStats[BonusItemCard.ItemIndex] of
     - 1:
       begin
@@ -773,7 +810,6 @@ begin
       end;
     0:
       begin
-        Msg('money +' + IntToStr(BonusItemCard.Value));
         BonusPick := 0;
       end;
     1:
@@ -783,7 +819,6 @@ begin
       end;
     2:
       begin
-        Msg('+wep');
         BonusPick := 0;
       end;
     3:
