@@ -59,6 +59,8 @@ type
 
 implementation
 
+uses Game;
+
 function TField.GetFieldSize;
 begin
   GetFieldSize := Size;
@@ -360,6 +362,7 @@ end;
 procedure TField.AddMoneyOn(count: integer);
 begin
   RecivedMoney := RecivedMoney + count;
+  GameForm.CoinCountLabel.Caption :=  tStr(tInt(GameForm.CoinCountLabel.Caption) + count);
 end;
 
 end.

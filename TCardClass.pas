@@ -18,18 +18,21 @@ type
     CardBackIm: timage;
     CardItemIm: timage;
     CardBorderIm: timage;
+    CardPlayerItemIm: timage;
+
     HealthValueText: tlabel;
     ValueText: tlabel;
     IsCardIsPlayer: bool;
     Value: integer;
     HasAItem: integer;
-    ItemValue: integer;
+    PlayerItemValue: integer;
     IsMinimized: bool;
 
     procedure CreateImage(var Image: timage);
     procedure CreateBackImage();
     procedure CreateItemImage();
     procedure CreateBorderImage();
+    procedure CreatePlayerItemImage();
     procedure CreateLabel(var Labeel: tlabel; mode: integer);
     procedure CreateValueLabel();
     procedure CreateHealthValueLabel();
@@ -196,6 +199,8 @@ begin
   CreateBorderImage();
   CreateBackImage();
   CreateItemImage();
+  if IsCardIsPlayer then
+    CreatePlayerItemImage();
   CreateValueLabel();
   CreateHealthValueLabel();
   ValueRefresh;
@@ -317,6 +322,12 @@ begin
   GameForm.CardBorderList.GetBitmap(BorderIndex, CardBorderIm.Picture.Bitmap);
 end;
 
+procedure TCard.CreatePlayerItemImage();
+begin
+  CreateImage(CardPlayerItemIm);
+  ScaleImageAt(CardPlayerItemIm, 0);
+end;
+
 procedure TCard.CreateValueLabel();
 begin
   CreateLabel(ValueText, 1);
@@ -325,6 +336,8 @@ begin
     if not((ItemIndex = CHEST_INDEX) and (ItemType = TItemType.bonus)) then
       ValueText.Visible := true;
   end;
+
+
 end;
 
 procedure TCard.CreateHealthValueLabel();
@@ -344,14 +357,17 @@ procedure TCard.ValueRefresh();
 begin
 
   HealthValueText.Caption := IntToStr(Value);
+  ValueText.Caption := IntToStr(Value);
+
+  
   if IsCardIsPlayer then
   begin
+    ValueText.Visible := (HasAItem <> 0);
+    ValueText.Caption := IntToStr(PlayerItemValue);
+    
     HealthValueText.Caption := HealthValueText.Caption + '/' +
       IntToStr(PLAYER_CARD_BASE_HEALTH + MainForm.GetSelectedPlayerIndex * 2);
-
   end;
-
-  ValueText.Caption := IntToStr(Value);
 end;
 
 procedure TCard.ReScaleToNormal(var Image: timage);
@@ -410,6 +426,7 @@ begin
   ScaleImageOn(CardBackIm, ds);
   ScaleImageOn(CardItemIm, ds);
   ScaleImageOn(CardBorderIm, ds);
+  if IsCardIsPlayer then  ScaleImageOn(CardPlayerItemIm, ds);
   ScaleLabelOn(HealthValueText, ds, 0);
   ScaleLabelOn(ValueText, ds, 1);
 end;
@@ -419,6 +436,7 @@ begin
   ScaleImageAt(CardBackIm, ds);
   ScaleImageAt(CardItemIm, ds);
   ScaleImageAt(CardBorderIm, ds + ds * 0.08);
+  if IsCardIsPlayer then ScaleImageAt(CardPlayerItemIm, ds);
   ScaleLabelAt(HealthValueText, 0.1, 0);
   ScaleLabelAt(ValueText, 0.1, 1);
 end;
@@ -431,6 +449,8 @@ begin
         ReScaleToNormal(CardBackIm);
         ReScaleToNormal(CardItemIm);
         ReScaleToNormal(CardBorderIm);
+        if IsCardIsPlayer then
+          ReScaleToNormal(CardPlayerItemIm);
         ReScaleLabelToNormal(HealthValueText, 0);
         ReScaleLabelToNormal(ValueText, 1);
 
@@ -442,6 +462,8 @@ begin
         ReScaleToNone(CardBackIm);
         ReScaleToNone(CardItemIm);
         ReScaleToNone(CardBorderIm);
+        if IsCardIsPlayer then
+          ReScaleToNone(CardPlayerItemIm);
         ReScaleLabelToNone(HealthValueText);
         ReScaleLabelToNone(ValueText);
       end;
@@ -453,6 +475,8 @@ begin
   MoveImageOn(CardBackIm, dx, dy);
   MoveImageOn(CardItemIm, dx, dy);
   MoveImageOn(CardBorderIm, dx, dy);
+  if IsCardIsPlayer then
+    MoveImageOn(CardPlayerItemIm, dx, dy);
   MoveLabelOn(HealthValueText, dx, dy);
   MoveLabelOn(ValueText, dx, dy);
 end;
@@ -462,6 +486,8 @@ begin
   MoveImageAt(CardBackIm, dx, dy);
   MoveImageAt(CardItemIm, dx, dy);
   MoveImageAt(CardBorderIm, dx, dy);
+  if IsCardIsPlayer then
+    MoveImageAt(CardPlayerItemIm, dx, dy);
   MoveLabelAt(HealthValueText, dx, dy);
   MoveLabelAt(ValueText, dx, dy);
 end;
@@ -548,6 +574,8 @@ begin
   CardBackIm.Visible := isVisible;
   CardItemIm.Visible := isVisible;
   CardBorderIm.Visible := isVisible;
+  if IsCardIsPlayer then
+    CardPlayerItemIm.Visible := isVisible;
   HealthValueText.Visible := isVisible;
   ValueText.Visible := isVisible;
 end;
@@ -557,17 +585,27 @@ begin
   Position := CardStat.Position;
   BorderIndex := CardStat.BorderIndex;
   ItemIndex := CardStat.ItemIndex;
+  IsCardIsPlayer := CardStat.IsCardIsPlayer;
   CardBackIm.Picture.Bitmap := CardStat.CardBackIm.Picture.Bitmap;
   CardItemIm.Picture.Bitmap := CardStat.CardItemIm.Picture.Bitmap;
   CardBorderIm.Picture.Bitmap := CardStat.CardBorderIm.Picture.Bitmap;
   Value := CardStat.Value;
+  HasAItem := CardStat.HasAItem;
+  PlayerItemValue := CardStat.PlayerItemValue;
+  IsMinimized := CardStat.IsMinimized;
 
   ValueText.Visible := CardStat.ValueText.Visible;
   HealthValueText.Visible := CardStat.HealthValueText.Visible;
   ValueText.Caption := CardStat.ValueText.Caption;
   HealthValueText.Caption := CardStat.HealthValueText.Caption;
-  IsCardIsPlayer := CardStat.IsCardIsPlayer;
+
   CardBorderIm.Visible := IsCardIsPlayer;
+
+  if IsCardIsPlayer then
+    begin
+      CreateImage(CardPlayerItemIm);
+      CardPlayerItemIm.Picture.Bitmap := CardStat.CardPlayerItemIm.Picture.Bitmap;
+    end;
 end;
 
 procedure TCard.SetMinimized(Min: bool);
@@ -621,7 +659,7 @@ begin
   dy := Abs(FieldOfCards.GetPlayerPos.Y - Position.Y);
   plP := FieldOfCards.GetPlayerPos;
   if (((dx = 1) and (dy = 0)) or ((dx = 0) and (dy = 1))) and
-    not FieldOfCards.IsCardAnimPlayed(3) then
+    not FieldOfCards.IsCardAnimPlayed(3) and not IsCardIsPlayer then
   begin
     dx := Position.X - FieldOfCards.GetPlayerPos.X;
     dy := FieldOfCards.GetPlayerPos.Y - Position.Y;
@@ -662,9 +700,9 @@ begin
     FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
     ValueRefresh;
 
-    if (ItemType = TItemType.bonus) and ((ItemIndex = 1) or (ItemIndex = 4)) then
-    FieldOfCards.AddMoneyOn(Value);
-
+    if (ItemType = TItemType.bonus) and ((ItemIndex = 1) or (ItemIndex = 4))
+    then
+      FieldOfCards.AddMoneyOn(Value);
 
     FieldOfCards.ToggleAnimOn(3, FieldOfCards.GetPlayerPos.X,
       FieldOfCards.GetPlayerPos.Y, CoordToVector(CTP(dx, dy)));
@@ -721,7 +759,8 @@ begin
       nothing:
         GenerateItemIndex := 0;
       bonus:
-        GenerateItemIndex := Rnd(1, round(COUNT_OF_BONUS_CARDS * Difficult / 30) + 7);
+        GenerateItemIndex :=
+          Rnd(1, Round(COUNT_OF_BONUS_CARDS * Difficult / 30) + 7);
       enemy:
         GenerateItemIndex := Rnd(1, COUNT_OF_ENEMIES - 15 + Difficult);
       trap:
@@ -787,7 +826,8 @@ begin
     (KilledCard.ItemIndex = CHEST_INDEX) then
   begin
     LootGenCard.ItemType := TItemType.bonus;
-    LootGenCard.ItemIndex := Rnd(1, COUNT_OF_BONUS_CARDS,CHEST_INDEX,CHEST_INDEX);
+    LootGenCard.ItemIndex := Rnd(1, COUNT_OF_BONUS_CARDS, CHEST_INDEX,
+      CHEST_INDEX);
   end;
   if (KilledCard.ItemType = TItemType.enemy) then
   begin
@@ -802,14 +842,26 @@ var
   BonusItemCard: TCard;
   CardGen: TCardGen;
   ChangeAnsw: integer;
+  plP: TPosition;
 begin
   BonusItemCard := FieldOfCards.GetFieldOfCards[BonusItemPos.X, BonusItemPos.Y];
+  plP := FieldOfCards.GetPlayerPos;
   CardGen.ItemType := BonusItemCard.ItemType;
   CardGen.ItemIndex := BonusItemCard.ItemIndex;
   case BonusTypesStats[BonusItemCard.ItemIndex] of
     - 1:
       begin
-        ChangeAnsw := ChangeHealhOn(-BonusItemCard.Value);
+
+        if IsDeadAfterDamage(Value) then
+        begin
+
+          FieldOfCards.GetFieldOfCards[FieldOfCards.GetPlayerPos.X,
+            FieldOfCards.GetPlayerPos.Y].ValueRefresh;
+          DeadMessageShow(1);
+          ChangeAnsw := 0;
+        end
+        else
+          ChangeAnsw := 1;
         BonusPick := 0;
       end;
     0:
@@ -823,6 +875,10 @@ begin
       end;
     2:
       begin
+        FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem := ItemIndex;
+        FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue := Value;
+        msg(tStr(Value) + ' ' + tStr(ItemIndex));
+
         BonusPick := 0;
       end;
     3:
