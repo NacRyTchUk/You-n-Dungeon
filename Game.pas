@@ -26,6 +26,7 @@ type
     CardTrapsImageList: TImageList;
     CoinImage: TImage;
     CoinCountLabel: TLabel;
+    CardWeaponImageList: TImageList;
     procedure BackBtnImageClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
