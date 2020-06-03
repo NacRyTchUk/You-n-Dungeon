@@ -24,6 +24,7 @@ type
     BufferCard: TCard;
     BaseDifficult: integer;
     RecivedMoney: integer;
+    Steps: integer;
 
     CardAnimState: array [0 .. CARD_ANIM_COUNT] of bool;
     CardAnimStage: array [0 .. CARD_ANIM_COUNT] of integer;
@@ -39,7 +40,7 @@ type
     function GetFieldSize(): TPosition;
     function GetPlayerPos(): TPosition;
     function GetFieldOfCards(): TFieldOfCards;
-    function GetMoneyRecived(): Integer;
+    function GetMoneyRecived(): integer;
     function IsCardAnimPlayed(): bool; overload;
     function IsCardAnimPlayed(AnimIndex: integer): bool; overload;
 
@@ -52,14 +53,22 @@ type
     procedure PlayAnim_SlideFromTo(x, y, side: integer);
     procedure PlayAnim_FieldSizeIn();
     procedure PlayAnim_ChangeCard(x, y, data: integer);
+    procedure CheckForNoAnim();
+    function IsReloadTime(): bool;
 
-    Constructor Create(BaseDifficult: integer);
+    procedure BrokePlayerItem();
+    function SaveField(): TFieldOfCardSaveData;
+    procedure LoadField(LoadData: TFieldOfCardSaveData);
+
+    Constructor Create(BaseDifficult: integer); overload;
+    Constructor Create(BaseDifficult: integer;
+      LoadData: TFieldOfCardSaveData); overload;
     // Destructor  Destroy;
   end;
 
 implementation
 
-uses Game;
+uses Game, SelectDifficult;
 
 function TField.GetFieldSize;
 begin
@@ -76,11 +85,39 @@ begin
   GetFieldOfCards := FieldOfCards;
 end;
 
+function TField.GetMoneyRecived(): integer;
+begin
+  GetMoneyRecived := RecivedMoney;
+end;
 
-    function TField.GetMoneyRecived(): Integer;
+function TField.SaveField(): TFieldOfCardSaveData;
+var
+  i, j, x, y: integer;
+  cardisplayer: bool;
+  SaveData: TFieldOfCardSaveData;
+begin
+  SaveData.BaseDifficult := BaseDifficult;
+  SaveData.PlayerCard := PlayerCard;
+  SaveData.RecivedMoney := RecivedMoney;
+
+  for i := 0 to FIELD_SIZE_X - 1 do
+    for j := 0 to FIELD_SIZE_Y - 1 do
     begin
-      GetMoneyRecived := RecivedMoney;
+
+      SaveData.FieldOfCardsSaveData[i, j] := FieldOfCards[i, j].SaveCardData;
+      if SaveData.FieldOfCardsSaveData[i, j].IsCardIsPlayer then
+      begin
+        SaveData.PlayerCard := CTP(i, j);
+        SaveData.FieldOfCardsSaveData[i, j].Position := CTP(i, j);
+      end;
     end;
+  SaveField := SaveData;
+end;
+
+procedure TField.LoadField(LoadData: TFieldOfCardSaveData);
+begin
+  //
+end;
 
 Constructor TField.Create(BaseDifficult: integer);
 var
@@ -100,6 +137,26 @@ begin
         BaseDifficult);
     end;
   ToggleAnimOn(4);
+end;
+
+Constructor TField.Create(BaseDifficult: integer;
+  LoadData: TFieldOfCardSaveData);
+var
+  i, j, x, y: integer;
+  cardisplayer: bool;
+begin
+  Self.BaseDifficult := BaseDifficult;
+
+  PlayerCard := LoadData.PlayerCard;
+
+  Self.RecivedMoney := LoadData.RecivedMoney;
+  AddMoneyOn(0);
+
+  for i := 0 to FIELD_SIZE_X - 1 do
+    for j := 0 to FIELD_SIZE_Y - 1 do
+    begin
+      FieldOfCards[i, j] := TCard.Create(LoadData.FieldOfCardsSaveData[i, j]);
+    end;
 end;
 
 function TField.IsCardAnimPlayed(): bool;
@@ -178,6 +235,7 @@ begin
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
+    CheckForNoAnim;
     FieldOfCards[x, y].SetMinimized(true);
   end;
 end;
@@ -198,6 +256,7 @@ begin
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
+    CheckForNoAnim;
     FieldOfCards[x, y].SetMinimized(false);
     FieldOfCards[x, y].ReSetPosToMode(1);
   end;
@@ -238,13 +297,12 @@ begin
     FieldOfCards[PlayerCard.x, PlayerCard.y].SetCardStat(FieldOfCards[x, y]);
 
     FieldOfCards[x, y].SetVisible(false);
-
     FieldOfCards[x, y].Create(CTP(x, y), false, BaseDifficult);
     ToggleAnimOn(2, x, y);
-
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
+    CheckForNoAnim;
     // FieldOfCards[x, y].ReSetPosToMode(1);
   end;
 
@@ -270,7 +328,7 @@ begin
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
-
+    CheckForNoAnim;
     for x := 0 to FIELD_SIZE_X - 1 do
       for y := 0 to FIELD_SIZE_Y - 1 do
         FieldOfCards[x, y].ReSetPosToMode(1);
@@ -294,6 +352,7 @@ begin
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
+    CheckForNoAnim;
   end;
 
   if (IsCardAnimPlayed(2) = false) and (FieldOfCards[x, y].IsCardMinimized) then
@@ -326,15 +385,40 @@ begin
   end;
 end;
 
+procedure TField.CheckForNoAnim();
+var
+  i: integer;
+begin
+  for i := 1 to CARD_ANIM_COUNT do
+    if CardAnimState[i] then
+      exit;
+  CardAnimState[0] := false;
+end;
+
+function TField.IsReloadTime(): bool;
+begin
+  inc(Steps);
+  if Steps > COUNT_OF_STEPS_TO_RELOAD then
+  begin
+    IsReloadTime := true;
+    SelectDifficultForm.GameReload;
+    exit;
+  end;
+  IsReloadTime := false;
+
+end;
+
 function TField.AnimProc(AnimIndex, AnimSpeed: integer): bool;
 begin
+  CardAnimState[0] := true;
+
   if not IsCardAnimPlayed(AnimIndex) then
   begin
     AnimProc := true;
     exit;
   end;
 
-  Inc(CardAnimStage[AnimIndex]);
+  inc(CardAnimStage[AnimIndex]);
 
   if CardAnimStage[AnimIndex] < AnimSpeed then
   begin
@@ -343,7 +427,7 @@ begin
   end;
 
   CardAnimStage[AnimIndex] := 0;
-  Inc(CardAnimFrame[AnimIndex]);
+  inc(CardAnimFrame[AnimIndex]);
 
   AnimProc := false;
 end;
@@ -362,7 +446,14 @@ end;
 procedure TField.AddMoneyOn(count: integer);
 begin
   RecivedMoney := RecivedMoney + count;
-  GameForm.CoinCountLabel.Caption :=  tStr(tInt(GameForm.CoinCountLabel.Caption) + count);
+  GameForm.CoinCountLabel.Caption := tStr(RecivedMoney);
+end;
+
+procedure TField.BrokePlayerItem();
+begin
+
+  FieldOfCards[PlayerCard.x, PlayerCard.y].BrokeItem;
+  // FieldOfCards[PlayerCard.X, PlayerCard.Y].HasAItem := 0;
 end;
 
 end.

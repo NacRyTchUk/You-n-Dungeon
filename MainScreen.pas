@@ -8,7 +8,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
   Vcl.ExtCtrls, configurate, System.ImageList, Vcl.ImgList, Vcl.Imaging.jpeg,
   GifImg, SelectDifficult,
-  NiceStuff;
+  NiceStuff, Vcl.OleCtrls, SHDocVw;
 
 type
   TMainForm = class(TForm)
@@ -90,7 +90,7 @@ end;
 
 procedure TMainForm.AchiveBtnImageClick(Sender: TObject);
 begin
-  Msg('trophey');
+ // Msg('trophey');
 end;
 
 procedure TMainForm.AchiveBtnImageMouseEnter(Sender: TObject);
@@ -129,6 +129,8 @@ end;
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   InitForm(self);
+
+
   MainForm.font.Color := RGB(222, 185, 56);
 
 end;
@@ -136,6 +138,7 @@ end;
 procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+
   if Key = 27 then
     BackGroundForm.Close;
 end;

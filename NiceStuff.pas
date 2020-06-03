@@ -4,90 +4,6 @@ interface
 
 uses Dialogs, System.SysUtils, TPositionLib, Forms;
 
-type
-  TIndexOfCardMsg = (OK, OutOfBorder, FAIL);
-
-type
-  TItemType = (nothing, bonus, enemy, trap);
-
-
-
-type
-  TCardStat = record
-    CardName: string;
-    CardType: TItemType;
-    CardIndex: integer;
-    CardWeight : Integer;
-
-    MinDifToBe: integer;
-
-    HaveAValue: Boolean;
-    ValueType: string;
-    BaseValue: integer;
-    ValueRange: integer;
-    Increaseable: Boolean;
-    IncValue: integer;
-
-    ReplaceACard: Boolean;
-    ReplacebleCardIndex: integer;
-    DropCoin: Boolean;
-    isSwapable: Boolean;
-    DontNeedbeNear: Boolean;
-    EventCard: Boolean;
-    OneClick : Boolean;
-
-  end;
-
-type
-  TPosition = record
-    X: integer;
-    Y: integer;
-  end;
-
-type
-  TCardGen = record
-    ItemType : TItemType;
-    ItemIndex : Integer;
-  end;
-
-type
-  TCardSendingData = record
-  IntData : Integer;
-  CardGenData : TCardGen;
-  end;
-
-
-type
-  TSaveData = record
-  Money : Integer;
-  HeroSelected : Integer;
-  AbilitySelected : Integer;
-  end;
-
-procedure Msg(text: string); overload;
-procedure Msg(numb: integer); overload;
-function tStr(i: integer): string;
-function tInt(s: string): integer;
-function CTP(X, Y: integer): TPosition;
-procedure ReSizeResolution(oForm: TForm);
-procedure InitForm(oForm: TForm);
-function CoordToVector(Coord: TPosition): integer;
-function VectorToCoord(vector: integer): TPosition;
-function Rnd(min, max: integer): integer; overload;
-function Rnd(max: integer): integer; overload;
-function Rnd(min, max, wmin, wmax: integer): integer; overload;
-function RndWWeight(var weight: array of integer): integer;
-function CGTDT(CardGen : TCardGen) : Integer;
-
-procedure SaveGameData();  overload;
-procedure SaveGameData(path : string); overload;
-procedure LoadGameDataFrom(); overload;
-procedure LoadGameDataFrom(path : string); overload;
-
-const
-  MinimizeWinWight = 896;
-  MinimizeWinHeight = 504;
-
 const
   SIZE_SPACE = 14;
   SIZE_CARD_X = 110;
@@ -110,7 +26,114 @@ const
 
   CARD_ANIM_COUNT = 5;
 
+  COUNT_OF_STEPS_TO_RELOAD = 3;
+
   PLAYER_CARD_BASE_HEALTH = 10;
+
+type
+  TIndexOfCardMsg = (OK, OutOfBorder, FAIL);
+
+type
+  TItemType = (nothing, bonus, enemy, trap);
+
+type
+  TCardStat = record
+    CardName: string;
+    CardType: TItemType;
+    CardIndex: integer;
+    CardWeight: integer;
+
+    MinDifToBe: integer;
+
+    HaveAValue: Boolean;
+    ValueType: string;
+    BaseValue: integer;
+    ValueRange: integer;
+    Increaseable: Boolean;
+    IncValue: integer;
+
+    ReplaceACard: Boolean;
+    ReplacebleCardIndex: integer;
+    DropCoin: Boolean;
+    isSwapable: Boolean;
+    DontNeedbeNear: Boolean;
+    EventCard: Boolean;
+    OneClick: Boolean;
+
+  end;
+
+type
+  TPosition = record
+    X: integer;
+    Y: integer;
+  end;
+
+type
+  TCardGen = record
+    ItemType: TItemType;
+    ItemIndex: integer;
+  end;
+
+type
+  TCardSendingData = record
+    IntData: integer;
+    CardGenData: TCardGen;
+  end;
+
+type
+  TSaveData = record
+    Money: integer;
+    HeroSelected: integer;
+    AbilitySelected: integer;
+  end;
+
+type
+  TCardSaveData = record
+    Position: TPosition;
+    BorderIndex: integer;
+    ItemIndex: integer;
+    ItemType: TItemType;
+    IsCardIsPlayer: Boolean;
+    Value: integer;
+    HasAItem: integer;
+    PlayerItemValue: integer;
+    IsMinimized: Boolean;
+  end;
+
+type
+  TFieldOfCardSaveData = record
+    FieldOfCardsSaveData: array [0 .. FIELD_SIZE_X - 1, 0 .. FIELD_SIZE_Y - 1]
+      of TCardSaveData;
+
+    Size: TPosition;
+    PlayerCard: TPosition;
+    BaseDifficult: integer;
+    RecivedMoney: integer;
+  end;
+
+procedure Msg(text: string); overload;
+procedure Msg(numb: integer); overload;
+function tStr(i: integer): string;
+function tInt(s: string): integer;
+function CTP(X, Y: integer): TPosition;
+procedure ReSizeResolution(oForm: TForm);
+procedure InitForm(oForm: TForm);
+function CoordToVector(Coord: TPosition): integer;
+function VectorToCoord(vector: integer): TPosition;
+function Rnd(min, max: integer): integer; overload;
+function Rnd(max: integer): integer; overload;
+function Rnd(min, max, wmin, wmax: integer): integer; overload;
+function RndWWeight(var weight: array of integer): integer;
+function CGTDT(CardGen: TCardGen): integer;
+
+procedure SaveGameData(); overload;
+procedure SaveGameData(path: string); overload;
+procedure LoadGameDataFrom(); overload;
+procedure LoadGameDataFrom(path: string); overload;
+
+const
+  MinimizeWinWight = 896;
+  MinimizeWinHeight = 504;
 
 var
   iPercentage: integer;
@@ -170,8 +193,6 @@ begin
   end;
 end;
 
-
-
 function Rnd(min, max: integer): integer;
 begin
   Rnd := Random(abs(max - min + 1)) + min;
@@ -184,7 +205,7 @@ end;
 
 function Rnd(min, max, wmin, wmax: integer): integer;
 var
-  RndNumb : Integer;
+  RndNumb: integer;
 begin
   repeat
     RndNumb := Rnd(min, max);
@@ -224,7 +245,7 @@ end;
 
 function RndWWeight(var weight: array of integer): integer;
 var
-  lenghtOfArray: Integer;
+  lenghtOfArray: integer;
   i, n: integer;
   RandNumb: integer;
   SumOfWeight: integer;
@@ -251,46 +272,43 @@ begin
 
 end;
 
-
-
-function CGTDT(CardGen : TCardGen) : Integer;
+function CGTDT(CardGen: TCardGen): integer;
 var
-  data : Integer;
+  data: integer;
 begin
-data := 0;
-data := CardGen.ItemIndex*10;
-case CardGen.ItemType of
-  nothing: data := data + 1;
-  bonus: data := data + 2;
-  enemy: data := data + 3;
-  trap: data := data + 4;
+  data := 0;
+  data := CardGen.ItemIndex * 10;
+  case CardGen.ItemType of
+    nothing:
+      data := data + 1;
+    bonus:
+      data := data + 2;
+    enemy:
+      data := data + 3;
+    trap:
+      data := data + 4;
+  end;
+  CGTDT := data;
 end;
-CGTDT := data;
-end;
-
-
-
-
 
 procedure SaveGameData();
 begin
-//
+  //
 end;
 
-procedure SaveGameData(path : string);
+procedure SaveGameData(path: string);
 begin
-//
+  //
 end;
 
 procedure LoadGameDataFrom();
 begin
-//
+  //
 end;
 
-procedure LoadGameDataFrom(path : string);
+procedure LoadGameDataFrom(path: string);
 begin
-//
+  //
 end;
-
 
 end.

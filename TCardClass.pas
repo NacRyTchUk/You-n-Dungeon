@@ -1,4 +1,4 @@
-﻿unit TCardClass;
+unit TCardClass;
 
 interface
 
@@ -84,7 +84,7 @@ type
     function IsCurCardIsPlayer(): bool;
     function IsCardMinimized(): bool;
 
-    procedure BrokePlayerItem();
+    procedure BrokeItem();
 
     // ====
     function OnClick(SCard: TCard): integer;
@@ -96,13 +96,17 @@ type
     procedure ScaleAt(ds: real);
     procedure ReSetPosToMode(ScaleModeIndex: integer);
 
+    function SaveCardData(): TCardSaveData;
+    procedure LoadCardData(LoadData: TCardSaveData);
+
     procedure CardCreate(Position: TPosition; IsPlayer: bool;
       Difficult: integer);
     Constructor Create(Position: TPosition; IsPlayer: bool;
       Difficult: integer); overload;
     Constructor Create(Position: TPosition; IsPlayer: bool; Difficult: integer;
       CardGen: TCardGen); overload;
-    // Destructor  Destroy;
+    constructor Create(LoadData: TCardSaveData); overload;
+    Destructor Destroy();
   end;
 
 implementation
@@ -174,6 +178,27 @@ begin
   //
 end;
 
+function TCard.SaveCardData(): TCardSaveData;
+var
+  SD: TCardSaveData;
+begin
+  SD.Position := Position;
+  SD.BorderIndex := BorderIndex;
+  SD.ItemIndex := ItemIndex;
+  SD.ItemType := ItemType;
+  SD.IsCardIsPlayer := IsCardIsPlayer;
+  SD.Value := Value;
+  SD.HasAItem := HasAItem;
+  SD.PlayerItemValue := PlayerItemValue;
+  SD.IsMinimized := IsMinimized;
+  SaveCardData := SD;
+end;
+
+procedure TCard.LoadCardData(LoadData: TCardSaveData);
+begin
+  //
+end;
+
 procedure TCard.CardCreate(Position: TPosition; IsPlayer: bool;
   Difficult: integer);
 var
@@ -237,7 +262,43 @@ begin
     Value := Round(Value * Rnd(15, 20) / 10);
 
   CardCreate(Position, IsPlayer, Difficult);
+end;
 
+constructor TCard.Create(LoadData: TCardSaveData);
+var
+  RndMin, RndMax: integer;
+begin
+  Self.Position := LoadData.Position;
+  IsCardIsPlayer := LoadData.IsCardIsPlayer;
+  Self.ItemIndex := LoadData.ItemIndex;
+  Self.ItemType := LoadData.ItemType;
+
+  Self.Value := LoadData.Value;
+  Self.BorderIndex := LoadData.BorderIndex;
+  self.HasAItem := LoadData.HasAItem;
+  self.PlayerItemValue := LoadData.PlayerItemValue;
+  self.IsMinimized := LoadData.IsMinimized;
+
+  CreateBorderImage();
+  CreateBackImage();
+  CreateItemImage();
+  if IsCardIsPlayer then
+    CreatePlayerItemImage();
+  CreateValueLabel();
+  CreateHealthValueLabel();
+  ValueRefresh;
+  ReSetPosToMode(1);
+end;
+
+Destructor TCard.Destroy();
+begin
+  CardBackIm.Free;
+  CardItemIm.Free;
+  CardBorderIm.Free;
+  if IsCardIsPlayer then
+    CardPlayerItemIm.Free;
+  ValueText.Free;
+  HealthValueText.Free;
 end;
 
 procedure TCard.CreateImage(var Image: timage);
@@ -329,9 +390,9 @@ procedure TCard.CreatePlayerItemImage();
 begin
   CreateImage(CardPlayerItemIm);
   ScaleImageAt(CardPlayerItemIm, 0);
-  CardPlayerItemIm.Visible := true;
   CardPlayerItemIm.Transparent := true;
-
+  if HasAItem <> 0 then
+    GameForm.CardWeaponImageList.GetBitmap(HasAItem, CardPlayerItemIm.Picture.Bitmap);
 end;
 
 procedure TCard.CreateValueLabel();
@@ -371,6 +432,9 @@ begin
 
     HealthValueText.Caption := HealthValueText.Caption + '/' +
       IntToStr(PLAYER_CARD_BASE_HEALTH + MainForm.GetSelectedPlayerIndex * 2);
+
+    CardPlayerItemIm.Visible := (HasAItem <> 0);
+
   end;
 end;
 
@@ -404,8 +468,6 @@ procedure TCard.ReScaleLabelToNormal(var Labeel: tlabel; mode: integer);
 begin
   with Labeel do
   begin
-    // Width := SIZE_CARD_X * iPercentage div 100;
-    // Height := SIZE_CARD_Y * iPercentage div 100;
     Font.Size := 10;
     Left := CardItemIm.Left + CardItemIm.Width div 10;
     if mode = 0 then
@@ -603,8 +665,9 @@ begin
     CardPlayerItemIm.Transparent := true;
     CardPlayerItemIm.Left := CardStat.CardPlayerItemIm.Left;
     CardPlayerItemIm.Top := CardStat.CardPlayerItemIm.Top;
-    CardPlayerItemIm.Visible := true;
+    CardPlayerItemIm.Visible := CardStat.CardPlayerItemIm.Visible;
     CardPlayerItemIm.Picture.Bitmap := CardStat.CardPlayerItemIm.Picture.Bitmap;
+    CardStat.CardPlayerItemIm.Free;
   end;
   Value := CardStat.Value;
   HasAItem := CardStat.HasAItem;
@@ -635,44 +698,7 @@ var
   dHP: integer;
   plP: TPosition;
 begin
-  // msg(FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem);
-  { if FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem <> 0 then
-    begin
-    if Damage >= FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue then
-
-    begin
-    Value := Damage - FieldOfCards.GetFieldOfCards[plP.X, plP.Y]
-    .PlayerItemValue;
-    FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem := 0;
-    GameForm.CardWeaponImageList.GetBitmap(1,FieldOfCards.GetFieldOfCards[plP.X, plP.Y].CardPlayerItemIm.Picture.Bitmap);
-    end
-    else
-    FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue :=
-    FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue - Damage;
-
-    ValueRefresh;
-    exit;
-    end;
-  }
-  dHP := ChangeHealhOn(-Damage);
-  if (dHP > 0) then
-  begin
-    Value := dHP;
-    ValueRefresh;
-    DamageDealAnsw := 1;
-    exit;
-  end;
-  if dHP = -1 then
-  begin
-    DamageDealAnsw := -1;
-    exit;
-  end;
-  if dHP = -2 then
-  begin
-    DamageDealAnsw := 0;
-    exit;
-  end;
-  DamageDealAnsw := 0;
+  DamageDealAnsw := ChangeHealhOn(-Damage);
 end;
 
 procedure TCard.DeadMessageShow(mode: integer);
@@ -699,6 +725,7 @@ begin
   begin
     dx := Position.X - FieldOfCards.GetPlayerPos.X;
     dy := FieldOfCards.GetPlayerPos.Y - Position.Y;
+    if FieldOfCards.IsReloadTime then exit;
 
     if FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value <= 0 then
     begin
@@ -716,7 +743,6 @@ begin
         begin
           DDansw := DamageDealAnsw(Value);
           FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
-
           if DDansw = -1 then
           begin
             DeadMessageShow(1);
@@ -729,17 +755,18 @@ begin
       trap:
         begin
           if (isTrapsFacing(Position) = 1) then
-
+          begin
             DDansw := DamageDealAnsw(Value);
 
-          FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
-          if DDansw = 0 then
-            exit;
+            FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
+            if DDansw = 0 then
+              exit;
 
-          if DDansw = -1 then
-          begin
-            DeadMessageShow(1);
-            exit;
+            if DDansw = -1 then
+            begin
+              DeadMessageShow(1);
+              exit;
+            end;
           end;
         end;
     end;
@@ -753,7 +780,6 @@ begin
     FieldOfCards.ToggleAnimOn(3, FieldOfCards.GetPlayerPos.X,
       FieldOfCards.GetPlayerPos.Y, CoordToVector(CTP(dx, dy)));
     FieldOfCards.ToggleAnimOn(1, Position.X, Position.Y);
-
   end;
 end;
 
@@ -829,7 +855,7 @@ var
 begin
   plP := FieldOfCards.GetPlayerPos;
   if ((FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem <> 0) and
-    (ItemType <> TItemType.bonus)) then
+    (ItemType = TItemType.enemy)) then
   begin
     wepDeal := true;
     dVal := FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue + Value;
@@ -843,6 +869,10 @@ begin
       MainForm.GetSelectedPlayerIndex * 2);
   end;
 
+  CardGen.ItemType := ItemType;
+  CardGen.ItemIndex := ItemIndex;
+  CardGen := CardLootGen(CardGen);
+
   if (dVal > 0) and (dVal <= maxHealth) then
   begin
 
@@ -851,10 +881,6 @@ begin
     begin
 
       FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue := dVal;
-      CardGen.ItemType := ItemType;
-      CardGen.ItemIndex := ItemIndex;
-      CardGen := CardLootGen(CardGen);
-      // FieldOfCards.PlayAnim_ChangeCard(Position.X, Position.Y, CGTDT(cardGen));
       FieldOfCards.ToggleAnimOn(5, Position.X, Position.Y, CGTDT(CardGen));
     end
     else
@@ -868,19 +894,21 @@ begin
   begin
     if not wepDeal then
     begin
-      ChangeHealhOn := -dVal;
-      if -dVal = 0 then
-        ChangeHealhOn := -1;
-
+      ChangeHealhOn := -1;
+      Self.Value := -dVal;
       FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value := 0;
     end
     else
     begin
+      if dVal = 0 then
+        FieldOfCards.ToggleAnimOn(5, Position.X, Position.Y, CGTDT(CardGen));
+
       Self.Value := -dVal;
-      FieldOfCards.BrokePlayerItem;
+      FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem := 0;
+      FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue := 0;
       ValueRefresh;
 
-      ChangeHealhOn := -2;
+      ChangeHealhOn := 0;
     end;
 
   end
@@ -893,63 +921,18 @@ begin
 
 end;
 
-procedure TCard.BrokePlayerItem();
+procedure TCard.BrokeItem();
 begin
-  if IsCurCardIsPlayer then
-  begin
-    PlayerItemValue := 0;
-    HasAItem := 0;
-    //GameForm.CardWeaponImageList.GetBitmap(1, CardPlayerItemIm.Picture.Bitmap);
-  end;
+  // if IsCurCardIsPlayer then
+  /// begin
+  // GameForm.CardWeaponImageList.GetBitmap(1, CardPlayerItemIm.Picture.Bitmap);
+  // end;
 end;
 
 function TCard.ChangeWepHealhOn(Value: integer): integer;
 begin
 
 end;
-
-{ function TCard.ChangeHealhOn(Value: integer): integer;
-  var
-  plP: TPosition;
-  dVal, pVal, maxHealth: integer;
-  haI: bool;
-  begin
-  plP := FieldOfCards.GetPlayerPos;
-  pVal := FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value;
-  if (FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem <> 0) then
-  begin
-  haI := true;
-  dVal := pVal + Value;
-  end
-  else
-  begin
-  dVal := pVal + Value;
-  end;
-
-  maxHealth := (PLAYER_CARD_BASE_HEALTH + MainForm.GetSelectedPlayerIndex * 2);
-  if (dVal > 0) and (dVal <= maxHealth) then
-  begin
-  FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value := dVal;
-  ChangeHealhOn := 0;
-
-  end
-  else if (dVal <= 0) then
-  begin
-  ChangeHealhOn := -(pVal + Value);
-  if -(pVal + Value) = 0 then
-  ChangeHealhOn := -1;
-
-  FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value := 0;
-
-  end
-  else if (dVal > maxHealth) then
-  begin
-  FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value := maxHealth;
-  ChangeHealhOn := 0;
-
-  end;
-
-  end; }
 
 function TCard.isTrapsFacing(trapP: TPosition): integer;
 var

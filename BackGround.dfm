@@ -3,8 +3,8 @@ object BackGroundForm: TBackGroundForm
   Top = 0
   BorderStyle = bsNone
   Caption = 'BackGroundForm'
-  ClientHeight = 240
-  ClientWidth = 463
+  ClientHeight = 504
+  ClientWidth = 896
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,15 +17,15 @@ object BackGroundForm: TBackGroundForm
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
-    463
-    240)
+    896
+    504)
   PixelsPerInch = 96
   TextHeight = 13
   object BackGroundImage: TImage
     Left = 0
     Top = 0
-    Width = 463
-    Height = 240
+    Width = 896
+    Height = 504
     Anchors = [akLeft, akTop, akRight, akBottom]
     Picture.Data = {
       0954506E67496D61676589504E470D0A1A0A0000000D49484452000000100000
@@ -33,12 +33,14 @@ object BackGroundForm: TBackGroundForm
       000000174944415478DA63D4D030612005308E6A18D5307C35000078BB0851E4
       EF0E3F0000000049454E44AE426082}
     Stretch = True
+    ExplicitWidth = 463
+    ExplicitHeight = 240
   end
   object StartTimer: TTimer
     Enabled = False
-    Interval = 100
+    Interval = 1
     OnTimer = StartTimerTimer
-    Left = 360
-    Top = 208
+    Left = 856
+    Top = 8
   end
 end

@@ -35,9 +35,13 @@ type
     procedure LevelSelectBrn4MouseEnter(Sender: TObject);
     procedure LevelSelectBrn4MouseLeave(Sender: TObject);
   private
-    procedure GameStart(Difficult : integer);
+    BufferFieldData: TFieldOfCardSaveData;
+    procedure GameStart(Difficult: integer);
   public
-    { Public declarations }
+    procedure GameReset(Difficult: integer);
+    procedure GameSave();
+    procedure GameLoad();
+    procedure GameReload();
   end;
 
 var
@@ -84,12 +88,12 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn2MouseEnter(Sender: TObject);
 begin
-   LevelSelectBrnBack2.Visible := True;
+  LevelSelectBrnBack2.Visible := true;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn2MouseLeave(Sender: TObject);
 begin
-   LevelSelectBrnBack2.Visible := false;
+  LevelSelectBrnBack2.Visible := false;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn3Click(Sender: TObject);
@@ -100,12 +104,12 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn3MouseEnter(Sender: TObject);
 begin
-    LevelSelectBrnBack3.Visible := true;
+  LevelSelectBrnBack3.Visible := true;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn3MouseLeave(Sender: TObject);
 begin
-    LevelSelectBrnBack3.Visible := false;
+  LevelSelectBrnBack3.Visible := false;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn4Click(Sender: TObject);
@@ -115,20 +119,49 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn4MouseEnter(Sender: TObject);
 begin
-     LevelSelectBrnBack4.Visible := true;
+  LevelSelectBrnBack4.Visible := true;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn4MouseLeave(Sender: TObject);
 begin
-     LevelSelectBrnBack4.Visible := false;
+  LevelSelectBrnBack4.Visible := false;
 end;
 
-procedure TSelectDifficultForm.GameStart(Difficult : integer);
+procedure TSelectDifficultForm.GameStart(Difficult: integer);
 begin
   GameForm := TGameForm.Create(Application);
   GameForm.SetDifficult(Difficult);
   GameForm.Show;
   SelectDifficultForm.Close;
+end;
+
+procedure TSelectDifficultForm.GameReset(Difficult: integer);
+begin
+  GameForm.Free;
+  GameForm := TGameForm.Create(Application);
+  GameForm.SetDifficult(Difficult);
+  GameForm.GameStart();
+  GameForm.Show;
+end;
+
+procedure TSelectDifficultForm.GameSave();
+begin
+  //
+  BufferFieldData := FieldOfCards.SaveField;
+end;
+
+procedure TSelectDifficultForm.GameLoad();
+begin
+  GameForm := TGameForm.Create(Application);
+  GameForm.GameStart(BufferFieldData);
+  GameForm.Show;
+end;
+
+procedure TSelectDifficultForm.GameReload();
+begin
+  GameSave;
+  GameForm.Free;
+  GameLoad;
 end;
 
 end.
