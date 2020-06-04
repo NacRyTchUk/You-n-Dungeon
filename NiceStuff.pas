@@ -24,9 +24,15 @@ const
   CHANCE_OF_TRAPS = 15;
   CHEST_INDEX = 3;
 
+  SPEED_OF_ANIM_SIZE_OUT = 10;
+  SPEED_OF_ANIM_SIZE_IN = 10;
+  SPEED_OF_ANIM_SLIDE_FROM_TO = 10;
+  SPEED_OF_ANIM_FIELD_SIZE_IN = 6;
+  SPEED_OF_ANIM_CHANGE_CARD = 6;
+
   CARD_ANIM_COUNT = 5;
 
-  COUNT_OF_STEPS_TO_RELOAD = 3;
+  COUNT_OF_STEPS_TO_RELOAD = 30;
 
   PLAYER_CARD_BASE_HEALTH = 10;
 
@@ -125,6 +131,7 @@ function Rnd(max: integer): integer; overload;
 function Rnd(min, max, wmin, wmax: integer): integer; overload;
 function RndWWeight(var weight: array of integer): integer;
 function CGTDT(CardGen: TCardGen): integer;
+function KeyToChar(Key : Integer) : Char;
 
 procedure SaveGameData(); overload;
 procedure SaveGameData(path: string); overload;
@@ -148,6 +155,7 @@ begin
       * 100) + 100;
     oForm.ScaleBy(iPercentage, 100);
   end;
+
 end;
 
 procedure InitForm(oForm: TForm);
@@ -309,6 +317,21 @@ end;
 procedure LoadGameDataFrom(path: string);
 begin
   //
+end;
+
+
+function KeyToChar(Key : Integer) : Char;
+var
+  chKey : Char;
+begin
+  chKey := Chr(Key);
+  case Key of
+    37 : chKey := 'A';
+    38 : chKey := 'W';
+    39 : chKey := 'D';
+    40 : chKey := 'S';
+  end;
+  KeyToChar := chKey;
 end;
 
 end.

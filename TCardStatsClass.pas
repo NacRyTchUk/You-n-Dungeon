@@ -151,7 +151,7 @@ BonusTypesStats[ItemId] := 3;
 Inc(ItemId);
 BonusTypesStats[ItemId] := 0;
 Inc(ItemId);
-BonusTypesStats[ItemId] := -1;
+BonusTypesStats[ItemId] := 0;
 Inc(ItemId);
 BonusTypesStats[ItemId] := 2;
 Inc(ItemId);

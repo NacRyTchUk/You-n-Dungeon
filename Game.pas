@@ -7,7 +7,7 @@ uses
   System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
   Vcl.StdCtrls, TFieldClass, TCardClass, NiceStuff, System.ImageList,
-  Vcl.ImgList,
+  Vcl.ImgList, mmsystem,
   TCardStatsClass;
 
 type
@@ -27,17 +27,23 @@ type
     CoinImage: TImage;
     CoinCountLabel: TLabel;
     CardWeaponImageList: TImageList;
+    Label1: TLabel;
+    InputLockcooldown: TTimer;
     procedure BackBtnImageClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure UpDateTimer(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure InputLockcooldownTimer(Sender: TObject);
   private
-    GameStartMode : Integer;
-    BufferLoadData : TFieldOfCardSaveData;
+    GameStartMode: Integer;
+    BufferLoadData: TFieldOfCardSaveData;
+    procedure BackToMenu();
+    procedure DoKeyDown(Key: Integer);
+    procedure DoJoyKey();
   public
-    procedure SetDifficult(Difficult: integer);
+    procedure SetDifficult(Difficult: Integer);
     procedure GameStart(); overload;
     procedure GameStart(LoadData: TFieldOfCardSaveData); overload;
   end;
@@ -45,7 +51,7 @@ type
 var
   GameForm: TGameForm;
   FieldOfCards: TField;
-  BaseDifficult: integer;
+  BaseDifficult: Integer;
 
 implementation
 
@@ -55,6 +61,11 @@ uses mainscreen, BackGround, SelectDifficult;
 
 procedure TGameForm.BackBtnImageClick(Sender: TObject);
 begin
+  BackToMenu();
+end;
+
+procedure TGameForm.BackToMenu();
+begin
   GameData.Money := GameData.Money + FieldOfCards.GetMoneyRecived;
   MainForm.Show();
   GameForm.free;
@@ -62,15 +73,14 @@ end;
 
 procedure TGameForm.Button1Click(Sender: TObject);
 var
-  I: integer;
+  I: Integer;
   s: string;
+
+  gamePad: tjoyinfo;
 begin
-  s := '';
-  for I := 0 to 10 do
-  begin
-    s := s + IntToStr(Rnd(1, 3, 2, 2)) + ';';
-  end;
-  msg(s);
+  joygetpos(joystickid2, @gamePad);
+
+  Msg(gamePad.wXpos.ToString + ' ' + gamePad.wYpos.ToString);
 end;
 
 procedure TGameForm.Button2Click(Sender: TObject);
@@ -82,13 +92,43 @@ end;
 
 procedure TGameForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
+
 begin
+
+  // Msg(KeyToChar(Key) + ' ' + tStr(Key));
+  DoKeyDown(Key);
+end;
+
+procedure TGameForm.DoKeyDown(Key: Integer);
+begin
+  if InputLockcooldown.Enabled then
+    exit;
+  InputLockcooldown.Enabled := true;
+
   if Key = 27 then
-    BackGroundForm.Close;
-  if (Key = 82) or (Key = 114) or (Key = 202) or (Key = 234) then
-    SelectDifficultForm.GameReset(BaseDifficult);
-    if (Key = 76) or (Key = 108) or (Key = 196) or (Key = 228) then
-   SelectDifficultForm.GameReload;
+    BackToMenu();
+  case KeyToChar(Key) of
+    'R':
+      SelectDifficultForm.GameReset(BaseDifficult);
+    'L':
+      SelectDifficultForm.GameReload;
+    'W':
+      if FieldOfCards.GetPlayerPos.Y - 1 >= 0 then
+        FieldOfCards.GetFieldOfCards[FieldOfCards.GetPlayerPos.X,
+          FieldOfCards.GetPlayerPos.Y - 1].DoClick;
+    'S':
+      if FieldOfCards.GetPlayerPos.Y + 1 <= FIELD_SIZE_Y - 1 then
+        FieldOfCards.GetFieldOfCards[FieldOfCards.GetPlayerPos.X,
+          FieldOfCards.GetPlayerPos.Y + 1].DoClick;
+    'A':
+      if FieldOfCards.GetPlayerPos.X - 1 >= 0 then
+        FieldOfCards.GetFieldOfCards[FieldOfCards.GetPlayerPos.X - 1,
+          FieldOfCards.GetPlayerPos.Y].DoClick;
+    'D':
+      if FieldOfCards.GetPlayerPos.X + 1 <= FIELD_SIZE_X - 1 then
+        FieldOfCards.GetFieldOfCards[FieldOfCards.GetPlayerPos.X + 1,
+          FieldOfCards.GetPlayerPos.Y].DoClick;
+  end;
 end;
 
 procedure TGameForm.FormShow(Sender: TObject);
@@ -96,9 +136,9 @@ begin
   InitForm(self);
 
   if GameStartMode = 0 then
-      FieldOfCards := TField.Create(BaseDifficult)
-      else
-      FieldOfCards := TField.Create(BufferLoadData.BaseDifficult, BufferLoadData);
+    FieldOfCards := TField.Create(BaseDifficult)
+  else
+    FieldOfCards := TField.Create(BufferLoadData.BaseDifficult, BufferLoadData);
   font.Color := RGB(222, 185, 56);
 end;
 
@@ -113,12 +153,51 @@ begin
   BufferLoadData := LoadData;
 end;
 
+procedure TGameForm.InputLockcooldownTimer(Sender: TObject);
+begin
+  InputLockcooldown.Enabled := False;
+end;
+
 procedure TGameForm.UpDateTimer(Sender: TObject);
 begin
+
+  DoJoyKey();
   FieldOfCards.UpdateAnim;
 end;
 
-procedure TGameForm.SetDifficult(Difficult: integer);
+procedure TGameForm.DoJoyKey();
+var
+  gamePad: tjoyinfo;
+  keypad: Integer;
+begin
+  joygetpos(joystickid1, @gamePad);
+
+  Label1.Caption := tStr(gamePad.wXpos) + ' ' + tStr(gamePad.wYpos) + ' ' +
+    tStr(gamePad.wZpos) + ' ' + tStr(gamePad.wButtons);
+
+  if gamePad.wXpos > 60000 then
+    DoKeyDown(VK_RIGHT);
+  if gamePad.wXpos < 5000 then
+    DoKeyDown(VK_LEFT);
+  if gamePad.wYpos > 60000 then
+    DoKeyDown(VK_DOWN);
+  if gamePad.wYpos < 5000 then
+    DoKeyDown(VK_UP);
+  case gamePad.wButtons of
+    1:
+     ;
+    2:
+     DoKeyDown(VK_ESCAPE);
+    4:
+      DoKeyDown(76); //L
+    8:
+      DoKeyDown(82); //R
+
+  end;
+
+end;
+
+procedure TGameForm.SetDifficult(Difficult: Integer);
 begin
   BaseDifficult := Difficult;
 end;

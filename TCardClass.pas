@@ -51,6 +51,7 @@ type
     procedure ReScaleLabelToNone(var Labeel: tlabel);
     procedure ValueRefresh();
 
+
     procedure ImMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
     procedure ImMouseUp(Sender: TObject; Button: TMouseButton;
@@ -58,6 +59,7 @@ type
     procedure ImMouseEnter(Sender: TObject);
     procedure ImMouseLeave(Sender: TObject);
     procedure DeadMessageShow(mode: integer);
+    procedure EndStep();
 
     function DamageDealAnsw(Damage: integer): integer;
 
@@ -76,6 +78,7 @@ type
     procedure SetVisible(isVisible: bool);
     procedure SetCardStat(CardStat: TCard);
     procedure SetMinimized(Min: bool);
+    procedure DoClick();
 
     function GetCardStat(): TCard;
     function GetPosition(): TPosition;
@@ -218,7 +221,7 @@ begin
       2 + Difficult);
     Self.Value := Rnd(RndMin, RndMax);
 
-    if (ItemType = TItemType.bonus) and (ItemIndex = 3) then
+    if (ItemType = TItemType.bonus) and (ItemIndex = 5) then
       Self.Value := Self.Value * 2;
 
     BorderIndex := 0;
@@ -275,9 +278,9 @@ begin
 
   Self.Value := LoadData.Value;
   Self.BorderIndex := LoadData.BorderIndex;
-  self.HasAItem := LoadData.HasAItem;
-  self.PlayerItemValue := LoadData.PlayerItemValue;
-  self.IsMinimized := LoadData.IsMinimized;
+  Self.HasAItem := LoadData.HasAItem;
+  Self.PlayerItemValue := LoadData.PlayerItemValue;
+  Self.IsMinimized := LoadData.IsMinimized;
 
   CreateBorderImage();
   CreateBackImage();
@@ -392,7 +395,8 @@ begin
   ScaleImageAt(CardPlayerItemIm, 0);
   CardPlayerItemIm.Transparent := true;
   if HasAItem <> 0 then
-    GameForm.CardWeaponImageList.GetBitmap(HasAItem, CardPlayerItemIm.Picture.Bitmap);
+    GameForm.CardWeaponImageList.GetBitmap(HasAItem,
+      CardPlayerItemIm.Picture.Bitmap);
 end;
 
 procedure TCard.CreateValueLabel();
@@ -711,8 +715,18 @@ begin
   end;
 end;
 
+procedure TCard.EndStep();
+begin
+  FieldOfCards.DoStep;
+end;
+
 procedure TCard.ImMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: integer);
+begin
+DoClick;
+end;
+
+procedure TCard.DoClick();
 var
   dx, dy, dHP, DDansw: integer;
   plP: TPosition;
@@ -725,7 +739,7 @@ begin
   begin
     dx := Position.X - FieldOfCards.GetPlayerPos.X;
     dy := FieldOfCards.GetPlayerPos.Y - Position.Y;
-    if FieldOfCards.IsReloadTime then exit;
+    FieldOfCards.DoStep;
 
     if FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value <= 0 then
     begin
@@ -773,8 +787,8 @@ begin
     FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
     ValueRefresh;
 
-    if (ItemType = TItemType.bonus) and ((ItemIndex = 1) or (ItemIndex = 4))
-    then
+    if (ItemType = TItemType.bonus) and ((ItemIndex = 1) or (ItemIndex = 4) or
+      (ItemIndex = 5)) then
       FieldOfCards.AddMoneyOn(Value);
 
     FieldOfCards.ToggleAnimOn(3, FieldOfCards.GetPlayerPos.X,
@@ -959,8 +973,12 @@ begin
   end;
   if (KilledCard.ItemType = TItemType.enemy) then
   begin
-    LootGenCard.ItemType := TItemType.bonus;
-    LootGenCard.ItemIndex := Rnd(1, 3, 2, 2);
+    LootGenCard.ItemIndex := Rnd(0, 5);
+    if LootGenCard.ItemIndex = 0 then
+      LootGenCard.ItemType := TItemType.nothing
+    else
+      LootGenCard.ItemType := TItemType.bonus;
+
   end;
   CardLootGen := LootGenCard;
 end;

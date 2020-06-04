@@ -55,6 +55,7 @@ type
     procedure PlayAnim_ChangeCard(x, y, data: integer);
     procedure CheckForNoAnim();
     function IsReloadTime(): bool;
+    procedure DoStep();
 
     procedure BrokePlayerItem();
     function SaveField(): TFieldOfCardSaveData;
@@ -221,7 +222,7 @@ end;
 procedure TField.PlayAnim_SizeOut(x, y: integer);
 const
   OneStageStepsAmount = 1;
-  FrameAmount = 10;
+  FrameAmount = SPEED_OF_ANIM_SIZE_OUT;
   AnimID = 1;
 begin
   if AnimProc(AnimID, OneStageStepsAmount) then
@@ -243,7 +244,7 @@ end;
 procedure TField.PlayAnim_SizeIn(x, y: integer);
 const
   OneStageStepsAmount = 2;
-  FrameAmount = 10;
+  FrameAmount = SPEED_OF_ANIM_SIZE_IN;
   AnimID = 2;
 begin
   if AnimProc(AnimID, OneStageStepsAmount) then
@@ -256,6 +257,7 @@ begin
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
+    GameForm.InputLockcooldown.Enabled := False;
     CheckForNoAnim;
     FieldOfCards[x, y].SetMinimized(false);
     FieldOfCards[x, y].ReSetPosToMode(1);
@@ -265,7 +267,7 @@ end;
 procedure TField.PlayAnim_SlideFromTo(x, y, side: integer);
 const
   OneStageStepsAmount = 2;
-  FrameAmount = 10;
+  FrameAmount = SPEED_OF_ANIM_SLIDE_FROM_TO;
   AnimID = 3;
 var
   dx, dy: integer;
@@ -299,10 +301,14 @@ begin
     FieldOfCards[x, y].SetVisible(false);
     FieldOfCards[x, y].Create(CTP(x, y), false, BaseDifficult);
     ToggleAnimOn(2, x, y);
+
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
     CheckForNoAnim;
+
+    if IsReloadTime then
+      exit;
     // FieldOfCards[x, y].ReSetPosToMode(1);
   end;
 
@@ -311,7 +317,7 @@ end;
 procedure TField.PlayAnim_FieldSizeIn();
 const
   OneStageStepsAmount = 8;
-  FrameAmount = 6;
+  FrameAmount = SPEED_OF_ANIM_FIELD_SIZE_IN;
   AnimID = 4;
 var
   x, y: integer;
@@ -338,7 +344,7 @@ end;
 procedure TField.PlayAnim_ChangeCard(x, y, data: integer);
 const
   OneStageStepsAmount = 8;
-  FrameAmount = 6;
+  FrameAmount = SPEED_OF_ANIM_CHANGE_CARD;
   AnimID = 5;
 var
   ChangeCardStat: TCardGen;
@@ -397,7 +403,7 @@ end;
 
 function TField.IsReloadTime(): bool;
 begin
-  inc(Steps);
+
   if Steps > COUNT_OF_STEPS_TO_RELOAD then
   begin
     IsReloadTime := true;
@@ -406,6 +412,11 @@ begin
   end;
   IsReloadTime := false;
 
+end;
+
+procedure TField.DoStep();
+begin
+  inc(Steps);
 end;
 
 function TField.AnimProc(AnimIndex, AnimSpeed: integer): bool;
