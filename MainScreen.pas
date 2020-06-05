@@ -7,7 +7,7 @@ uses
   System.Classes, Vcl.Graphics, ShellApi,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
   Vcl.ExtCtrls, configurate, System.ImageList, Vcl.ImgList, Vcl.Imaging.jpeg,
-  GifImg, SelectDifficult,
+  GifImg, SelectDifficult, mmsystem,
   NiceStuff, Vcl.OleCtrls, SHDocVw;
 
 type
@@ -32,6 +32,8 @@ type
     AbilityLabel: TLabel;
     CoinImage: TImage;
     CoinCountLabel: TLabel;
+    UpDate: TTimer;
+    FormShowInputFreze: TTimer;
     procedure FormResize(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CloseBtnImageMouseUp(Sender: TObject; Button: TMouseButton;
@@ -56,8 +58,13 @@ type
     procedure AbilitySelectImageClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure UpDateTimer(Sender: TObject);
+    procedure FormShowInputFrezeTimer(Sender: TObject);
+    procedure FormHide(Sender: TObject);
   private
     SelectPlayerIndex: Integer;
+    isFormActive : boolean;
+    procedure GameStart(mode: BOOL);
 
   public
     function GetSelectedPlayerIndex(): Integer;
@@ -65,7 +72,7 @@ type
 
 var
   MainForm: TMainForm;
-  GameData : TSaveData;
+  GameData: TSaveData;
 
 implementation
 
@@ -90,7 +97,7 @@ end;
 
 procedure TMainForm.AchiveBtnImageClick(Sender: TObject);
 begin
- // Msg('trophey');
+  // Msg('trophey');
 end;
 
 procedure TMainForm.AchiveBtnImageMouseEnter(Sender: TObject);
@@ -130,9 +137,13 @@ procedure TMainForm.FormCreate(Sender: TObject);
 begin
   InitForm(self);
 
-
   MainForm.font.Color := RGB(222, 185, 56);
 
+end;
+
+procedure TMainForm.FormHide(Sender: TObject);
+begin
+isFormActive := False;
 end;
 
 procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
@@ -153,13 +164,20 @@ end;
 procedure TMainForm.FormShow(Sender: TObject);
 begin
   // BackGroundForm.Show();
+  FormShowInputFreze.Enabled := true;
   CoinCountLabel.Caption := IntToStr(GameData.Money);
   AbilityLabel.Width := 200;
-  AbilityLabel.Height := 200;
+  AbilityLabel.height := 200;
   HeroLabel.Width := 200;
-  HeroLabel.Height := 200;
+  HeroLabel.height := 200;
   CoinCountLabel.Width := 200;
-  CoinCountLabel.Height := 200;
+  CoinCountLabel.height := 200;
+end;
+
+procedure TMainForm.FormShowInputFrezeTimer(Sender: TObject);
+begin
+isFormActive := True;
+FormShowInputFreze.Enabled := False
 end;
 
 procedure TMainForm.InfoBtnImageClick(Sender: TObject);
@@ -188,8 +206,7 @@ procedure TMainForm.NewGameBtnImageMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 // New Game
 begin
-  SelectDifficultForm.Show;
-  MainForm.hide;
+  GameStart(false);
 end;
 
 procedure TMainForm.NewGameBtnImageMouseEnter(Sender: TObject);
@@ -211,6 +228,48 @@ procedure TMainForm.SettingsBtnImageClick(Sender: TObject);
 begin
 
   showmessage('settings');
+end;
+
+procedure TMainForm.UpDateTimer(Sender: TObject);
+var
+  gamePad: tjoyinfo;
+  keypad: Integer;
+begin
+if not isFormActive then exit;
+
+joygetpos(joystickid1, @gamePad);
+if not GAME_PAD_CONNECTED then
+    begin
+       if (gamePad.wXpos > 32000) and (gamePad.wXpos < 33000) and (gamePad.wYpos > 32000) and (gamePad.wYpos < 33000)  then
+      begin
+        GAME_PAD_CONNECTED := true;
+        Msg('Был обнаружен подключенный GamePad. Вы можете играть в игру с его помощью.');
+
+      end;
+      exit;
+    end;
+
+
+  case gamePad.wButtons of
+    128:
+      GameStart(False);
+    64:
+      BackGroundForm.Close;
+    4:
+      ; // L
+    8:
+      ; // R
+  end;
+end;
+
+procedure TMainForm.GameStart(mode: BOOL);
+begin
+  if mode then
+  else
+  begin
+    SelectDifficultForm.Show;
+    MainForm.hide;
+  end;
 end;
 
 function TMainForm.GetSelectedPlayerIndex(): Integer;

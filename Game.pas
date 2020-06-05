@@ -29,6 +29,7 @@ type
     CardWeaponImageList: TImageList;
     Label1: TLabel;
     InputLockcooldown: TTimer;
+    FormShowInputFreze: TTimer;
     procedure BackBtnImageClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
@@ -36,8 +37,10 @@ type
     procedure UpDateTimer(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure InputLockcooldownTimer(Sender: TObject);
+    procedure FormShowInputFrezeTimer(Sender: TObject);
   private
     GameStartMode: Integer;
+    isFormActive: Boolean;
     BufferLoadData: TFieldOfCardSaveData;
     procedure BackToMenu();
     procedure DoKeyDown(Key: Integer);
@@ -142,6 +145,12 @@ begin
   font.Color := RGB(222, 185, 56);
 end;
 
+procedure TGameForm.FormShowInputFrezeTimer(Sender: TObject);
+begin
+  isFormActive := true;
+  FormShowInputFreze.Enabled := False;
+end;
+
 procedure TGameForm.GameStart();
 begin
   GameStartMode := 0;
@@ -170,31 +179,43 @@ var
   gamePad: tjoyinfo;
   keypad: Integer;
 begin
+  if InputLockcooldown.Enabled then
+    exit;
+
   joygetpos(joystickid1, @gamePad);
 
-  Label1.Caption := tStr(gamePad.wXpos) + ' ' + tStr(gamePad.wYpos) + ' ' +
-    tStr(gamePad.wZpos) + ' ' + tStr(gamePad.wButtons);
 
-  if gamePad.wXpos > 60000 then
+  Label1.Caption := tStr(gamePad.wXpos) + ' ' + tStr(gamePad.wYpos) + ' ' +
+    tStr(gamePad.wZpos) + ' ' + tStr(gamePad.wZpos) + ' ' +
+    tStr(gamePad.wButtons) + ' ' + tStr(FieldOfCards.IsCardAnimPlayed(3)) + ' '
+    + tStr(FieldOfCards.IsCardAnimPlayed(1));
+
+  if gamePad.wXpos > 65400 then
     DoKeyDown(VK_RIGHT);
-  if gamePad.wXpos < 5000 then
+  if gamePad.wXpos < 100 then
     DoKeyDown(VK_LEFT);
-  if gamePad.wYpos > 60000 then
+  if gamePad.wYpos > 65400 then
     DoKeyDown(VK_DOWN);
-  if gamePad.wYpos < 5000 then
+  if gamePad.wYpos < 100 then
     DoKeyDown(VK_UP);
+
   case gamePad.wButtons of
     1:
-     ;
+      DoKeyDown(VK_DOWN);
     2:
-     DoKeyDown(VK_ESCAPE);
+      DoKeyDown(VK_RIGHT);
     4:
-      DoKeyDown(76); //L
+      DoKeyDown(VK_LEFT); // L
     8:
-      DoKeyDown(82); //R
+      DoKeyDown(VK_UP); // R
+    16:
+      DoKeyDown(82);
+    32:
+      DoKeyDown(76);
+    64:
+      DoKeyDown(VK_ESCAPE);
 
   end;
-
 end;
 
 procedure TGameForm.SetDifficult(Difficult: Integer);

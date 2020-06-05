@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
+  System.Classes, Vcl.Graphics, mmsystem,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
   nicestuff;
 
@@ -20,6 +20,8 @@ type
     LevelSelectBrnBack3: TImage;
     LevelSelectBrnBack4: TImage;
     LevelSelectBrn4: TImage;
+    UpDate: TTimer;
+    FormShowInputFreze: TTimer;
     procedure BackBtnImageClick(Sender: TObject);
     procedure LevelSelectBrn1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -34,9 +36,15 @@ type
     procedure LevelSelectBrn4Click(Sender: TObject);
     procedure LevelSelectBrn4MouseEnter(Sender: TObject);
     procedure LevelSelectBrn4MouseLeave(Sender: TObject);
+    procedure UpDateTimer(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure FormHide(Sender: TObject);
+    procedure FormShowInputFrezeTimer(Sender: TObject);
   private
     BufferFieldData: TFieldOfCardSaveData;
+    isFormActive: boolean;
     procedure GameStart(Difficult: integer);
+
   public
     procedure GameReset(Difficult: integer);
     procedure GameSave();
@@ -65,6 +73,22 @@ begin
   InitForm(self);
 end;
 
+procedure TSelectDifficultForm.FormHide(Sender: TObject);
+begin
+  isFormActive := false;
+end;
+
+procedure TSelectDifficultForm.FormShow(Sender: TObject);
+begin
+  FormShowInputFreze.Enabled := True;
+end;
+
+procedure TSelectDifficultForm.FormShowInputFrezeTimer(Sender: TObject);
+begin
+  FormShowInputFreze.Enabled := false;
+  isFormActive := True;
+end;
+
 procedure TSelectDifficultForm.LevelSelectBrn1Click(Sender: TObject);
 begin
   GameStart(1);
@@ -72,7 +96,7 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn1MouseEnter(Sender: TObject);
 begin
-  LevelSelectBrnBack1.Visible := true;
+  LevelSelectBrnBack1.Visible := True;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn1MouseLeave(Sender: TObject);
@@ -88,7 +112,7 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn2MouseEnter(Sender: TObject);
 begin
-  LevelSelectBrnBack2.Visible := true;
+  LevelSelectBrnBack2.Visible := True;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn2MouseLeave(Sender: TObject);
@@ -104,7 +128,7 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn3MouseEnter(Sender: TObject);
 begin
-  LevelSelectBrnBack3.Visible := true;
+  LevelSelectBrnBack3.Visible := True;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn3MouseLeave(Sender: TObject);
@@ -119,12 +143,34 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn4MouseEnter(Sender: TObject);
 begin
-  LevelSelectBrnBack4.Visible := true;
+  LevelSelectBrnBack4.Visible := True;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn4MouseLeave(Sender: TObject);
 begin
   LevelSelectBrnBack4.Visible := false;
+end;
+
+procedure TSelectDifficultForm.UpDateTimer(Sender: TObject);
+var
+  gamePad: tjoyinfo;
+  keypad: integer;
+begin
+  if not isFormActive then
+    exit;
+
+  joygetpos(joystickid1, @gamePad);
+
+  case gamePad.wButtons of
+    1:
+      GameStart(1);
+    2:
+      GameStart(5);
+    4:
+      GameStart(10);
+    8:
+      GameStart(15);
+  end;
 end;
 
 procedure TSelectDifficultForm.GameStart(Difficult: integer);
@@ -137,6 +183,7 @@ end;
 
 procedure TSelectDifficultForm.GameReset(Difficult: integer);
 begin
+  GameData.Money := GameData.Money + FieldOfCards.GetMoneyRecived;
   GameForm.Free;
   GameForm := TGameForm.Create(Application);
   GameForm.SetDifficult(Difficult);

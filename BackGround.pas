@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
+  System.Classes, Vcl.Graphics, mmsystem,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
   Vcl.StdCtrls, Vcl.ComCtrls;
 
@@ -46,13 +46,22 @@ end;
 procedure TBackGroundForm.StartTimerTimer(Sender: TObject);
 var
   screenProp: real;
+  gamePad: tjoyinfo;
+  keypad: Integer;
 begin
+
+  joygetpos(joystickid1, @gamePad);
+
   screenProp := Screen.Width / Screen.Height;
   StartTimer.Enabled := false;
+
+
   if (round(screenProp * 10) <> 18) then
     ShowException(exception.Create
       ('ВНИМАНИЕ!!! Вы запускаете игру на мониторе с не поддерживаемым соотношением сторон! Пожалуйста, по возможности, переключитесь на разрешение сторон близким к 16:9. Игра You''n''Dungeon продолжит работу с некоректным отображением UI.'),
       0);
+
+
 
   AddFontResourceEx('Assets\Fonts\Gnomoria.ttf', FR_PRIVATE, 0);
   InitCardStat;

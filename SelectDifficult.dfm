@@ -13,6 +13,8 @@ object SelectDifficultForm: TSelectDifficultForm
   Font.Style = []
   OldCreateOrder = False
   OnCreate = FormCreate
+  OnHide = FormHide
+  OnShow = FormShow
   DesignSize = (
     896
     504)
@@ -614,5 +616,18 @@ object SelectDifficultForm: TSelectDifficultForm
     OnClick = LevelSelectBrn4Click
     OnMouseEnter = LevelSelectBrn4MouseEnter
     OnMouseLeave = LevelSelectBrn4MouseLeave
+  end
+  object UpDate: TTimer
+    Interval = 15
+    OnTimer = UpDateTimer
+    Left = 864
+    Top = 304
+  end
+  object FormShowInputFreze: TTimer
+    Enabled = False
+    Interval = 100
+    OnTimer = FormShowInputFrezeTimer
+    Left = 824
+    Top = 240
   end
 end

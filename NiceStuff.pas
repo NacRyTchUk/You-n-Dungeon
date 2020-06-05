@@ -19,7 +19,7 @@ const
   COUNTS_OF_CARDS = COUNT_OF_BONUS_CARDS + COUNT_OF_ENEMIES + COUNT_OF_TRAPS;
 
   CHANCE_OF_NOTHING = 5;
-  CHANCE_OF_BONUS = 40;
+  CHANCE_OF_BONUS = 50;
   CHANCE_OF_ENEMIES = 60;
   CHANCE_OF_TRAPS = 15;
   CHEST_INDEX = 3;
@@ -119,7 +119,8 @@ type
 
 procedure Msg(text: string); overload;
 procedure Msg(numb: integer); overload;
-function tStr(i: integer): string;
+function tStr(i: integer): string; overload;
+function tStr(i: Boolean): string; overload;
 function tInt(s: string): integer;
 function CTP(X, Y: integer): TPosition;
 procedure ReSizeResolution(oForm: TForm);
@@ -131,7 +132,7 @@ function Rnd(max: integer): integer; overload;
 function Rnd(min, max, wmin, wmax: integer): integer; overload;
 function RndWWeight(var weight: array of integer): integer;
 function CGTDT(CardGen: TCardGen): integer;
-function KeyToChar(Key : Integer) : Char;
+function KeyToChar(Key: integer): Char;
 
 procedure SaveGameData(); overload;
 procedure SaveGameData(path: string); overload;
@@ -144,6 +145,7 @@ const
 
 var
   iPercentage: integer;
+  GAME_PAD_CONNECTED : Boolean = false;
 
 implementation
 
@@ -246,6 +248,14 @@ begin
   tStr := IntToStr(i);
 end;
 
+function tStr(i: Boolean): string;
+begin
+  if i then
+    tStr := 'true'
+  else
+    tStr := 'false';
+end;
+
 function tInt(s: string): integer;
 begin
   tInt := StrToInt(s);
@@ -319,17 +329,20 @@ begin
   //
 end;
 
-
-function KeyToChar(Key : Integer) : Char;
+function KeyToChar(Key: integer): Char;
 var
-  chKey : Char;
+  chKey: Char;
 begin
   chKey := Chr(Key);
   case Key of
-    37 : chKey := 'A';
-    38 : chKey := 'W';
-    39 : chKey := 'D';
-    40 : chKey := 'S';
+    37:
+      chKey := 'A';
+    38:
+      chKey := 'W';
+    39:
+      chKey := 'D';
+    40:
+      chKey := 'S';
   end;
   KeyToChar := chKey;
 end;

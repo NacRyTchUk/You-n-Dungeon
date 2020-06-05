@@ -735,8 +735,13 @@ begin
   dy := Abs(FieldOfCards.GetPlayerPos.Y - Position.Y);
   plP := FieldOfCards.GetPlayerPos;
   if (((dx = 1) and (dy = 0)) or ((dx = 0) and (dy = 1))) and
-    not FieldOfCards.IsCardAnimPlayed(3) and not IsCardIsPlayer then
+    true and not IsCardIsPlayer then
   begin
+       
+    if  FieldOfCards.IsCardAnimPlayed(3) or
+     FieldOfCards.IsCardAnimPlayed(1) then exit;
+    
+
     dx := Position.X - FieldOfCards.GetPlayerPos.X;
     dy := FieldOfCards.GetPlayerPos.Y - Position.Y;
     FieldOfCards.DoStep;
@@ -824,9 +829,9 @@ begin
     Randomize;
 
     CO_NO := CHANCE_OF_NOTHING;
-    CO_BO := Round(CHANCE_OF_BONUS * (0.5 + 1 / Difficult)) + CO_NO;
-    CO_EN := Round(CHANCE_OF_ENEMIES * (Difficult * Difficult)) + CO_BO;
-    CO_TR := Round(CHANCE_OF_TRAPS * (Difficult * Difficult)) + CO_EN;
+    CO_BO := Round(CHANCE_OF_BONUS {* (0.5 + 1 / Difficult)}) + CO_NO;
+    CO_EN := Round(CHANCE_OF_ENEMIES {* (Difficult * Difficult)}) + CO_BO;
+    CO_TR := Round(CHANCE_OF_TRAPS {* (Difficult * Difficult)}) + CO_EN;
 
     randomR := Rnd(0, CO_TR);
 

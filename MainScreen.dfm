@@ -14,6 +14,7 @@ object MainForm: TMainForm
   OldCreateOrder = False
   WindowState = wsMaximized
   OnCreate = FormCreate
+  OnHide = FormHide
   OnKeyDown = FormKeyDown
   OnResize = FormResize
   OnShow = FormShow
@@ -1154,5 +1155,18 @@ object MainForm: TMainForm
     Proportional = True
     Stretch = True
     OnClick = AbilitySelectImageClick
+  end
+  object UpDate: TTimer
+    Interval = 15
+    OnTimer = UpDateTimer
+    Left = 808
+    Top = 232
+  end
+  object FormShowInputFreze: TTimer
+    Enabled = False
+    Interval = 500
+    OnTimer = FormShowInputFrezeTimer
+    Left = 808
+    Top = 280
   end
 end
