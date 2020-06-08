@@ -179,11 +179,17 @@ var
   gamePad: tjoyinfo;
   keypad: Integer;
 begin
-  if InputLockcooldown.Enabled then
+  if InputLockcooldown.Enabled or not GAME_PAD_CONNECTED then
     exit;
 
-  joygetpos(joystickid1, @gamePad);
+  if not IsGamePadIsConnected then
+  begin
+    GAME_PAD_CONNECTED := False;
+    Msg('Похоже, что геймпад был отключен...');
+    exit;
+  end;
 
+  joygetpos(joystickid1, @gamePad);
 
   Label1.Caption := tStr(gamePad.wXpos) + ' ' + tStr(gamePad.wYpos) + ' ' +
     tStr(gamePad.wZpos) + ' ' + tStr(gamePad.wZpos) + ' ' +

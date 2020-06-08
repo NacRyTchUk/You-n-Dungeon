@@ -51,7 +51,6 @@ type
     procedure ReScaleLabelToNone(var Labeel: tlabel);
     procedure ValueRefresh();
 
-
     procedure ImMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
     procedure ImMouseUp(Sender: TObject; Button: TMouseButton;
@@ -723,7 +722,7 @@ end;
 procedure TCard.ImMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: integer);
 begin
-DoClick;
+  DoClick;
 end;
 
 procedure TCard.DoClick();
@@ -734,13 +733,12 @@ begin
   dx := Abs(FieldOfCards.GetPlayerPos.X - Position.X);
   dy := Abs(FieldOfCards.GetPlayerPos.Y - Position.Y);
   plP := FieldOfCards.GetPlayerPos;
-  if (((dx = 1) and (dy = 0)) or ((dx = 0) and (dy = 1))) and
-    true and not IsCardIsPlayer then
+  if (((dx = 1) and (dy = 0)) or ((dx = 0) and (dy = 1))) and true and not IsCardIsPlayer
+  then
   begin
-       
-    if  FieldOfCards.IsCardAnimPlayed(3) or
-     FieldOfCards.IsCardAnimPlayed(1) then exit;
-    
+
+    if FieldOfCards.IsCardAnimPlayed(3) or FieldOfCards.IsCardAnimPlayed(1) then
+      exit;
 
     dx := Position.X - FieldOfCards.GetPlayerPos.X;
     dy := FieldOfCards.GetPlayerPos.Y - Position.Y;
@@ -829,9 +827,9 @@ begin
     Randomize;
 
     CO_NO := CHANCE_OF_NOTHING;
-    CO_BO := Round(CHANCE_OF_BONUS {* (0.5 + 1 / Difficult)}) + CO_NO;
-    CO_EN := Round(CHANCE_OF_ENEMIES {* (Difficult * Difficult)}) + CO_BO;
-    CO_TR := Round(CHANCE_OF_TRAPS {* (Difficult * Difficult)}) + CO_EN;
+    CO_BO := Round(CHANCE_OF_BONUS { * (0.5 + 1 / Difficult) } ) + CO_NO;
+    CO_EN := Round(CHANCE_OF_ENEMIES { * (Difficult * Difficult) } ) + CO_BO;
+    CO_TR := Round(CHANCE_OF_TRAPS { * (Difficult * Difficult) } ) + CO_EN;
 
     randomR := Rnd(0, CO_TR);
 
@@ -1026,13 +1024,17 @@ begin
       end;
     2:
       begin
-        FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem := ItemIndex;
-        FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue := Value;
-        FieldOfCards.GetFieldOfCards[plP.X, plP.Y]
-          .CardPlayerItemIm.Visible := true;
-        GameForm.CardWeaponImageList.GetBitmap(ItemIndex,
+        if Value > FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue
+        then
+        begin
+          FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem := ItemIndex;
+          FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue := Value;
           FieldOfCards.GetFieldOfCards[plP.X, plP.Y]
-          .CardPlayerItemIm.Picture.Bitmap);
+            .CardPlayerItemIm.Visible := true;
+          GameForm.CardWeaponImageList.GetBitmap(ItemIndex,
+            FieldOfCards.GetFieldOfCards[plP.X, plP.Y]
+            .CardPlayerItemIm.Picture.Bitmap);
+        end;
         BonusPick := 0;
       end;
     3:

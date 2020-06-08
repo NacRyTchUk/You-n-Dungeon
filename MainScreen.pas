@@ -34,6 +34,7 @@ type
     CoinCountLabel: TLabel;
     UpDate: TTimer;
     FormShowInputFreze: TTimer;
+    Label1: TLabel;
     procedure FormResize(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CloseBtnImageMouseUp(Sender: TObject; Button: TMouseButton;
@@ -63,7 +64,7 @@ type
     procedure FormHide(Sender: TObject);
   private
     SelectPlayerIndex: Integer;
-    isFormActive : boolean;
+    isFormActive: boolean;
     procedure GameStart(mode: BOOL);
 
   public
@@ -143,7 +144,7 @@ end;
 
 procedure TMainForm.FormHide(Sender: TObject);
 begin
-isFormActive := False;
+  isFormActive := false;
 end;
 
 procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
@@ -164,6 +165,7 @@ end;
 procedure TMainForm.FormShow(Sender: TObject);
 begin
   // BackGroundForm.Show();
+  GAME_PAD_CONNECTED := IsGamePadIsConnected;
   FormShowInputFreze.Enabled := true;
   CoinCountLabel.Caption := IntToStr(GameData.Money);
   AbilityLabel.Width := 200;
@@ -176,8 +178,8 @@ end;
 
 procedure TMainForm.FormShowInputFrezeTimer(Sender: TObject);
 begin
-isFormActive := True;
-FormShowInputFreze.Enabled := False
+  isFormActive := true;
+  FormShowInputFreze.Enabled := false
 end;
 
 procedure TMainForm.InfoBtnImageClick(Sender: TObject);
@@ -235,24 +237,38 @@ var
   gamePad: tjoyinfo;
   keypad: Integer;
 begin
-if not isFormActive then exit;
+  if not isFormActive then
+    exit;
 
-joygetpos(joystickid1, @gamePad);
-if not GAME_PAD_CONNECTED then
+  joygetpos(joystickid1, @gamePad);
+
+  Label1.Caption := tStr(gamePad.wXpos) + ' ' + tStr(gamePad.wYpos) + ' ' +
+    tStr(gamePad.wZpos) + ' ' + tStr(gamePad.wZpos) + ' ' +
+    tStr(gamePad.wButtons);
+
+  if GAME_PAD_CONNECTED then
+  begin
+    if not IsGamePadIsConnected then
     begin
-       if (gamePad.wXpos > 32000) and (gamePad.wXpos < 33000) and (gamePad.wYpos > 32000) and (gamePad.wYpos < 33000)  then
-      begin
-        GAME_PAD_CONNECTED := true;
-        Msg('Был обнаружен подключенный GamePad. Вы можете играть в игру с его помощью.');
-
-      end;
+      GAME_PAD_CONNECTED := false;
+      Msg('Похоже, что геймпад был отключен...');
       exit;
     end;
+  end
+  else
+  begin
 
+    if IsGamePadIsConnected then
+    begin
+      GAME_PAD_CONNECTED := true;
+      Msg('Был обнаружен подключенный GamePad. Вы можете играть в игру с его помощью.');
+    end;
+    exit;
+  end;
 
   case gamePad.wButtons of
     128:
-      GameStart(False);
+      GameStart(false);
     64:
       BackGroundForm.Close;
     4:

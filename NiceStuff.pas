@@ -2,7 +2,7 @@ unit NiceStuff;
 
 interface
 
-uses Dialogs, System.SysUtils, TPositionLib, Forms;
+uses Dialogs, System.SysUtils, TPositionLib, Forms, mmsystem;
 
 const
   SIZE_SPACE = 14;
@@ -133,6 +133,7 @@ function Rnd(min, max, wmin, wmax: integer): integer; overload;
 function RndWWeight(var weight: array of integer): integer;
 function CGTDT(CardGen: TCardGen): integer;
 function KeyToChar(Key: integer): Char;
+function IsGamePadIsConnected(): Boolean;
 
 procedure SaveGameData(); overload;
 procedure SaveGameData(path: string); overload;
@@ -145,7 +146,7 @@ const
 
 var
   iPercentage: integer;
-  GAME_PAD_CONNECTED : Boolean = false;
+  GAME_PAD_CONNECTED: Boolean = false;
 
 implementation
 
@@ -346,5 +347,15 @@ begin
   end;
   KeyToChar := chKey;
 end;
+
+function IsGamePadIsConnected(): Boolean;
+var
+  gamePad: tjoyinfo;
+  jr : Cardinal;
+begin
+jr :=  joygetpos(joystickid1, @gamePad);
+IsGamePadIsConnected := jr = JOYERR_NOERROR;
+end;
+
 
 end.
