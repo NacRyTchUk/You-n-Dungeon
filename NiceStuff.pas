@@ -147,6 +147,7 @@ const
 var
   iPercentage: integer;
   GAME_PAD_CONNECTED: Boolean = false;
+  SETT_GAMEPAD_ON : Boolean = true;
 
 implementation
 

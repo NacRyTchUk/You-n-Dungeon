@@ -166,6 +166,7 @@ procedure TMainForm.FormShow(Sender: TObject);
 begin
   // BackGroundForm.Show();
   GAME_PAD_CONNECTED := IsGamePadIsConnected;
+  if not GAME_PAD_CONNECTED then UpDate.Interval := 5000;
   FormShowInputFreze.Enabled := true;
   CoinCountLabel.Caption := IntToStr(GameData.Money);
   AbilityLabel.Width := 200;
@@ -174,6 +175,7 @@ begin
   HeroLabel.height := 200;
   CoinCountLabel.Width := 200;
   CoinCountLabel.height := 200;
+
 end;
 
 procedure TMainForm.FormShowInputFrezeTimer(Sender: TObject);
@@ -237,7 +239,7 @@ var
   gamePad: tjoyinfo;
   keypad: Integer;
 begin
-  if not isFormActive then
+  if not isFormActive or not SETT_GAMEPAD_ON then
     exit;
 
   joygetpos(joystickid1, @gamePad);
@@ -252,16 +254,19 @@ begin
     begin
       GAME_PAD_CONNECTED := false;
       Msg('Похоже, что геймпад был отключен...');
+      UpDate.Interval := 1000;
       exit;
     end;
   end
   else
   begin
 
+
     if IsGamePadIsConnected then
     begin
       GAME_PAD_CONNECTED := true;
       Msg('Был обнаружен подключенный GamePad. Вы можете играть в игру с его помощью.');
+      UpDate.Interval := 15;
     end;
     exit;
   end;

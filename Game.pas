@@ -179,7 +179,7 @@ var
   gamePad: tjoyinfo;
   keypad: Integer;
 begin
-  if InputLockcooldown.Enabled or not GAME_PAD_CONNECTED then
+  if InputLockcooldown.Enabled or not GAME_PAD_CONNECTED or not SETT_GAMEPAD_ON then
     exit;
 
   if not IsGamePadIsConnected then

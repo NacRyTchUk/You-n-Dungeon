@@ -156,7 +156,7 @@ var
   gamePad: tjoyinfo;
   keypad: integer;
 begin
-  if not isFormActive then
+  if not isFormActive or not GAME_PAD_CONNECTED or not SETT_GAMEPAD_ON then
     exit;
 
   joygetpos(joystickid1, @gamePad);

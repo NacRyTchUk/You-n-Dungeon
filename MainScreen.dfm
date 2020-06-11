@@ -1166,7 +1166,7 @@ object MainForm: TMainForm
     WordWrap = True
   end
   object UpDate: TTimer
-    Interval = 15
+    Interval = 60
     OnTimer = UpDateTimer
     Left = 808
     Top = 232
