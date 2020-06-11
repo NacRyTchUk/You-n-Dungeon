@@ -2,7 +2,7 @@ unit NiceStuff;
 
 interface
 
-uses Dialogs, System.SysUtils, TPositionLib, Forms, mmsystem;
+uses Dialogs, System.SysUtils, TPositionLib, Forms, Winapi.Windows, mmsystem;
 
 const
   SIZE_SPACE = 14;
@@ -168,6 +168,7 @@ begin
   ReSizeResolution(oForm);
   oForm.DoubleBuffered := true;
   oForm.Font.Name := 'Gnomoria_rus';
+  oForm.font.Color := RGB(222, 185, 56);
 end;
 
 procedure InitForm(oForm: TForm; Param: string);

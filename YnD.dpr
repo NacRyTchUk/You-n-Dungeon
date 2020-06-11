@@ -4,6 +4,7 @@ program YnD;
 
 uses
   Vcl.Forms,
+  GifImg,
   MainScreen in 'MainScreen.pas' {MainForm},
   Configurate in 'Configurate.pas',
   SelectDifficult in 'SelectDifficult.pas' {SelectDifficultForm},
@@ -19,6 +20,7 @@ uses
 {$R *.res}
 
 begin
+  GIFImageDefaultAnimate := True;
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.Title := 'You''n''Dungeon';

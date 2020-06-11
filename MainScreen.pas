@@ -34,6 +34,8 @@ type
     CoinCountLabel: TLabel;
     UpDate: TTimer;
     FormShowInputFreze: TTimer;
+    LeftFireGif: TImage;
+    RightFireGif: TImage;
     procedure FormResize(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CloseBtnImageMouseUp(Sender: TObject; Button: TMouseButton;
@@ -103,6 +105,8 @@ end;
 procedure TMainForm.AchiveBtnImageMouseEnter(Sender: TObject);
 begin
   AchiveBorderBtnImage.Visible := true;
+
+
 end;
 
 procedure TMainForm.AchiveBtnImageMouseLeave(Sender: TObject);
@@ -134,11 +138,10 @@ begin
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
+var
+  tGif : TGIFImage;
 begin
   InitForm(self);
-
-  MainForm.font.Color := RGB(222, 185, 56);
-
 end;
 
 procedure TMainForm.FormHide(Sender: TObject);
