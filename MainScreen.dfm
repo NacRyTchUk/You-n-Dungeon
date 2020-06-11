@@ -1156,15 +1156,6 @@ object MainForm: TMainForm
     Stretch = True
     OnClick = AbilitySelectImageClick
   end
-  object Label1: TLabel
-    Left = 112
-    Top = 0
-    Width = 38
-    Height = 16
-    Caption = 'Label1'
-    Visible = False
-    WordWrap = True
-  end
   object UpDate: TTimer
     Interval = 60
     OnTimer = UpDateTimer

@@ -124,7 +124,8 @@ function tStr(i: Boolean): string; overload;
 function tInt(s: string): integer;
 function CTP(X, Y: integer): TPosition;
 procedure ReSizeResolution(oForm: TForm);
-procedure InitForm(oForm: TForm);
+procedure InitForm(oForm: TForm); overload;
+procedure InitForm(oForm: TForm; Param: string); overload;
 function CoordToVector(Coord: TPosition): integer;
 function VectorToCoord(vector: integer): TPosition;
 function Rnd(min, max: integer): integer; overload;
@@ -147,7 +148,7 @@ const
 var
   iPercentage: integer;
   GAME_PAD_CONNECTED: Boolean = false;
-  SETT_GAMEPAD_ON : Boolean = true;
+  SETT_GAMEPAD_ON: Boolean = true;
 
 implementation
 
@@ -165,7 +166,19 @@ end;
 procedure InitForm(oForm: TForm);
 begin
   ReSizeResolution(oForm);
+  oForm.DoubleBuffered := true;
   oForm.Font.Name := 'Gnomoria_rus';
+end;
+
+procedure InitForm(oForm: TForm; Param: string);
+begin
+  {case Param of
+    '-resize':
+      begin
+        oForm.DoubleBuffered := true;
+        oForm.Font.Name := 'Gnomoria_rus';
+      end;
+  end;}
 end;
 
 function CoordToVector(Coord: TPosition): integer;
@@ -352,11 +365,10 @@ end;
 function IsGamePadIsConnected(): Boolean;
 var
   gamePad: tjoyinfo;
-  jr : Cardinal;
+  jr: Cardinal;
 begin
-jr :=  joygetpos(joystickid1, @gamePad);
-IsGamePadIsConnected := jr = JOYERR_NOERROR;
+  jr := joygetpos(joystickid1, @gamePad);
+  IsGamePadIsConnected := jr = JOYERR_NOERROR;
 end;
-
 
 end.

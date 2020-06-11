@@ -12,7 +12,9 @@ uses
   TCardClass in 'TCardClass.pas',
   TFieldClass in 'TFieldClass.pas',
   NiceStuff in 'NiceStuff.pas',
-  TCardStatsClass in 'TCardStatsClass.pas';
+  TCardStatsClass in 'TCardStatsClass.pas',
+  SelectPlayer in 'SelectPlayer.pas' {SelectPlayerForm},
+  SelectAbility in 'SelectAbility.pas' {SelectAbillityForm};
 
 {$R *.res}
 
@@ -23,5 +25,7 @@ begin
   Application.CreateForm(TBackGroundForm, BackGroundForm);
   Application.CreateForm(TSelectDifficultForm, SelectDifficultForm);
   Application.CreateForm(TMainForm, MainForm);
+  Application.CreateForm(TSelectPlayerForm, SelectPlayerForm);
+  Application.CreateForm(TSelectAbillityForm, SelectAbillityForm);
   Application.Run;
 end.

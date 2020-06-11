@@ -8,7 +8,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
   Vcl.ExtCtrls, configurate, System.ImageList, Vcl.ImgList, Vcl.Imaging.jpeg,
   GifImg, SelectDifficult, mmsystem,
-  NiceStuff, Vcl.OleCtrls, SHDocVw;
+  NiceStuff, Vcl.OleCtrls, SHDocVw, Vcl.ComCtrls;
 
 type
   TMainForm = class(TForm)
@@ -34,7 +34,6 @@ type
     CoinCountLabel: TLabel;
     UpDate: TTimer;
     FormShowInputFreze: TTimer;
-    Label1: TLabel;
     procedure FormResize(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CloseBtnImageMouseUp(Sender: TObject; Button: TMouseButton;
@@ -79,7 +78,7 @@ implementation
 
 {$R *.dfm}
 
-uses BackGround;
+uses BackGround, selectplayer, selectability;
 
 function CentrX(weight: Integer): Integer;
 begin
@@ -93,7 +92,7 @@ end;
 
 procedure TMainForm.AbilitySelectImageClick(Sender: TObject);
 begin
-  showmessage('ability');
+  SelectAbillityForm.Show;
 end;
 
 procedure TMainForm.AchiveBtnImageClick(Sender: TObject);
@@ -225,7 +224,7 @@ end;
 
 procedure TMainForm.PlayerSelectImageClick(Sender: TObject);
 begin
-  showmessage('hero');
+ SelectPlayerForm.Show;
 end;
 
 procedure TMainForm.SettingsBtnImageClick(Sender: TObject);
@@ -243,10 +242,6 @@ begin
     exit;
 
   joygetpos(joystickid1, @gamePad);
-
-  Label1.Caption := tStr(gamePad.wXpos) + ' ' + tStr(gamePad.wYpos) + ' ' +
-    tStr(gamePad.wZpos) + ' ' + tStr(gamePad.wZpos) + ' ' +
-    tStr(gamePad.wButtons);
 
   if GAME_PAD_CONNECTED then
   begin

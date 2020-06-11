@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics, mmsystem,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
-  nicestuff;
+  nicestuff, System.ImageList, Vcl.ImgList;
 
 type
   TSelectDifficultForm = class(TForm)
@@ -69,7 +69,6 @@ end;
 
 procedure TSelectDifficultForm.FormCreate(Sender: TObject);
 begin
-
   InitForm(self);
 end;
 
@@ -97,6 +96,8 @@ end;
 procedure TSelectDifficultForm.LevelSelectBrn1MouseEnter(Sender: TObject);
 begin
   LevelSelectBrnBack1.Visible := True;
+
+
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn1MouseLeave(Sender: TObject);

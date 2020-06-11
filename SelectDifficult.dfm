@@ -21,8 +21,8 @@ object SelectDifficultForm: TSelectDifficultForm
   PixelsPerInch = 96
   TextHeight = 13
   object BackGroundImage: TImage
-    Left = 0
-    Top = 0
+    Left = -1
+    Top = -1
     Width = 897
     Height = 505
     Picture.Data = {
@@ -218,6 +218,7 @@ object SelectDifficultForm: TSelectDifficultForm
     Top = 106
     Width = 289
     Height = 92
+    ParentShowHint = False
     Picture.Data = {
       0954506E67496D61676589504E470D0A1A0A0000000D49484452000001210000
       005C080600000021D603B0000000097048597300000B1300000B1301009A9C18
@@ -249,13 +250,14 @@ object SelectDifficultForm: TSelectDifficultForm
       853C716711628C0917F2C49D4747E82F91ACBFD35B2D60570000000049454E44
       AE426082}
     Proportional = True
+    ShowHint = False
     Stretch = True
     Visible = False
     OnClick = LevelSelectBrn1Click
   end
   object LevelSelectBrnBack2: TImage
     Tag = 1
-    Left = 304
+    Left = 303
     Top = 198
     Width = 289
     Height = 92
@@ -620,14 +622,14 @@ object SelectDifficultForm: TSelectDifficultForm
   object UpDate: TTimer
     Interval = 15
     OnTimer = UpDateTimer
-    Left = 864
-    Top = 304
+    Left = 848
+    Top = 288
   end
   object FormShowInputFreze: TTimer
     Enabled = False
     Interval = 100
     OnTimer = FormShowInputFrezeTimer
-    Left = 824
+    Left = 848
     Top = 240
   end
 end
