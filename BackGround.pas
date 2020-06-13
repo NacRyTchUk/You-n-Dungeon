@@ -12,6 +12,7 @@ type
   TBackGroundForm = class(TForm)
     BackGroundImage: TImage;
     StartTimer: TTimer;
+    ImageForReload: TImage;
     procedure StartTimerTimer(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -63,7 +64,6 @@ begin
 
 
 
-  AddFontResourceEx('Assets\Fonts\Gnomoria.ttf', FR_PRIVATE, 0);
   InitCardStat;
 
   MainForm.Show;

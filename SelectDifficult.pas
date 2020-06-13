@@ -22,6 +22,7 @@ type
     LevelSelectBrn4: TImage;
     UpDate: TTimer;
     FormShowInputFreze: TTimer;
+    ReloadTimer: TTimer;
     procedure BackBtnImageClick(Sender: TObject);
     procedure LevelSelectBrn1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -40,6 +41,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormHide(Sender: TObject);
     procedure FormShowInputFrezeTimer(Sender: TObject);
+    procedure ReloadTimerTimer(Sender: TObject);
   private
     BufferFieldData: TFieldOfCardSaveData;
     isFormActive: boolean;
@@ -59,7 +61,7 @@ implementation
 
 {$R *.dfm}
 
-uses MainScreen, Game;
+uses MainScreen, Game, BackGround;
 
 procedure TSelectDifficultForm.BackBtnImageClick(Sender: TObject);
 begin
@@ -96,7 +98,6 @@ end;
 procedure TSelectDifficultForm.LevelSelectBrn1MouseEnter(Sender: TObject);
 begin
   LevelSelectBrnBack1.Visible := True;
-
 
 end;
 
@@ -152,6 +153,15 @@ begin
   LevelSelectBrnBack4.Visible := false;
 end;
 
+procedure TSelectDifficultForm.ReloadTimerTimer(Sender: TObject);
+begin
+  ReloadTimer.Enabled := false;
+
+  GameLoad;
+  BackGroundForm.ImageForReload.Picture :=
+    BackGroundForm.BackGroundImage.Picture;
+end;
+
 procedure TSelectDifficultForm.UpDateTimer(Sender: TObject);
 var
   gamePad: tjoyinfo;
@@ -186,10 +196,12 @@ procedure TSelectDifficultForm.GameReset(Difficult: integer);
 begin
   GameData.Money := GameData.Money + FieldOfCards.GetMoneyRecived;
   GameForm.Free;
+
   GameForm := TGameForm.Create(Application);
   GameForm.SetDifficult(Difficult);
   GameForm.GameStart();
   GameForm.Show;
+
 end;
 
 procedure TSelectDifficultForm.GameSave();
@@ -206,10 +218,17 @@ begin
 end;
 
 procedure TSelectDifficultForm.GameReload();
+var
+  gameBit, backBit: TBitmap;
 begin
+  backBit := TBitmap.Create;
+  gameBit := TBitmap.Create;
+  backBit := BackGroundForm.ImageForReload.Picture.Bitmap;
+  TakeScreenShot(gameBit);
+  BackGroundForm.ImageForReload.Picture.Bitmap := gameBit;
+  ReloadTimer.Enabled := True;
   GameSave;
   GameForm.Free;
-  GameLoad;
 end;
 
 end.

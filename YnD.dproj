@@ -106,11 +106,9 @@
         <DCCReference Include="TCardStatsClass.pas"/>
         <DCCReference Include="SelectPlayer.pas">
             <Form>SelectPlayerForm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="SelectAbility.pas">
             <Form>SelectAbillityForm</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>

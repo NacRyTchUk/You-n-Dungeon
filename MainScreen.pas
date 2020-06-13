@@ -36,6 +36,8 @@ type
     FormShowInputFreze: TTimer;
     LeftFireGif: TImage;
     RightFireGif: TImage;
+    PlayerDemoImages: TImageList;
+    AbilityDemoImages: TImageList;
     procedure FormResize(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CloseBtnImageMouseUp(Sender: TObject; Button: TMouseButton;
@@ -61,6 +63,7 @@ type
     procedure FormShow(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure UpDateTimer(Sender: TObject);
+    procedure GamePadKeyDo();
     procedure FormShowInputFrezeTimer(Sender: TObject);
     procedure FormHide(Sender: TObject);
   private
@@ -70,6 +73,10 @@ type
 
   public
     function GetSelectedPlayerIndex(): Integer;
+    procedure AnimWindowBlend(oForm: TForm;
+      mode, blendPercent, maxCouter: Integer; var counter: Integer;
+      var animTimer: TTimer);
+    procedure RefreshIconImg();
   end;
 
 var
@@ -99,13 +106,17 @@ end;
 
 procedure TMainForm.AchiveBtnImageClick(Sender: TObject);
 begin
-  // Msg('trophey');
-end;
+//  Msg('trophey');
+GameData.HeroSelected := 1;
+  RefreshIconImg;
+  Msg(1);
+GameData.HeroSelected := 2;
+  RefreshIconImg;
+  end;
 
 procedure TMainForm.AchiveBtnImageMouseEnter(Sender: TObject);
 begin
   AchiveBorderBtnImage.Visible := true;
-
 
 end;
 
@@ -139,9 +150,10 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 var
-  tGif : TGIFImage;
+  tGif: TGIFImage;
 begin
   InitForm(self);
+  RefreshIconImg;
 end;
 
 procedure TMainForm.FormHide(Sender: TObject);
@@ -152,9 +164,16 @@ end;
 procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-
-  if Key = 27 then
-    BackGroundForm.Close;
+  case Key of
+    113:
+      TakeScreenShot();
+    27:
+      BackGroundForm.Close;
+  end;
+  case KeyToChar(Key) of
+    ' ':
+      GameStart(false);
+  end;
 end;
 
 procedure TMainForm.FormResize(Sender: TObject);
@@ -168,15 +187,10 @@ procedure TMainForm.FormShow(Sender: TObject);
 begin
   // BackGroundForm.Show();
   GAME_PAD_CONNECTED := IsGamePadIsConnected;
-  if not GAME_PAD_CONNECTED then UpDate.Interval := 5000;
+  if not GAME_PAD_CONNECTED then
+    UpDate.Interval := 5000;
   FormShowInputFreze.Enabled := true;
   CoinCountLabel.Caption := IntToStr(GameData.Money);
-  AbilityLabel.Width := 200;
-  AbilityLabel.height := 200;
-  HeroLabel.Width := 200;
-  HeroLabel.height := 200;
-  CoinCountLabel.Width := 200;
-  CoinCountLabel.height := 200;
 
 end;
 
@@ -227,7 +241,7 @@ end;
 
 procedure TMainForm.PlayerSelectImageClick(Sender: TObject);
 begin
- SelectPlayerForm.Show;
+  SelectPlayerForm.Show;
 end;
 
 procedure TMainForm.SettingsBtnImageClick(Sender: TObject);
@@ -237,6 +251,11 @@ begin
 end;
 
 procedure TMainForm.UpDateTimer(Sender: TObject);
+begin
+  GamePadKeyDo;
+end;
+
+procedure TMainForm.GamePadKeyDo();
 var
   gamePad: tjoyinfo;
   keypad: Integer;
@@ -258,7 +277,6 @@ begin
   end
   else
   begin
-
 
     if IsGamePadIsConnected then
     begin
@@ -296,6 +314,64 @@ begin
 
   SelectPlayerIndex := 0;
   GetSelectedPlayerIndex := SelectPlayerIndex;
+end;
+
+procedure TMainForm.AnimWindowBlend(oForm: TForm;
+  mode, blendPercent, maxCouter: Integer; var counter: Integer;
+  var animTimer: TTimer);
+
+var
+  stepNormValue, normalizevValue, minValue: real;
+begin
+  stepNormValue := blendPercent / 100;
+  minValue := maxCouter / stepNormValue - maxCouter;
+  normalizevValue := 256 / (maxCouter + minValue);
+
+  case mode of
+    1:
+      begin
+        if counter <= maxCouter then
+        begin
+          oForm.AlphaBlendValue := round(counter * normalizevValue);
+          MainForm.AlphaBlendValue :=
+            round((maxCouter - counter * stepNormValue) * normalizevValue);
+          inc(counter);
+        end
+        else
+        begin
+          animTimer.Enabled := false;
+          oForm.AlphaBlendValue := 255;
+        end;
+      end;
+    2:
+      begin
+        if counter <= maxCouter then
+        begin
+          oForm.AlphaBlendValue :=
+            round((maxCouter - counter) * normalizevValue);
+          MainForm.AlphaBlendValue :=
+            round((minValue + counter * stepNormValue) * normalizevValue);
+          inc(counter);
+        end
+        else
+          oForm.Close;
+      end;
+  end;
+end;
+
+procedure TMainForm.RefreshIconImg();
+var bm : TBitmap;
+begin
+bm := TBitmap.Create;
+bm.Width := PlayerSelectImage.Width;
+bm.Height := PlayerSelectImage.Height;
+//какого черта этот чертов язык не может работать номально?
+//без доп переменной он банально не рефрешает его во второй раз
+PlayerDemoImages.GetBitmap(GameData.HeroSelected,bm);
+PlayerSelectImage.Picture.Bitmap := bm;
+AbilityDemoImages.GetBitmap(GameData.AbilitySelected, bm);
+AbilitySelectImage.Picture.Bitmap := bm;
+bm.Free;
 end;
 
 end.

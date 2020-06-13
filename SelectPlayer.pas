@@ -35,7 +35,7 @@ type
     procedure SelectPanelItem2Click(Sender: TObject);
     procedure SelectPanelItem3Click(Sender: TObject);
   private
-    AnimCounter, AnimMode: Integer;
+    AnimCounter, AnimMode, ItemSelected: Integer;
 
     procedure SelectItem(Number: Integer);
   public
@@ -53,6 +53,8 @@ uses mainscreen;
 
 procedure TSelectPlayerForm.BackBtnImageClick(Sender: TObject);
 begin
+    GameData.HeroSelected := ItemSelected;
+    MainForm.RefreshIconImg;
 
   AnimCounter := 0;
   AnimMode := 2;
@@ -67,6 +69,7 @@ end;
 
 procedure TSelectPlayerForm.FormShow(Sender: TObject);
 begin
+  SelectItem(GameData.HeroSelected);
   AnimCounter := 0;
   AnimMode := 1;
   AnimTimer.Enabled := true;
@@ -75,53 +78,30 @@ end;
 
 procedure TSelectPlayerForm.AnimTimerTimer(Sender: TObject);
 begin
-  case AnimMode of
-    1:
-      begin
-        if AnimCounter <= 10 then
-        begin
-          self.AlphaBlendValue := round(AnimCounter * 25.5);
-          MainForm.AlphaBlendValue := round((10 - AnimCounter / 2) * 25.5);
-          inc(AnimCounter);
-        end
-        else
-          AnimTimer.Enabled := False;
-      end;
-    2:
-      begin
-        if AnimCounter <= 10 then
-        begin
-          self.AlphaBlendValue := round((10 - AnimCounter) * 25.5);
-          MainForm.AlphaBlendValue := round((5 + AnimCounter / 2) * 25.5);
-          inc(AnimCounter);
-        end
-        else
-          self.Close;
-      end;
-  end;
-
+MainForm.AnimWindowBlend(Self, AnimMode,75, 10, AnimCounter, AnimTimer);
 end;
 
 procedure TSelectPlayerForm.SelectItem(Number: Integer);
 begin
-SelectPanelBorder1.Visible := (Number = 1);
-SelectPanelBorder2.Visible := (Number = 2);
-SelectPanelBorder3.Visible := (Number = 3);
+SelectPanelBorder1.Visible := (Number = 0);
+SelectPanelBorder2.Visible := (Number = 1);
+SelectPanelBorder3.Visible := (Number = 2);
+ItemSelected := Number;
 end;
 
 procedure TSelectPlayerForm.SelectPanelItem1Click(Sender: TObject);
 begin
-   SelectItem(1);
+   SelectItem(0);
 end;
 
 procedure TSelectPlayerForm.SelectPanelItem2Click(Sender: TObject);
 begin
-   SelectItem(2);
+   SelectItem(1);
 end;
 
 procedure TSelectPlayerForm.SelectPanelItem3Click(Sender: TObject);
 begin
-   SelectItem(3);
+   SelectItem(2);
 end;
 
 end.

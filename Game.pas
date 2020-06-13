@@ -142,7 +142,7 @@ begin
     FieldOfCards := TField.Create(BaseDifficult)
   else
     FieldOfCards := TField.Create(BufferLoadData.BaseDifficult, BufferLoadData);
-  font.Color := RGB(222, 185, 56);
+
 end;
 
 procedure TGameForm.FormShowInputFrezeTimer(Sender: TObject);

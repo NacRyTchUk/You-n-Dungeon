@@ -208,8 +208,9 @@ var
 begin
   if IsCardIsPlayer then
   begin
+    ItemIndex :=   GameData.HeroSelected;
     BorderIndex := 1;
-    Self.Value := 10;
+    Self.Value := 10 + ItemIndex*2;
   end
   else
   begin
@@ -353,7 +354,7 @@ begin
   CardItemIm.Transparent := true;
 
   if IsCardIsPlayer then
-    GameForm.CardPlayersImageList.GetBitmap(ItemIndex,
+       GameForm.CardPlayersImageList.GetBitmap(ItemIndex,
       CardItemIm.Picture.Bitmap)
   else
   begin
@@ -434,7 +435,7 @@ begin
     ValueText.Caption := IntToStr(PlayerItemValue);
 
     HealthValueText.Caption := HealthValueText.Caption + '/' +
-      IntToStr(PLAYER_CARD_BASE_HEALTH + MainForm.GetSelectedPlayerIndex * 2);
+      IntToStr(PLAYER_CARD_BASE_HEALTH + GameData.HeroSelected * 2);
 
     CardPlayerItemIm.Visible := (HasAItem <> 0);
 
@@ -883,7 +884,7 @@ begin
     wepDeal := false;
     dVal := FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value + Value;
     maxHealth := (PLAYER_CARD_BASE_HEALTH +
-      MainForm.GetSelectedPlayerIndex * 2);
+      GameData.HeroSelected * 2);
   end;
 
   CardGen.ItemType := ItemType;

@@ -2,7 +2,8 @@ unit NiceStuff;
 
 interface
 
-uses Dialogs, System.SysUtils, TPositionLib, Forms, Winapi.Windows, mmsystem;
+uses Dialogs, vcl.stdctrls, vcl.ExtCtrls, System.SysUtils, TPositionLib, Forms,
+  Winapi.Windows, mmsystem, Clipbrd, Graphics, vcl.imaging.pngimage;
 
 const
   SIZE_SPACE = 14;
@@ -135,6 +136,8 @@ function RndWWeight(var weight: array of integer): integer;
 function CGTDT(CardGen: TCardGen): integer;
 function KeyToChar(Key: integer): Char;
 function IsGamePadIsConnected(): Boolean;
+procedure TakeScreenShot(var bitm: TBitmap); overload;
+procedure TakeScreenShot(); overload;
 
 procedure SaveGameData(); overload;
 procedure SaveGameData(path: string); overload;
@@ -152,13 +155,103 @@ var
 
 implementation
 
+uses mainscreen, game;
+
+procedure TakeScreenShot();
+var
+  hWin: HWND;
+  dc: HDC;
+  bmp: TBitmap;
+  Dir: string;
+begin
+  Dir := ExtractFilePath(ParamStr(0)) + 'ScreenShots\';
+  if not DirectoryExists(Dir) then
+    ForceDirectories(Dir);
+
+  hWin := GetForegroundWindow;
+  dc := GetWindowDC(hWin);
+
+  bmp := TBitmap.Create;
+  bmp.Height := Screen.Height;
+  bmp.Width := Screen.Width;
+  BitBlt(bmp.Canvas.Handle, 0, 0, Screen.Width, Screen.Height, dc, 0,
+    0, SRCCOPY);
+
+  bmp.SaveToFile(Dir + FormatDateTime('dd.mm.yyyy"-"hh/nn/ss.zzz', Now)
+    + '.png');
+
+  ReleaseDC(hWin, dc);
+  bmp.Free;
+
+end;
+
+procedure TakeScreenShot(var bitm: TBitmap);
+var
+  hWin: HWND;
+  dc: HDC;
+begin
+
+  hWin := GetForegroundWindow;
+  dc := GetWindowDC(hWin);
+
+  bitm.Height := Screen.Height;
+  bitm.Width := Screen.Width;
+  BitBlt(bitm.Canvas.Handle, 0, 0, Screen.Width, Screen.Height, dc, 0,
+    0, SRCCOPY);
+
+  // bmp.SaveToFile(Dir + FormatDateTime('dd.mm.yyyy"-"hh/nn/ss.zzz', Now)
+  // + '.png');
+
+  ReleaseDC(hWin, dc);
+  // bmp.Free;
+
+end;
+
+{ var
+  Pic: TPicture;
+  BM: TBitmap;
+  bmHDC : HDC;
+  Dir: string;
+  begin
+
+  if not DirectoryExists(ExtractFilePath(ParamStr(0)) + 'ScreenShots') then
+  ForceDirectories(ExtractFilePath(ParamStr(0)) + 'ScreenShots');
+
+  Dir := ExtractFilePath(ParamStr(0)) + 'ScreenShots';
+  Pic := TPicture.Create;
+  BM := TBitmap.Create;
+  try
+  BM := TBitmap.Create;
+  BM.Width := Screen.Width;
+  BM.Height := Screen.Height;
+  BitBlt(getDC(MainForm.Handle), 0, 0, Screen.Width, Screen.Height, MainForm.BackGroundImage.Picture.Bitmap.Handle  ,0,0,SRCCOPY);
+
+  ///Pic.Width := Screen.Width;
+  //Pic.Height := Screen.Height
+
+  //Pic.Assign(BM);
+  //PNG.
+  {with PNG do
+  begin
+  bm.Handle := ClipBoard.getashandle(cf_bitmap);
+  //Resize(Screen.Width, Screen.Height);
+  Assign(BM);
+  //SaveToFile(Dir + '\' + IntToStr(1) + '.png');
+  end;
+  finally
+  Pic.Free;
+  BM.Free;
+  end;
+  TakeScreenShot := pic;
+  end;
+}
 procedure ReSizeResolution(oForm: TForm);
 begin
   if Screen.Width > MinimizeWinWight then
   begin
     iPercentage := Round(((Screen.Width - MinimizeWinWight) / MinimizeWinWight)
       * 100) + 100;
-    oForm.ScaleBy(iPercentage, 100);
+    oForm.ScaleBy(iPercentage + 1, 100);
   end;
 
 end;
@@ -168,18 +261,18 @@ begin
   ReSizeResolution(oForm);
   oForm.DoubleBuffered := true;
   oForm.Font.Name := 'Gnomoria_rus';
-  oForm.font.Color := RGB(222, 185, 56);
+  oForm.Font.Color := RGB(222, 185, 56);
 end;
 
 procedure InitForm(oForm: TForm; Param: string);
 begin
-  {case Param of
+  { case Param of
     '-resize':
-      begin
-        oForm.DoubleBuffered := true;
-        oForm.Font.Name := 'Gnomoria_rus';
-      end;
-  end;}
+    begin
+    oForm.DoubleBuffered := true;
+    oForm.Font.Name := 'Gnomoria_rus';
+    end;
+    end; }
 end;
 
 function CoordToVector(Coord: TPosition): integer;
@@ -359,6 +452,7 @@ begin
       chKey := 'D';
     40:
       chKey := 'S';
+
   end;
   KeyToChar := chKey;
 end;

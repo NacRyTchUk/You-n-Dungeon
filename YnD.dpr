@@ -5,6 +5,7 @@ program YnD;
 uses
   Vcl.Forms,
   GifImg,
+  Winapi.Windows,
   MainScreen in 'MainScreen.pas' {MainForm},
   Configurate in 'Configurate.pas',
   SelectDifficult in 'SelectDifficult.pas' {SelectDifficultForm},
@@ -20,6 +21,7 @@ uses
 {$R *.res}
 
 begin
+  AddFontResourceEx('Assets\Fonts\Gnomoria.ttf', FR_PRIVATE, 0);
   GIFImageDefaultAnimate := True;
   Application.Initialize;
   Application.MainFormOnTaskbar := True;

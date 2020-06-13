@@ -307,8 +307,10 @@ begin
     CardAnimStage[AnimID] := 0;
     CheckForNoAnim;
 
-    if IsReloadTime then
-      exit;
+    //if
+    IsReloadTime;
+    //then
+     // exit;
     // FieldOfCards[x, y].ReSetPosToMode(1);
   end;
 

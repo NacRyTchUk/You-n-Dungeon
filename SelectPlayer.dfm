@@ -16,14 +16,15 @@ object SelectPlayerForm: TSelectPlayerForm
   Font.Name = 'Gnomoria_rus'
   Font.Style = []
   OldCreateOrder = False
-  Position = poScreenCenter
+  Position = poDesktopCenter
+  PrintScale = poNone
   OnCreate = FormCreate
   OnShow = FormShow
   DesignSize = (
     448
     252)
   PixelsPerInch = 96
-  TextHeight = 19
+  TextHeight = 14
   object BackGroundImage: TImage
     Left = 0
     Top = 0
@@ -270,8 +271,8 @@ object SelectPlayerForm: TSelectPlayerForm
   object DescriptionLabel: TLabel
     Left = 54
     Top = 122
-    Width = 148
-    Height = 19
+    Width = 94
+    Height = 14
     Caption = #1054#1087#1080#1089#1072#1085#1080#1077' '#1080' '#1089#1090#1072#1090#1099
   end
   object SelectPanelItem1: TImage

@@ -632,4 +632,11 @@ object SelectDifficultForm: TSelectDifficultForm
     Left = 848
     Top = 240
   end
+  object ReloadTimer: TTimer
+    Enabled = False
+    Interval = 1
+    OnTimer = ReloadTimerTimer
+    Left = 848
+    Top = 344
+  end
 end
