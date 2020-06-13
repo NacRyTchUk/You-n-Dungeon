@@ -30,6 +30,10 @@ type
     Label1: TLabel;
     InputLockcooldown: TTimer;
     FormShowInputFreze: TTimer;
+    CainMultiplyLabel: TLabel;
+    AbilitySelectBackImage: TImage;
+    AbilitySelectImage: TImage;
+    AbillityChargeProgressLabel: TLabel;
     procedure BackBtnImageClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Button1Click(Sender: TObject);
@@ -137,6 +141,8 @@ end;
 procedure TGameForm.FormShow(Sender: TObject);
 begin
   InitForm(self);
+  AbilitySelectImage.Picture := MainForm.AbilitySelectImage.Picture;
+
 
   if GameStartMode = 0 then
     FieldOfCards := TField.Create(BaseDifficult)

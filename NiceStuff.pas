@@ -194,17 +194,12 @@ begin
   hWin := GetForegroundWindow;
   dc := GetWindowDC(hWin);
 
-  bitm.Height := Screen.Height;
+  bitm.Height := GameForm.Height;
   bitm.Width := Screen.Width;
   BitBlt(bitm.Canvas.Handle, 0, 0, Screen.Width, Screen.Height, dc, 0,
     0, SRCCOPY);
 
-  // bmp.SaveToFile(Dir + FormatDateTime('dd.mm.yyyy"-"hh/nn/ss.zzz', Now)
-  // + '.png');
-
   ReleaseDC(hWin, dc);
-  // bmp.Free;
-
 end;
 
 { var

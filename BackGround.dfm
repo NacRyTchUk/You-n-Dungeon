@@ -41,7 +41,7 @@ object BackGroundForm: TBackGroundForm
     Top = 0
     Width = 896
     Height = 504
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Anchors = [akLeft, akTop, akRight]
     Picture.Data = {
       0954506E67496D61676589504E470D0A1A0A0000000D49484452000000100000
       0010080200000090916836000000097048597300000B1200000B1201D2DD7EFC
@@ -49,7 +49,6 @@ object BackGroundForm: TBackGroundForm
       EF0E3F0000000049454E44AE426082}
     Stretch = True
     ExplicitWidth = 463
-    ExplicitHeight = 240
   end
   object StartTimer: TTimer
     Enabled = False

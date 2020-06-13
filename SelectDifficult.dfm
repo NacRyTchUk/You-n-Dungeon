@@ -21,10 +21,11 @@ object SelectDifficultForm: TSelectDifficultForm
   PixelsPerInch = 96
   TextHeight = 13
   object BackGroundImage: TImage
-    Left = -1
-    Top = -1
-    Width = 897
-    Height = 505
+    Left = 0
+    Top = 0
+    Width = 896
+    Height = 504
+    Align = alClient
     Picture.Data = {
       0954506E67496D61676589504E470D0A1A0A0000000D49484452000003800000
       01F808060000001BDA83D2000000097048597300000B1300000B1301009A9C18
@@ -187,6 +188,10 @@ object SelectDifficultForm: TSelectDifficultForm
       1042000200008410800000002104200000400801080000104200020000841080
       00000021FE0F17D129EF514A90FB0000000049454E44AE426082}
     Stretch = True
+    ExplicitLeft = -1
+    ExplicitTop = -1
+    ExplicitWidth = 897
+    ExplicitHeight = 505
   end
   object BackBtnImage: TImage
     Left = 8
