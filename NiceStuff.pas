@@ -36,6 +36,7 @@ const
   COUNT_OF_STEPS_TO_RELOAD = 30;
 
   PLAYER_CARD_BASE_HEALTH = 10;
+  ABILITY_CHARDGE_VALUE_BASE = 6;
 
 type
   TIndexOfCardMsg = (OK, OutOfBorder, FAIL);
@@ -111,7 +112,7 @@ type
   TFieldOfCardSaveData = record
     FieldOfCardsSaveData: array [0 .. FIELD_SIZE_X - 1, 0 .. FIELD_SIZE_Y - 1]
       of TCardSaveData;
-
+    Energy : Integer;
     Size: TPosition;
     PlayerCard: TPosition;
     BaseDifficult: integer;

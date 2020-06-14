@@ -24,6 +24,7 @@ type
     BufferCard: TCard;
     BaseDifficult: integer;
     RecivedMoney: integer;
+    Energy: integer;
     Steps: integer;
 
     CardAnimState: array [0 .. CARD_ANIM_COUNT] of bool;
@@ -32,6 +33,8 @@ type
     CardAnimIndex: array [0 .. CARD_ANIM_COUNT, 1 .. 3] of integer;
 
     function AnimProc(AnimIndex, AnimSpeed: integer): bool;
+    procedure RefreshAbilValue();
+    procedure AbilityDo();
   public
 
     procedure SetFieldVisible(isVisible: bool);
@@ -56,6 +59,7 @@ type
     procedure CheckForNoAnim();
     function IsReloadTime(): bool;
     procedure DoStep();
+    procedure ChargeTheAbilityOn(cValue: integer);
 
     procedure BrokePlayerItem();
     function SaveField(): TFieldOfCardSaveData;
@@ -69,7 +73,7 @@ type
 
 implementation
 
-uses Game, SelectDifficult;
+uses Game, SelectDifficult, MainScreen;
 
 function TField.GetFieldSize;
 begin
@@ -97,10 +101,11 @@ var
   cardisplayer: bool;
   SaveData: TFieldOfCardSaveData;
 begin
+
   SaveData.BaseDifficult := BaseDifficult;
   SaveData.PlayerCard := PlayerCard;
   SaveData.RecivedMoney := RecivedMoney;
-
+  SaveData.Energy := Energy;
   for i := 0 to FIELD_SIZE_X - 1 do
     for j := 0 to FIELD_SIZE_Y - 1 do
     begin
@@ -112,6 +117,7 @@ begin
         SaveData.FieldOfCardsSaveData[i, j].Position := CTP(i, j);
       end;
     end;
+
   SaveField := SaveData;
 end;
 
@@ -125,6 +131,7 @@ var
   i, j, x, y: integer;
   cardisplayer: bool;
 begin
+  RefreshAbilValue;
   Self.BaseDifficult := BaseDifficult;
 
   PlayerCard.x := (FIELD_SIZE_X - 1) div 2;
@@ -147,7 +154,8 @@ var
   cardisplayer: bool;
 begin
   Self.BaseDifficult := BaseDifficult;
-
+  Energy := LoadData.Energy;
+  RefreshAbilValue;
   PlayerCard := LoadData.PlayerCard;
 
   Self.RecivedMoney := LoadData.RecivedMoney;
@@ -257,7 +265,7 @@ begin
     CardAnimFrame[AnimID] := 0;
     CardAnimState[AnimID] := false;
     CardAnimStage[AnimID] := 0;
-    GameForm.InputLockcooldown.Enabled := False;
+    GameForm.InputLockcooldown.Enabled := false;
     CheckForNoAnim;
     FieldOfCards[x, y].SetMinimized(false);
     FieldOfCards[x, y].ReSetPosToMode(1);
@@ -307,10 +315,10 @@ begin
     CardAnimStage[AnimID] := 0;
     CheckForNoAnim;
 
-    //if
+    // if
     IsReloadTime;
-    //then
-     // exit;
+    // then
+    // exit;
     // FieldOfCards[x, y].ReSetPosToMode(1);
   end;
 
@@ -421,6 +429,32 @@ begin
   inc(Steps);
 end;
 
+procedure TField.ChargeTheAbilityOn(cValue: integer);
+begin
+  Energy := Energy + cValue;
+  if Energy >= ABILITY_CHARDGE_VALUE_BASE + GameData.AbilitySelected * 2 then
+  begin
+    Energy := 0;
+    AbilityDo;
+  end;
+  RefreshAbilValue;
+end;
+
+procedure TField.AbilityDo();
+begin
+  case GameData.AbilitySelected of
+    0 : AddMoneyOn(rnd(5,25));
+    1 : FieldOfCards[PlayerCard.X, PlayerCard.Y].HealthUp(rnd(2,7));
+    2 : FieldOfCards[PlayerCard.X, PlayerCard.Y].GiveAItem;
+  end;
+end;
+
+procedure TField.RefreshAbilValue();
+begin
+  GameForm.AbillityChargeProgressLabel.Caption := tstr(Energy) + '/' +
+    tstr(ABILITY_CHARDGE_VALUE_BASE + GameData.AbilitySelected * 2);
+end;
+
 function TField.AnimProc(AnimIndex, AnimSpeed: integer): bool;
 begin
   CardAnimState[0] := true;
@@ -459,7 +493,7 @@ end;
 procedure TField.AddMoneyOn(count: integer);
 begin
   RecivedMoney := RecivedMoney + count;
-  GameForm.CoinCountLabel.Caption := tStr(RecivedMoney);
+  GameForm.CoinCountLabel.Caption := tstr(RecivedMoney);
 end;
 
 procedure TField.BrokePlayerItem();

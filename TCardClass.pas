@@ -97,6 +97,8 @@ type
     procedure ScaleOn(ds: real);
     procedure ScaleAt(ds: real);
     procedure ReSetPosToMode(ScaleModeIndex: integer);
+    procedure HealthUp(hValue: integer);
+    procedure GiveAItem();
 
     function SaveCardData(): TCardSaveData;
     procedure LoadCardData(LoadData: TCardSaveData);
@@ -201,6 +203,35 @@ begin
   //
 end;
 
+procedure TCard.HealthUp(hValue: integer);
+begin
+  if IsCardIsPlayer then
+    ChangeHealhOn(hValue);
+end;
+
+procedure TCard.GiveAItem();
+begin
+
+  if IsCardIsPlayer then
+    if HasAItem = 0 then
+    begin
+      HasAItem := rnd(6,14,10,11);
+      PlayerItemValue := Value;
+      CardPlayerItemIm.Visible := true;
+      GameForm.CardWeaponImageList.GetBitmap(HasAItem,
+        CardPlayerItemIm.Picture.Bitmap);
+    end
+    else
+    begin
+      PlayerItemValue := PlayerItemValue + round(HasAItem * 1.5);
+      if HasAItem * 3 < PlayerItemValue then
+        PlayerItemValue := HasAItem * 3;
+
+    end;
+
+  ValueRefresh;
+end;
+
 procedure TCard.CardCreate(Position: TPosition; IsPlayer: bool;
   Difficult: integer);
 var
@@ -208,16 +239,16 @@ var
 begin
   if IsCardIsPlayer then
   begin
-    ItemIndex :=   GameData.HeroSelected;
+    ItemIndex := GameData.HeroSelected;
     BorderIndex := 1;
-    Self.Value := 10 + ItemIndex*2;
+    Self.Value := 10 + ItemIndex * 2;
   end
   else
   begin
 
-    RndMin := Round(sqrt(1 + (0.05 + Difficult / 100) * power(ItemIndex, 2.5)) +
+    RndMin := round(sqrt(1 + (0.05 + Difficult / 100) * power(ItemIndex, 2.5)) +
       Difficult div 2);
-    RndMax := Round(sqrt(3 + (0.1 + Difficult / 100) * power(ItemIndex, 2.5)) +
+    RndMax := round(sqrt(3 + (0.1 + Difficult / 100) * power(ItemIndex, 2.5)) +
       2 + Difficult);
     Self.Value := Rnd(RndMin, RndMax);
 
@@ -262,7 +293,7 @@ begin
   Self.ItemType := CardGen.ItemType;
 
   if (ItemType = TItemType.bonus) then
-    Value := Round(Value * Rnd(15, 20) / 10);
+    Value := round(Value * Rnd(15, 20) / 10);
 
   CardCreate(Position, IsPlayer, Difficult);
 end;
@@ -354,7 +385,7 @@ begin
   CardItemIm.Transparent := true;
 
   if IsCardIsPlayer then
-       GameForm.CardPlayersImageList.GetBitmap(ItemIndex,
+    GameForm.CardPlayersImageList.GetBitmap(ItemIndex,
       CardItemIm.Picture.Bitmap)
   else
   begin
@@ -580,8 +611,8 @@ procedure TCard.ScaleImageOn(var Image: timage; ds: real);
 var
   wMultiple, hMultiple: integer;
 begin
-  wMultiple := Round(Image.Width * ds);
-  hMultiple := Round(Image.Height * ds);
+  wMultiple := round(Image.Width * ds);
+  hMultiple := round(Image.Height * ds);
   Image.Left := Image.Left + (Image.Width - wMultiple) div 2;
   Image.Top := Image.Top + (Image.Height - hMultiple) div 2;
   Image.Width := wMultiple;
@@ -592,8 +623,8 @@ procedure TCard.ScaleImageAt(var Image: timage; ds: real);
 var
   wMultiple, hMultiple: integer;
 begin
-  wMultiple := Round(SIZE_CARD_X * iPercentage * ds / 100);
-  hMultiple := Round(SIZE_CARD_Y * iPercentage * ds / 100);
+  wMultiple := round(SIZE_CARD_X * iPercentage * ds / 100);
+  hMultiple := round(SIZE_CARD_Y * iPercentage * ds / 100);
   Image.Left := Image.Left + (Image.Width - wMultiple) div 2;
   Image.Top := Image.Top + (Image.Height - hMultiple) div 2;
   Image.Width := wMultiple;
@@ -616,7 +647,7 @@ procedure TCard.ScaleLabelOn(var Labeel: tlabel; ds: real; mode: integer);
 var
   wMultiple, hMultiple: integer;
 begin
-  wMultiple := Round(ds * 10);
+  wMultiple := round(ds * 10);
   Labeel.Font.Size := wMultiple;
   Labeel.Left := CardItemIm.Left + CardItemIm.Width div 10;
   if mode = 0 then
@@ -631,7 +662,7 @@ procedure TCard.ScaleLabelAt(var Labeel: tlabel; ds: real; mode: integer);
 var
   wMultiple, hMultiple: integer;
 begin
-  wMultiple := Round(ds * 10);
+  wMultiple := round(ds * 10);
   Labeel.Font.Size := wMultiple;
   Labeel.Left := CardItemIm.Left + CardItemIm.Width div 10;
   if mode = 0 then
@@ -791,10 +822,6 @@ begin
     FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
     ValueRefresh;
 
-    if (ItemType = TItemType.bonus) and ((ItemIndex = 1) or (ItemIndex = 4) or
-      (ItemIndex = 5)) then
-      FieldOfCards.AddMoneyOn(Value);
-
     FieldOfCards.ToggleAnimOn(3, FieldOfCards.GetPlayerPos.X,
       FieldOfCards.GetPlayerPos.Y, CoordToVector(CTP(dx, dy)));
     FieldOfCards.ToggleAnimOn(1, Position.X, Position.Y);
@@ -825,12 +852,12 @@ begin
   end
   else
   begin
-    Randomize;
+    // Randomize;               d
 
     CO_NO := CHANCE_OF_NOTHING;
-    CO_BO := Round(CHANCE_OF_BONUS { * (0.5 + 1 / Difficult) } ) + CO_NO;
-    CO_EN := Round(CHANCE_OF_ENEMIES { * (Difficult * Difficult) } ) + CO_BO;
-    CO_TR := Round(CHANCE_OF_TRAPS { * (Difficult * Difficult) } ) + CO_EN;
+    CO_BO := round(CHANCE_OF_BONUS { * (0.5 + 1 / Difficult) } ) + CO_NO;
+    CO_EN := round(CHANCE_OF_ENEMIES { * (Difficult * Difficult) } ) + CO_BO;
+    CO_TR := round(CHANCE_OF_TRAPS { * (Difficult * Difficult) } ) + CO_EN;
 
     randomR := Rnd(0, CO_TR);
 
@@ -850,7 +877,7 @@ begin
         GenerateItemIndex := 0;
       bonus:
         GenerateItemIndex :=
-          Rnd(1, Round(COUNT_OF_BONUS_CARDS * Difficult / 30) + 7);
+          Rnd(1, round(COUNT_OF_BONUS_CARDS * Difficult / 30) + 7);
       enemy:
         GenerateItemIndex := Rnd(1, COUNT_OF_ENEMIES - 15 + Difficult);
       trap:
@@ -862,6 +889,7 @@ begin
   end;
 
 end;
+
 
 function TCard.ChangeHealhOn(Value: integer): integer;
 var
@@ -883,8 +911,7 @@ begin
   begin
     wepDeal := false;
     dVal := FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value + Value;
-    maxHealth := (PLAYER_CARD_BASE_HEALTH +
-      GameData.HeroSelected * 2);
+    maxHealth := (PLAYER_CARD_BASE_HEALTH + GameData.HeroSelected * 2);
   end;
 
   CardGen.ItemType := ItemType;
@@ -1016,6 +1043,12 @@ begin
       end;
     0:
       begin
+        FieldOfCards.AddMoneyOn(Value);
+        if ItemIndex = 5 then
+          FieldOfCards.ChargeTheAbilityOn(3)
+        else
+          FieldOfCards.ChargeTheAbilityOn(1);
+
         BonusPick := 0;
       end;
     1:

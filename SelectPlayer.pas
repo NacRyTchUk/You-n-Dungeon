@@ -27,6 +27,7 @@ type
     SelectPanelBorder1: TImage;
     DescriptionLabel: TLabel;
     AnimTimer: TTimer;
+    DiscriptionList: TListView;
     procedure BackBtnImageClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -86,6 +87,7 @@ begin
 SelectPanelBorder1.Visible := (Number = 0);
 SelectPanelBorder2.Visible := (Number = 1);
 SelectPanelBorder3.Visible := (Number = 2);
+DescriptionLabel.Caption := DiscriptionList.Items[Number].Caption.Replace(';',#10);
 ItemSelected := Number;
 end;
 
