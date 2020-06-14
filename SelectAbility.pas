@@ -50,7 +50,7 @@ implementation
 
 {$R *.dfm}
 
-uses mainscreen;
+uses mainscreen, BackGround;
 
 procedure TSelectAbillityForm.AnimTimerTimer(Sender: TObject);
 begin
@@ -59,7 +59,7 @@ end;
 
 procedure TSelectAbillityForm.BackBtnImageClick(Sender: TObject);
 begin
-
+GameSound('Click', true);
   GameData.AbilitySelected := ItemSelected;
   MainForm.RefreshIconImg;
 
@@ -86,16 +86,19 @@ end;
 
 procedure TSelectAbillityForm.SelectPanelItem1Click(Sender: TObject);
 begin
+GameSound('Click', true);
   SelectItem(0);
 end;
 
 procedure TSelectAbillityForm.SelectPanelItem2Click(Sender: TObject);
 begin
+GameSound('Click', true);
   SelectItem(1);
 end;
 
 procedure TSelectAbillityForm.SelectPanelItem3Click(Sender: TObject);
 begin
+GameSound('Click', true);
   SelectItem(2);
 end;
 

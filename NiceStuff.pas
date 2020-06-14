@@ -38,6 +38,8 @@ const
   PLAYER_CARD_BASE_HEALTH = 10;
   ABILITY_CHARDGE_VALUE_BASE = 6;
 
+  SFX_COUNT = 15;
+
 type
   TIndexOfCardMsg = (OK, OutOfBorder, FAIL);
 
@@ -112,11 +114,17 @@ type
   TFieldOfCardSaveData = record
     FieldOfCardsSaveData: array [0 .. FIELD_SIZE_X - 1, 0 .. FIELD_SIZE_Y - 1]
       of TCardSaveData;
-    Energy : Integer;
+    Energy: integer;
     Size: TPosition;
     PlayerCard: TPosition;
     BaseDifficult: integer;
     RecivedMoney: integer;
+  end;
+
+type
+  TMediaName = record
+    FileName: string;
+    MediaName: string;
   end;
 
 procedure Msg(text: string); overload;
@@ -139,6 +147,7 @@ function KeyToChar(Key: integer): Char;
 function IsGamePadIsConnected(): Boolean;
 procedure TakeScreenShot(var bitm: TBitmap); overload;
 procedure TakeScreenShot(); overload;
+procedure GlobalInit();
 
 procedure SaveGameData(); overload;
 procedure SaveGameData(path: string); overload;
@@ -151,12 +160,35 @@ const
 
 var
   iPercentage: integer;
+  SFX_NAMES: array [1 .. SFX_COUNT] of string;
   GAME_PAD_CONNECTED: Boolean = false;
   SETT_GAMEPAD_ON: Boolean = true;
 
 implementation
 
 uses mainscreen, game;
+
+procedure GlobalInit();
+var
+  count: integer;
+begin
+  count := 1;
+  SFX_NAMES[count] := 'MenuTheme';  inc(count);
+  SFX_NAMES[count] := 'GameTheme';  inc(count);
+  SFX_NAMES[count] := 'Ability';  inc(count);
+  SFX_NAMES[count] := 'BadPotion';  inc(count);
+  SFX_NAMES[count] := 'Bonus';  inc(count);
+  SFX_NAMES[count] := 'Boom';  inc(count);
+  SFX_NAMES[count] := 'Chest';  inc(count);
+  SFX_NAMES[count] := 'Click';  inc(count);
+  SFX_NAMES[count] := 'Coin';  inc(count);
+  SFX_NAMES[count] := 'GoldOre';  inc(count);
+  SFX_NAMES[count] := 'Potion';  inc(count);
+  SFX_NAMES[count] := 'Step';  inc(count);
+  SFX_NAMES[count] := 'Swap';  inc(count);
+  SFX_NAMES[count] := 'Sword';  inc(count);
+  SFX_NAMES[count] := 'Fire';  inc(count);
+end;
 
 procedure TakeScreenShot();
 var

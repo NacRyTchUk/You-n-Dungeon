@@ -23,6 +23,7 @@ type
     UpDate: TTimer;
     FormShowInputFreze: TTimer;
     ReloadTimer: TTimer;
+    MusicLoopTimer: TTimer;
     procedure BackBtnImageClick(Sender: TObject);
     procedure LevelSelectBrn1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -42,6 +43,7 @@ type
     procedure FormHide(Sender: TObject);
     procedure FormShowInputFrezeTimer(Sender: TObject);
     procedure ReloadTimerTimer(Sender: TObject);
+    procedure MusicLoopTimerTimer(Sender: TObject);
   private
     BufferFieldData: TFieldOfCardSaveData;
     isFormActive: boolean;
@@ -65,6 +67,8 @@ uses MainScreen, Game, BackGround;
 
 procedure TSelectDifficultForm.BackBtnImageClick(Sender: TObject);
 begin
+
+  GameSound('Click', true);
   SelectDifficultForm.Hide;
   MainForm.Show;
 end;
@@ -81,13 +85,13 @@ end;
 
 procedure TSelectDifficultForm.FormShow(Sender: TObject);
 begin
-  FormShowInputFreze.Enabled := True;
+  FormShowInputFreze.Enabled := true;
 end;
 
 procedure TSelectDifficultForm.FormShowInputFrezeTimer(Sender: TObject);
 begin
   FormShowInputFreze.Enabled := false;
-  isFormActive := True;
+  isFormActive := true;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn1Click(Sender: TObject);
@@ -97,7 +101,7 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn1MouseEnter(Sender: TObject);
 begin
-  LevelSelectBrnBack1.Visible := True;
+  LevelSelectBrnBack1.Visible := true;
 
 end;
 
@@ -114,7 +118,7 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn2MouseEnter(Sender: TObject);
 begin
-  LevelSelectBrnBack2.Visible := True;
+  LevelSelectBrnBack2.Visible := true;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn2MouseLeave(Sender: TObject);
@@ -130,7 +134,7 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn3MouseEnter(Sender: TObject);
 begin
-  LevelSelectBrnBack3.Visible := True;
+  LevelSelectBrnBack3.Visible := true;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn3MouseLeave(Sender: TObject);
@@ -145,12 +149,17 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn4MouseEnter(Sender: TObject);
 begin
-  LevelSelectBrnBack4.Visible := True;
+  LevelSelectBrnBack4.Visible := true;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn4MouseLeave(Sender: TObject);
 begin
   LevelSelectBrnBack4.Visible := false;
+end;
+
+procedure TSelectDifficultForm.MusicLoopTimerTimer(Sender: TObject);
+begin
+  GameSound('GameTheme', true);
 end;
 
 procedure TSelectDifficultForm.ReloadTimerTimer(Sender: TObject);
@@ -186,6 +195,11 @@ end;
 
 procedure TSelectDifficultForm.GameStart(Difficult: integer);
 begin
+  GameSound('Click', true);
+  GameSound('MenuTheme', false);
+  GameSound('GameTheme', true);
+  MainForm.MusicLoopTimer.Enabled := false;
+  MusicLoopTimer.Enabled := true;
   GameForm := TGameForm.Create(Application);
   GameForm.SetDifficult(Difficult);
   GameForm.Show;
@@ -194,6 +208,7 @@ end;
 
 procedure TSelectDifficultForm.GameReset(Difficult: integer);
 begin
+  GameSound('Swap', true);
   GameData.Money := GameData.Money + FieldOfCards.GetMoneyRecived;
   GameForm.Free;
 
@@ -221,12 +236,13 @@ procedure TSelectDifficultForm.GameReload();
 var
   gameBit, backBit: TBitmap;
 begin
+  GameSound('Swap', true);
   backBit := TBitmap.Create;
   gameBit := TBitmap.Create;
   backBit := BackGroundForm.ImageForReload.Picture.Bitmap;
   TakeScreenShot(gameBit);
   BackGroundForm.ImageForReload.Picture.Bitmap := gameBit;
-  ReloadTimer.Enabled := True;
+  ReloadTimer.Enabled := true;
   GameSave;
   GameForm.Free;
 end;

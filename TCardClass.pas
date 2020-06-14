@@ -115,7 +115,7 @@ type
 
 implementation
 
-uses Game, MainScreen;
+uses Game, MainScreen, BackGround;
 
 procedure TCard.SetPosition(Position: TPosition);
 begin
@@ -215,7 +215,7 @@ begin
   if IsCardIsPlayer then
     if HasAItem = 0 then
     begin
-      HasAItem := rnd(6,14,10,11);
+      HasAItem := rnd(6, 14, 10, 11);
       PlayerItemValue := Value;
       CardPlayerItemIm.Visible := true;
       GameForm.CardWeaponImageList.GetBitmap(HasAItem,
@@ -250,7 +250,7 @@ begin
       Difficult div 2);
     RndMax := round(sqrt(3 + (0.1 + Difficult / 100) * power(ItemIndex, 2.5)) +
       2 + Difficult);
-    Self.Value := Rnd(RndMin, RndMax);
+    Self.Value := rnd(RndMin, RndMax);
 
     if (ItemType = TItemType.bonus) and (ItemIndex = 5) then
       Self.Value := Self.Value * 2;
@@ -293,7 +293,7 @@ begin
   Self.ItemType := CardGen.ItemType;
 
   if (ItemType = TItemType.bonus) then
-    Value := round(Value * Rnd(15, 20) / 10);
+    Value := round(Value * rnd(15, 20) / 10);
 
   CardCreate(Position, IsPlayer, Difficult);
 end;
@@ -822,6 +822,7 @@ begin
     FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
     ValueRefresh;
 
+    GameSound('Step', true);
     FieldOfCards.ToggleAnimOn(3, FieldOfCards.GetPlayerPos.X,
       FieldOfCards.GetPlayerPos.Y, CoordToVector(CTP(dx, dy)));
     FieldOfCards.ToggleAnimOn(1, Position.X, Position.Y);
@@ -859,7 +860,7 @@ begin
     CO_EN := round(CHANCE_OF_ENEMIES { * (Difficult * Difficult) } ) + CO_BO;
     CO_TR := round(CHANCE_OF_TRAPS { * (Difficult * Difficult) } ) + CO_EN;
 
-    randomR := Rnd(0, CO_TR);
+    randomR := rnd(0, CO_TR);
 
     if (0 <= randomR) and (randomR < CO_NO) then
       ItemType := TItemType.nothing
@@ -877,11 +878,11 @@ begin
         GenerateItemIndex := 0;
       bonus:
         GenerateItemIndex :=
-          Rnd(1, round(COUNT_OF_BONUS_CARDS * Difficult / 30) + 7);
+          rnd(1, round(COUNT_OF_BONUS_CARDS * Difficult / 30) + 7);
       enemy:
-        GenerateItemIndex := Rnd(1, COUNT_OF_ENEMIES - 15 + Difficult);
+        GenerateItemIndex := rnd(1, COUNT_OF_ENEMIES - 15 + Difficult);
       trap:
-        GenerateItemIndex := Rnd(1, COUNT_OF_TRAPS);
+        GenerateItemIndex := rnd(1, COUNT_OF_TRAPS);
     else
       msg('rand ind err');
     end;
@@ -889,7 +890,6 @@ begin
   end;
 
 end;
-
 
 function TCard.ChangeHealhOn(Value: integer): integer;
 var
@@ -903,6 +903,7 @@ begin
   if ((FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem <> 0) and
     (ItemType = TItemType.enemy)) then
   begin
+    GameSound('Sword',true);
     wepDeal := true;
     dVal := FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue + Value;
     maxHealth := dVal;
@@ -999,12 +1000,12 @@ begin
     (KilledCard.ItemIndex = CHEST_INDEX) then
   begin
     LootGenCard.ItemType := TItemType.bonus;
-    LootGenCard.ItemIndex := Rnd(1, COUNT_OF_BONUS_CARDS, CHEST_INDEX,
+    LootGenCard.ItemIndex := rnd(1, COUNT_OF_BONUS_CARDS, CHEST_INDEX,
       CHEST_INDEX);
   end;
   if (KilledCard.ItemType = TItemType.enemy) then
   begin
-    LootGenCard.ItemIndex := Rnd(0, 5);
+    LootGenCard.ItemIndex := rnd(0, 5);
     if LootGenCard.ItemIndex = 0 then
       LootGenCard.ItemType := TItemType.nothing
     else
@@ -1028,7 +1029,7 @@ begin
   case BonusTypesStats[BonusItemCard.ItemIndex] of
     - 1:
       begin
-
+        GameSound('BadPotion', true);
         if DamageDealAnsw(Value) = -1 then
         begin
 
@@ -1045,14 +1046,20 @@ begin
       begin
         FieldOfCards.AddMoneyOn(Value);
         if ItemIndex = 5 then
-          FieldOfCards.ChargeTheAbilityOn(3)
+        begin
+          FieldOfCards.ChargeTheAbilityOn(3);
+          GameSound('Bonus', true);
+        end
         else
+        begin
           FieldOfCards.ChargeTheAbilityOn(1);
-
+          GameSound('Coin', true);
+        end;
         BonusPick := 0;
       end;
     1:
       begin
+      GameSound('Potion',true);
         ChangeAnsw := ChangeHealhOn(BonusItemCard.Value);
         BonusPick := 0;
       end;
@@ -1073,6 +1080,7 @@ begin
       end;
     3:
       begin
+      GameSound('Chest',true);
         FieldOfCards.ToggleAnimOn(5, BonusItemPos.X, BonusItemPos.Y,
           CGTDT(CardLootGen(CardGen)));
         BonusPick := 1;

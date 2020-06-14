@@ -73,6 +73,8 @@ end;
 
 procedure TGameForm.BackToMenu();
 begin
+  GameSound('Click', true);
+  GameSound('GameTheme',false);
   GameData.Money := GameData.Money + FieldOfCards.GetMoneyRecived;
   MainForm.Show();
   GameForm.free;

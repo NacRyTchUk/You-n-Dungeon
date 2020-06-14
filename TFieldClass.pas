@@ -73,7 +73,7 @@ type
 
 implementation
 
-uses Game, SelectDifficult, MainScreen;
+uses Game, SelectDifficult, MainScreen, BackGround;
 
 function TField.GetFieldSize;
 begin
@@ -431,6 +431,7 @@ end;
 
 procedure TField.ChargeTheAbilityOn(cValue: integer);
 begin
+
   Energy := Energy + cValue;
   if Energy >= ABILITY_CHARDGE_VALUE_BASE + GameData.AbilitySelected * 2 then
   begin
@@ -442,6 +443,7 @@ end;
 
 procedure TField.AbilityDo();
 begin
+GameSound('Ability',true);
   case GameData.AbilitySelected of
     0 : AddMoneyOn(rnd(5,25));
     1 : FieldOfCards[PlayerCard.X, PlayerCard.Y].HealthUp(rnd(2,7));

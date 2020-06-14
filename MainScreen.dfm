@@ -1033,8 +1033,8 @@ object MainForm: TMainForm
     Stretch = True
   end
   object CoinCountLabel: TLabel
-    Left = 454
-    Top = 146
+    Left = 448
+    Top = 144
     Width = 21
     Height = 16
     Anchors = [akLeft, akTop, akBottom]
@@ -1219,6 +1219,7 @@ object MainForm: TMainForm
       08003B}
     Stretch = True
     Transparent = True
+    OnClick = LeftFireGifClick
   end
   object RightFireGif: TImage
     Left = 716
@@ -1269,6 +1270,7 @@ object MainForm: TMainForm
     Proportional = True
     Stretch = True
     Transparent = True
+    OnClick = RightFireGifClick
   end
   object UpDate: TTimer
     Interval = 60
@@ -7909,5 +7911,12 @@ object MainForm: TMainForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000}
+  end
+  object MusicLoopTimer: TTimer
+    Enabled = False
+    Interval = 84500
+    OnTimer = MusicLoopTimerTimer
+    Left = 832
+    Top = 264
   end
 end

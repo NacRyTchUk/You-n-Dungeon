@@ -50,12 +50,13 @@ implementation
 
 {$R *.dfm}
 
-uses mainscreen;
+uses mainscreen, BackGround;
 
 procedure TSelectPlayerForm.BackBtnImageClick(Sender: TObject);
 begin
-    GameData.HeroSelected := ItemSelected;
-    MainForm.RefreshIconImg;
+  GameSound('Click', true);
+  GameData.HeroSelected := ItemSelected;
+  MainForm.RefreshIconImg;
 
   AnimCounter := 0;
   AnimMode := 2;
@@ -79,31 +80,35 @@ end;
 
 procedure TSelectPlayerForm.AnimTimerTimer(Sender: TObject);
 begin
-MainForm.AnimWindowBlend(Self, AnimMode,75, 10, AnimCounter, AnimTimer);
+  MainForm.AnimWindowBlend(self, AnimMode, 75, 10, AnimCounter, AnimTimer);
 end;
 
 procedure TSelectPlayerForm.SelectItem(Number: Integer);
 begin
-SelectPanelBorder1.Visible := (Number = 0);
-SelectPanelBorder2.Visible := (Number = 1);
-SelectPanelBorder3.Visible := (Number = 2);
-DescriptionLabel.Caption := DiscriptionList.Items[Number].Caption.Replace(';',#10);
-ItemSelected := Number;
+  SelectPanelBorder1.Visible := (Number = 0);
+  SelectPanelBorder2.Visible := (Number = 1);
+  SelectPanelBorder3.Visible := (Number = 2);
+  DescriptionLabel.Caption := DiscriptionList.Items[Number].Caption.Replace
+    (';', #10);
+  ItemSelected := Number;
 end;
 
 procedure TSelectPlayerForm.SelectPanelItem1Click(Sender: TObject);
 begin
-   SelectItem(0);
+  GameSound('Click', true);
+  SelectItem(0);
 end;
 
 procedure TSelectPlayerForm.SelectPanelItem2Click(Sender: TObject);
 begin
-   SelectItem(1);
+  GameSound('Click', true);
+  SelectItem(1);
 end;
 
 procedure TSelectPlayerForm.SelectPanelItem3Click(Sender: TObject);
 begin
-   SelectItem(2);
+  GameSound('Click', true);
+  SelectItem(2);
 end;
 
 end.

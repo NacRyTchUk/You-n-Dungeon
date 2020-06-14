@@ -7,8 +7,8 @@ uses
   System.Classes, Vcl.Graphics, ShellApi,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
   Vcl.ExtCtrls, configurate, System.ImageList, Vcl.ImgList, Vcl.Imaging.jpeg,
-  GifImg, SelectDifficult, mmsystem,
-  NiceStuff, Vcl.OleCtrls, SHDocVw, Vcl.ComCtrls;
+  GifImg, SelectDifficult, MMSystem,
+  NiceStuff, Vcl.OleCtrls, SHDocVw, Vcl.ComCtrls, Vcl.MPlayer;
 
 type
   TMainForm = class(TForm)
@@ -38,6 +38,7 @@ type
     RightFireGif: TImage;
     PlayerDemoImages: TImageList;
     AbilityDemoImages: TImageList;
+    MusicLoopTimer: TTimer;
     procedure FormResize(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CloseBtnImageMouseUp(Sender: TObject; Button: TMouseButton;
@@ -66,6 +67,9 @@ type
     procedure GamePadKeyDo();
     procedure FormShowInputFrezeTimer(Sender: TObject);
     procedure FormHide(Sender: TObject);
+    procedure MusicLoopTimerTimer(Sender: TObject);
+    procedure RightFireGifClick(Sender: TObject);
+    procedure LeftFireGifClick(Sender: TObject);
   private
     SelectPlayerIndex: Integer;
     isFormActive: boolean;
@@ -101,18 +105,14 @@ end;
 
 procedure TMainForm.AbilitySelectImageClick(Sender: TObject);
 begin
+  GameSound('Click', true);
   SelectAbillityForm.Show;
 end;
 
 procedure TMainForm.AchiveBtnImageClick(Sender: TObject);
 begin
-//  Msg('trophey');
-GameData.HeroSelected := 1;
-  RefreshIconImg;
-  Msg(1);
-GameData.HeroSelected := 2;
-  RefreshIconImg;
-  end;
+  GameSound('Click', true);
+end;
 
 procedure TMainForm.AchiveBtnImageMouseEnter(Sender: TObject);
 begin
@@ -128,6 +128,8 @@ end;
 procedure TMainForm.CloseBtnImageMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
+GameSound('Click', true);
+Sleep(50);
   BackGroundForm.Close;
 
 end;
@@ -186,28 +188,37 @@ end;
 procedure TMainForm.FormShow(Sender: TObject);
 begin
   // BackGroundForm.Show();
+  GameSound('MenuTheme', true);
+  MusicLoopTimer.Enabled := true;
   GAME_PAD_CONNECTED := IsGamePadIsConnected;
   if not GAME_PAD_CONNECTED then
     UpDate.Interval := 5000;
   FormShowInputFreze.Enabled := true;
   CoinCountLabel.Caption := IntToStr(GameData.Money);
-
 end;
 
 procedure TMainForm.FormShowInputFrezeTimer(Sender: TObject);
 begin
   isFormActive := true;
-  FormShowInputFreze.Enabled := false
+  FormShowInputFreze.Enabled := false;
 end;
 
 procedure TMainForm.InfoBtnImageClick(Sender: TObject);
 begin
+GameSound('Click', true);
   ShellExecute(Handle, 'open', 'www.nrtu.studio/projects/You-n-Dungeon', nil,
     nil, SW_NORMAL);
 end;
 
+procedure TMainForm.LeftFireGifClick(Sender: TObject);
+begin
+GameSound('Fire', False);
+  GameSound('Fire', true);
+end;
+
 procedure TMainForm.LiderBoardBtnImageClick(Sender: TObject);
 begin
+  GameSound('Click', true);
   showmessage('lider board');
 end;
 
@@ -222,10 +233,16 @@ begin
 
 end;
 
+procedure TMainForm.MusicLoopTimerTimer(Sender: TObject);
+begin
+  GameSound('MenuTheme', true);
+end;
+
 procedure TMainForm.NewGameBtnImageMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 // New Game
 begin
+
   GameStart(false);
 end;
 
@@ -241,18 +258,20 @@ end;
 
 procedure TMainForm.PlayerSelectImageClick(Sender: TObject);
 begin
+  GameSound('Click', true);
   SelectPlayerForm.Show;
 end;
 
 procedure TMainForm.SettingsBtnImageClick(Sender: TObject);
 begin
-
+  GameSound('Click', true);
   showmessage('settings');
 end;
 
 procedure TMainForm.UpDateTimer(Sender: TObject);
 begin
   GamePadKeyDo;
+
 end;
 
 procedure TMainForm.GamePadKeyDo();
@@ -301,6 +320,7 @@ end;
 
 procedure TMainForm.GameStart(mode: BOOL);
 begin
+  GameSound('Click', true);
   if mode then
   else
   begin
@@ -354,24 +374,37 @@ begin
           inc(counter);
         end
         else
+        begin
           oForm.Close;
+          animTimer.Enabled := false;
+          MainForm.AlphaBlendValue := 255;
+          // Msg();
+        end;
       end;
   end;
 end;
 
 procedure TMainForm.RefreshIconImg();
-var bm : TBitmap;
+var
+  bm: TBitmap;
 begin
-bm := TBitmap.Create;
-bm.Width := PlayerSelectImage.Width;
-bm.Height := PlayerSelectImage.Height;
-//какого черта этот чертов язык не может работать номально?
-//без доп переменной он банально не рефрешает его во второй раз
-PlayerDemoImages.GetBitmap(GameData.HeroSelected,bm);
-PlayerSelectImage.Picture.Bitmap := bm;
-AbilityDemoImages.GetBitmap(GameData.AbilitySelected, bm);
-AbilitySelectImage.Picture.Bitmap := bm;
-bm.Free;
+  bm := TBitmap.Create;
+  bm.Width := PlayerSelectImage.Width;
+  bm.height := PlayerSelectImage.height;
+  // какого черта этот чертов язык не может работать номально?
+  // без доп переменной он банально не рефрешает его во второй раз
+  PlayerDemoImages.GetBitmap(GameData.HeroSelected, bm);
+  PlayerSelectImage.Picture.Bitmap := bm;
+  AbilityDemoImages.GetBitmap(GameData.AbilitySelected, bm);
+  AbilitySelectImage.Picture.Bitmap := bm;
+  bm.Free;
+end;
+
+procedure TMainForm.RightFireGifClick(Sender: TObject);
+begin
+
+  GameSound('Fire', False);
+  GameSound('Fire', true);
 end;
 
 end.

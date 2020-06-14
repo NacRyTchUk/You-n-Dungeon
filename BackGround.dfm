@@ -50,6 +50,26 @@ object BackGroundForm: TBackGroundForm
     Stretch = True
     ExplicitWidth = 463
   end
+  object LoadingBarLabel: TLabel
+    Left = 416
+    Top = 469
+    Width = 37
+    Height = 13
+    Caption = 'Loading'
+  end
+  object LoadingBar: TProgressBar
+    Left = 40
+    Top = 488
+    Width = 817
+    Height = 8
+    Anchors = [akLeft, akTop, akRight]
+    DoubleBuffered = True
+    ParentDoubleBuffered = False
+    Smooth = True
+    SmoothReverse = True
+    State = pbsPaused
+    TabOrder = 0
+  end
   object StartTimer: TTimer
     Enabled = False
     Interval = 1
