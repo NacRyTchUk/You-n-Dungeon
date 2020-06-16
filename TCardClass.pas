@@ -774,13 +774,19 @@ begin
 
     dx := Position.X - FieldOfCards.GetPlayerPos.X;
     dy := FieldOfCards.GetPlayerPos.Y - Position.Y;
-    FieldOfCards.DoStep;
 
     if FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value <= 0 then
     begin
       DeadMessageShow(2);
       exit;
     end;
+
+
+
+    FieldOfCards.DoStep;
+
+    if IsGodMode then ItemType := TItemType.nothing;
+
 
     case ItemType of
       nothing:

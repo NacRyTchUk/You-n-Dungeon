@@ -67,7 +67,6 @@ uses MainScreen, Game, BackGround;
 
 procedure TSelectDifficultForm.BackBtnImageClick(Sender: TObject);
 begin
-
   GameSound('Click', true);
   SelectDifficultForm.Hide;
   MainForm.Show;
@@ -159,6 +158,7 @@ end;
 
 procedure TSelectDifficultForm.MusicLoopTimerTimer(Sender: TObject);
 begin
+   GameSound('GameTheme', false);
   GameSound('GameTheme', true);
 end;
 
@@ -176,7 +176,7 @@ var
   gamePad: tjoyinfo;
   keypad: integer;
 begin
-  if not isFormActive or not GAME_PAD_CONNECTED or not SETT_GAMEPAD_ON then
+  if not isFormActive or not GAME_PAD_CONNECTED or not GameData.GamePadIsOn then
     exit;
 
   joygetpos(joystickid1, @gamePad);

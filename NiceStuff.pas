@@ -40,6 +40,21 @@ const
 
   SFX_COUNT = 15;
 
+  GAMEDATA_FILENAME = 'Ñonfig.ini';
+  GAMEPROGRESS_FILENAME = 'Save.ini';
+  SKIP_INTRO_FILENAME = 'NoIntro.sett';
+
+  YNL_BOOST = 2;
+
+  DEF_MUSIC_ON = true;
+  DEF_SOUND_ON = true;
+  DEF_RELOAD_INTERVAL = 50;
+  RELOAD_INTERVAL_MIN = 10;
+  RELOAD_INTERVAL_MAX = 80;
+  RELOAD_INTERVAL_STEP = 5;
+  DEF_HINT = true;
+  DEF_GAMEPAD_ON = false;
+
 type
   TIndexOfCardMsg = (OK, OutOfBorder, FAIL);
 
@@ -95,6 +110,11 @@ type
     Money: integer;
     HeroSelected: integer;
     AbilitySelected: integer;
+    MusicIsOn : bool;
+    SoundIsOn : bool;
+    ReloadInterval : Integer;
+    HintIsOn : BOOL;
+    GamePadIsOn : BOOL;
   end;
 
 type
@@ -148,6 +168,7 @@ function IsGamePadIsConnected(): Boolean;
 procedure TakeScreenShot(var bitm: TBitmap); overload;
 procedure TakeScreenShot(); overload;
 procedure GlobalInit();
+function Delta(Value ,DealValue, Min, Max : Integer)  : Integer;
 
 procedure SaveGameData(); overload;
 procedure SaveGameData(path: string); overload;
@@ -163,6 +184,8 @@ var
   SFX_NAMES: array [1 .. SFX_COUNT] of string;
   GAME_PAD_CONNECTED: Boolean = false;
   SETT_GAMEPAD_ON: Boolean = true;
+  IsGodMode : BOOL = false;
+  IsNoIntro : bool = true;
 
 implementation
 
@@ -188,6 +211,14 @@ begin
   SFX_NAMES[count] := 'Swap';  inc(count);
   SFX_NAMES[count] := 'Sword';  inc(count);
   SFX_NAMES[count] := 'Fire';  inc(count);
+end;
+
+
+function Delta(Value ,DealValue, Min, Max : Integer)  : Integer;
+begin
+Value := Value + DealValue;
+if Value < min then Delta := min else
+if Value > max then Delta := max else Delta := Value;
 end;
 
 procedure TakeScreenShot();
@@ -235,44 +266,6 @@ begin
   ReleaseDC(hWin, dc);
 end;
 
-{ var
-  Pic: TPicture;
-  BM: TBitmap;
-  bmHDC : HDC;
-  Dir: string;
-  begin
-
-  if not DirectoryExists(ExtractFilePath(ParamStr(0)) + 'ScreenShots') then
-  ForceDirectories(ExtractFilePath(ParamStr(0)) + 'ScreenShots');
-
-  Dir := ExtractFilePath(ParamStr(0)) + 'ScreenShots';
-  Pic := TPicture.Create;
-  BM := TBitmap.Create;
-  try
-  BM := TBitmap.Create;
-  BM.Width := Screen.Width;
-  BM.Height := Screen.Height;
-  BitBlt(getDC(MainForm.Handle), 0, 0, Screen.Width, Screen.Height, MainForm.BackGroundImage.Picture.Bitmap.Handle  ,0,0,SRCCOPY);
-
-  ///Pic.Width := Screen.Width;
-  //Pic.Height := Screen.Height
-
-  //Pic.Assign(BM);
-  //PNG.
-  {with PNG do
-  begin
-  bm.Handle := ClipBoard.getashandle(cf_bitmap);
-  //Resize(Screen.Width, Screen.Height);
-  Assign(BM);
-  //SaveToFile(Dir + '\' + IntToStr(1) + '.png');
-  end;
-  finally
-  Pic.Free;
-  BM.Free;
-  end;
-  TakeScreenShot := pic;
-  end;
-}
 procedure ReSizeResolution(oForm: TForm);
 begin
   if Screen.Width > MinimizeWinWight then

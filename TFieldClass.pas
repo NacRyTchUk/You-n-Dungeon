@@ -144,6 +144,10 @@ begin
       FieldOfCards[i, j] := TCard.Create(CTP(i, j), cardisplayer,
         BaseDifficult);
     end;
+
+  if GameData.HeroSelected = 1 then
+    FieldOfCards[PlayerCard.x, PlayerCard.y].GiveAItem;
+
   ToggleAnimOn(4);
 end;
 
@@ -414,7 +418,7 @@ end;
 function TField.IsReloadTime(): bool;
 begin
 
-  if Steps > COUNT_OF_STEPS_TO_RELOAD then
+  if Steps > GameData.ReloadInterval then
   begin
     IsReloadTime := true;
     SelectDifficultForm.GameReload;
@@ -425,15 +429,27 @@ begin
 end;
 
 procedure TField.DoStep();
+var
+  str: string;
 begin
   inc(Steps);
+  str := GameForm.StepsCountLabel.Caption;
+  delete(str, 1, 11);
+
+  GameForm.StepsCountLabel.Caption := 'До сохранения: ' +
+    tStr(GameData.ReloadInterval - Steps);
 end;
 
 procedure TField.ChargeTheAbilityOn(cValue: integer);
+var
+  boost: integer;
 begin
+  if GameData.HeroSelected = 0 then
+    boost := YNL_BOOST;
 
   Energy := Energy + cValue;
-  if Energy >= ABILITY_CHARDGE_VALUE_BASE + GameData.AbilitySelected * 2 then
+  if Energy >= ABILITY_CHARDGE_VALUE_BASE + GameData.AbilitySelected * 2 - boost
+  then
   begin
     Energy := 0;
     AbilityDo;
@@ -443,18 +459,26 @@ end;
 
 procedure TField.AbilityDo();
 begin
-GameSound('Ability',true);
+  GameSound('Ability', true);
   case GameData.AbilitySelected of
-    0 : AddMoneyOn(rnd(5,25));
-    1 : FieldOfCards[PlayerCard.X, PlayerCard.Y].HealthUp(rnd(2,7));
-    2 : FieldOfCards[PlayerCard.X, PlayerCard.Y].GiveAItem;
+    0:
+      AddMoneyOn(rnd(5, 25));
+    1:
+      FieldOfCards[PlayerCard.x, PlayerCard.y].HealthUp(rnd(2, 7));
+    2:
+      FieldOfCards[PlayerCard.x, PlayerCard.y].GiveAItem;
   end;
 end;
 
 procedure TField.RefreshAbilValue();
+var
+  boost: integer;
 begin
-  GameForm.AbillityChargeProgressLabel.Caption := tstr(Energy) + '/' +
-    tstr(ABILITY_CHARDGE_VALUE_BASE + GameData.AbilitySelected * 2);
+  if GameData.HeroSelected = 0 then
+    boost := YNL_BOOST;
+
+  GameForm.AbillityChargeProgressLabel.Caption := tStr(Energy) + '/' +
+    tStr(ABILITY_CHARDGE_VALUE_BASE + GameData.AbilitySelected * 2 - boost);
 end;
 
 function TField.AnimProc(AnimIndex, AnimSpeed: integer): bool;
@@ -495,7 +519,7 @@ end;
 procedure TField.AddMoneyOn(count: integer);
 begin
   RecivedMoney := RecivedMoney + count;
-  GameForm.CoinCountLabel.Caption := tstr(RecivedMoney);
+  GameForm.CoinCountLabel.Caption := tStr(RecivedMoney);
 end;
 
 procedure TField.BrokePlayerItem();

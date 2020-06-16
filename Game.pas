@@ -30,7 +30,7 @@ type
     Label1: TLabel;
     InputLockcooldown: TTimer;
     FormShowInputFreze: TTimer;
-    CainMultiplyLabel: TLabel;
+    StepsCountLabel: TLabel;
     AbilitySelectBackImage: TImage;
     AbilitySelectImage: TImage;
     AbillityChargeProgressLabel: TLabel;
@@ -75,6 +75,7 @@ procedure TGameForm.BackToMenu();
 begin
   GameSound('Click', true);
   GameSound('GameTheme',false);
+  SelectDifficultForm.MusicLoopTimer.Enabled := False;
   GameData.Money := GameData.Money + FieldOfCards.GetMoneyRecived;
   MainForm.Show();
   GameForm.free;
@@ -187,13 +188,13 @@ var
   gamePad: tjoyinfo;
   keypad: Integer;
 begin
-  if InputLockcooldown.Enabled or not GAME_PAD_CONNECTED or not SETT_GAMEPAD_ON then
+  if InputLockcooldown.Enabled or not GAME_PAD_CONNECTED or not GameData.GamePadIsOn then
     exit;
 
   if not IsGamePadIsConnected then
   begin
     GAME_PAD_CONNECTED := False;
-    Msg('Похоже, что геймпад был отключен...');
+    if GameData.HintIsOn then Msg('Похоже, что геймпад был отключен...');
     exit;
   end;
 

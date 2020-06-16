@@ -1,12 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899.12.30 00:00:00.000.273,F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm=F:\OnI\DelProj\You'n'Dungeon\SelectAbility.dfm</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.005,F:\OnI\DelProj\You'n'Dungeon\SelectPlayer.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.005,F:\OnI\DelProj\You'n'Dungeon\SelectPlayer.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.273,F:\OnI\DelProj\You'n'Dungeon\Unit2.pas=F:\OnI\DelProj\You'n'Dungeon\SelectAbility.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.005,F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm=F:\OnI\DelProj\You'n'Dungeon\SelectPlayer.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.273,F:\OnI\DelProj\You'n'Dungeon\SelectAbility.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
     <Transaction>1899.12.30 00:00:00.000.196,F:\OnI\DelProj\You'n'Dungeon\YnD.dproj=F:\OnI\DelProj\You'n'Dungeon\YnD.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.273,F:\OnI\DelProj\You'n'Dungeon\SelectAbility.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.807,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.005,F:\OnI\DelProj\You'n'Dungeon\Unit2.pas=F:\OnI\DelProj\You'n'Dungeon\SelectPlayer.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.632,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>2020.06.16 11:05:49.731,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>2020.06.16 11:08:11.347,F:\OnI\DelProj\You'n'Dungeon\Settings.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
+    <Transaction>2020.06.16 11:08:11.347,F:\OnI\DelProj\You'n'Dungeon\Settings.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
   </Transactions>
 </BorlandProject>

@@ -35,6 +35,8 @@ type
     procedure SelectPanelItem1Click(Sender: TObject);
     procedure SelectPanelItem2Click(Sender: TObject);
     procedure SelectPanelItem3Click(Sender: TObject);
+    procedure ArrowBackClick(Sender: TObject);
+    procedure ArrowForwardClick(Sender: TObject);
   private
     AnimCounter, AnimMode, ItemSelected: Integer;
 
@@ -55,6 +57,16 @@ uses mainscreen, BackGround;
 procedure TSelectAbillityForm.AnimTimerTimer(Sender: TObject);
 begin
   MainForm.AnimWindowBlend(Self, AnimMode, 75, 10, AnimCounter, AnimTimer);
+end;
+
+procedure TSelectAbillityForm.ArrowBackClick(Sender: TObject);
+begin
+SelectItem(Delta(ItemSelected, -1 , 0,2));
+end;
+
+procedure TSelectAbillityForm.ArrowForwardClick(Sender: TObject);
+begin
+SelectItem(Delta(ItemSelected, 1 , 0,2));
 end;
 
 procedure TSelectAbillityForm.BackBtnImageClick(Sender: TObject);
@@ -86,24 +98,22 @@ end;
 
 procedure TSelectAbillityForm.SelectPanelItem1Click(Sender: TObject);
 begin
-GameSound('Click', true);
   SelectItem(0);
 end;
 
 procedure TSelectAbillityForm.SelectPanelItem2Click(Sender: TObject);
 begin
-GameSound('Click', true);
   SelectItem(1);
 end;
 
 procedure TSelectAbillityForm.SelectPanelItem3Click(Sender: TObject);
 begin
-GameSound('Click', true);
   SelectItem(2);
 end;
 
 procedure TSelectAbillityForm.SelectItem(Number: Integer);
 begin
+  GameSound('Click', true);
   SelectPanelBorder1.Visible := (Number = 0);
   SelectPanelBorder2.Visible := (Number = 1);
   SelectPanelBorder3.Visible := (Number = 2);

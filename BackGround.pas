@@ -15,17 +15,24 @@ type
     ImageForReload: TImage;
     LoadingBar: TProgressBar;
     LoadingBarLabel: TLabel;
+    AnimTimer: TTimer;
     procedure StartTimerTimer(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure AnimTimerTimer(Sender: TObject);
   private
     MediaSounds: array [1 .. SFX_COUNT] of TMediaPlayer;
+    AnimCounter: Integer;
     procedure SoundLoad();
+    procedure StartAnim();
   public
-
+    procedure SaveGameData();
+    procedure LoadGameData();
   end;
 
 procedure GameSound(sName: string; isPlay: BOOL);
+procedure GameSoundMute(sName: string);
 
 var
   BackGroundForm: TBackGroundForm;
@@ -44,13 +51,107 @@ begin
     if SFX_NAMES[I] = sName then
     begin
 
-      if isPlay then
+      if isPlay and (((GameData.MusicIsOn) and (I <= 2)) or
+        ((GameData.SoundIsOn) and (I > 2))) then
         BackGroundForm.MediaSounds[I].Play
       else
         BackGroundForm.MediaSounds[I].Position := 0;
       exit;
     end;
-  msg('"' +sName + '" song not found');
+  if GameData.HintIsOn then
+    msg('"' + sName + '" song not found');
+
+end;
+
+procedure GameSoundMute(sName: string);
+var
+  I: Integer;
+begin
+  for I := 1 to SFX_COUNT do
+  begin
+    if (I <= 2) and ((sName = 'm') or (sName = 'all')) then
+      GameSound(SFX_NAMES[I], false);
+    if (I > 2) and ((sName = 's') or (sName = 'all')) then
+      GameSound(SFX_NAMES[I], false);
+  end;
+end;
+
+procedure TBackGroundForm.SaveGameData();
+var
+  DataFile: file of TSaveData;
+begin
+  AssignFile(DataFile, GAMEDATA_FILENAME);
+  Rewrite(DataFile);
+  Write(DataFile, GameData);
+  CloseFile(DataFile);
+end;
+
+procedure TBackGroundForm.LoadGameData();
+var
+  DataFile: file of TSaveData;
+begin
+  if FileExists(GAMEDATA_FILENAME) then
+  begin
+    AssignFile(DataFile, GAMEDATA_FILENAME);
+    Reset(DataFile);
+    Read(DataFile, GameData);
+    CloseFile(DataFile);
+  end
+  else
+  begin
+    with GameData do
+    begin
+      Money := 0;
+      HeroSelected := 0;
+      AbilitySelected := 0;
+      MusicIsOn := DEF_MUSIC_ON;
+      SoundIsOn := DEF_SOUND_ON;
+      HintIsOn := DEF_HINT;
+      GamePadIsOn := DEF_GAMEPAD_ON;
+      ReloadInterval := DEF_RELOAD_INTERVAL;
+      SaveGameData;
+    end;
+  end;
+end;
+
+procedure TBackGroundForm.AnimTimerTimer(Sender: TObject);
+begin
+  StartAnim;
+end;
+
+procedure TBackGroundForm.StartAnim();
+begin
+inc(AnimCounter);
+  if AnimCounter <= 25 then
+    AlphaBlendValue := AnimCounter * 10 + 5;
+
+  if AnimCounter = 30 then
+  begin
+    LoadingBar.Visible := true;
+    LoadingBarLabel.Visible := true;
+
+
+
+
+    InitCardStat;
+    GlobalInit;
+    SoundLoad;
+     GameSound('Bonus', true);
+  end;
+
+
+  if AnimCounter = 120 then
+  begin
+     AnimTimer.Enabled := false;
+    MainForm.Show;
+
+    ImageForReload.Picture := BackGroundImage.Picture;
+  end;
+end;
+
+procedure TBackGroundForm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  SaveGameData;
 end;
 
 procedure TBackGroundForm.FormDestroy(Sender: TObject);
@@ -73,21 +174,17 @@ var
   keypad: Integer;
 begin
 
-  joygetpos(joystickid1, @gamePad);
-
-  screenProp := Screen.Width / Screen.Height;
-  StartTimer.Enabled := false;
-
-  if (round(screenProp * 10) <> 18) then
+   LoadGameData();
+   screenProp := Screen.Width / Screen.Height;
+  if GameData.HintIsOn and (round(screenProp * 10) <> 18) then
     ShowException(exception.Create
       ('ВНИМАНИЕ!!! Вы запускаете игру на мониторе с не поддерживаемым соотношением сторон! Пожалуйста, по возможности, переключитесь на разрешение сторон близким к 16:9. Игра You''n''Dungeon продолжит работу с некоректным отображением UI.'),
       0);
 
-  InitCardStat;
-  GlobalInit;
-  SoundLoad;
+  AnimCounter := 0;
+  AnimTimer.Enabled := true;
+  StartTimer.Enabled := false;
 
-  MainForm.Show;
 end;
 
 procedure TBackGroundForm.SoundLoad();
@@ -116,7 +213,8 @@ begin
 
     end;
   except
-    ShowException(exception.Create('Ошибка при загрузке звуковых файлов (#' + tstr(i) + ')'), 0);
+    ShowException(exception.Create('Ошибка при загрузке звуковых файлов (#' +
+      tstr(I) + ')'), 0);
     Close;
   end;
   LoadingBar.Visible := false;

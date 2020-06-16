@@ -91,7 +91,7 @@ implementation
 
 {$R *.dfm}
 
-uses BackGround, selectplayer, selectability;
+uses BackGround, selectplayer, selectability, settings;
 
 function CentrX(weight: Integer): Integer;
 begin
@@ -112,7 +112,8 @@ end;
 procedure TMainForm.AchiveBtnImageClick(Sender: TObject);
 begin
   GameSound('Click', true);
-end;
+  BackGroundForm.SaveGameData;
+  end;
 
 procedure TMainForm.AchiveBtnImageMouseEnter(Sender: TObject);
 begin
@@ -188,13 +189,13 @@ end;
 procedure TMainForm.FormShow(Sender: TObject);
 begin
   // BackGroundForm.Show();
-  GameSound('MenuTheme', true);
-  MusicLoopTimer.Enabled := true;
+  GameSound('MenuTheme', true); MusicLoopTimer.Enabled := true;
   GAME_PAD_CONNECTED := IsGamePadIsConnected;
   if not GAME_PAD_CONNECTED then
     UpDate.Interval := 5000;
   FormShowInputFreze.Enabled := true;
   CoinCountLabel.Caption := IntToStr(GameData.Money);
+  RefreshIconImg;
 end;
 
 procedure TMainForm.FormShowInputFrezeTimer(Sender: TObject);
@@ -235,6 +236,7 @@ end;
 
 procedure TMainForm.MusicLoopTimerTimer(Sender: TObject);
 begin
+         GameSound('MenuTheme', false);
   GameSound('MenuTheme', true);
 end;
 
@@ -265,7 +267,7 @@ end;
 procedure TMainForm.SettingsBtnImageClick(Sender: TObject);
 begin
   GameSound('Click', true);
-  showmessage('settings');
+  SettingsForm.Show;
 end;
 
 procedure TMainForm.UpDateTimer(Sender: TObject);
@@ -279,7 +281,7 @@ var
   gamePad: tjoyinfo;
   keypad: Integer;
 begin
-  if not isFormActive or not SETT_GAMEPAD_ON then
+  if not isFormActive or not GameData.GamePadIsOn then
     exit;
 
   joygetpos(joystickid1, @gamePad);
@@ -289,7 +291,7 @@ begin
     if not IsGamePadIsConnected then
     begin
       GAME_PAD_CONNECTED := false;
-      Msg('Похоже, что геймпад был отключен...');
+      if GameData.HintIsOn then Msg('Похоже, что геймпад был отключен...');
       UpDate.Interval := 1000;
       exit;
     end;
@@ -300,7 +302,7 @@ begin
     if IsGamePadIsConnected then
     begin
       GAME_PAD_CONNECTED := true;
-      Msg('Был обнаружен подключенный GamePad. Вы можете играть в игру с его помощью.');
+      if GameData.HintIsOn then Msg('Был обнаружен подключенный GamePad. Вы можете играть в игру с его помощью.');
       UpDate.Interval := 15;
     end;
     exit;

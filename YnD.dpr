@@ -16,7 +16,8 @@ uses
   NiceStuff in 'NiceStuff.pas',
   TCardStatsClass in 'TCardStatsClass.pas',
   SelectPlayer in 'SelectPlayer.pas' {SelectPlayerForm},
-  SelectAbility in 'SelectAbility.pas' {SelectAbillityForm};
+  SelectAbility in 'SelectAbility.pas' {SelectAbillityForm},
+  Settings in 'Settings.pas' {SettingsForm};
 
 {$R *.res}
 
@@ -31,5 +32,6 @@ begin
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TSelectPlayerForm, SelectPlayerForm);
   Application.CreateForm(TSelectAbillityForm, SelectAbillityForm);
+  Application.CreateForm(TSettingsForm, SettingsForm);
   Application.Run;
 end.

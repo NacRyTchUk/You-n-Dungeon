@@ -35,6 +35,8 @@ type
     procedure SelectPanelItem1Click(Sender: TObject);
     procedure SelectPanelItem2Click(Sender: TObject);
     procedure SelectPanelItem3Click(Sender: TObject);
+    procedure ArrowBackClick(Sender: TObject);
+    procedure ArrowForwardClick(Sender: TObject);
   private
     AnimCounter, AnimMode, ItemSelected: Integer;
 
@@ -51,6 +53,16 @@ implementation
 {$R *.dfm}
 
 uses mainscreen, BackGround;
+
+procedure TSelectPlayerForm.ArrowBackClick(Sender: TObject);
+begin
+SelectItem(Delta(ItemSelected, -1 , 0,2));
+end;
+
+procedure TSelectPlayerForm.ArrowForwardClick(Sender: TObject);
+begin
+SelectItem(Delta(ItemSelected, 1 , 0,2));
+end;
 
 procedure TSelectPlayerForm.BackBtnImageClick(Sender: TObject);
 begin
@@ -85,6 +97,8 @@ end;
 
 procedure TSelectPlayerForm.SelectItem(Number: Integer);
 begin
+
+  GameSound('Click', true);
   SelectPanelBorder1.Visible := (Number = 0);
   SelectPanelBorder2.Visible := (Number = 1);
   SelectPanelBorder3.Visible := (Number = 2);
@@ -95,19 +109,16 @@ end;
 
 procedure TSelectPlayerForm.SelectPanelItem1Click(Sender: TObject);
 begin
-  GameSound('Click', true);
   SelectItem(0);
 end;
 
 procedure TSelectPlayerForm.SelectPanelItem2Click(Sender: TObject);
 begin
-  GameSound('Click', true);
   SelectItem(1);
 end;
 
 procedure TSelectPlayerForm.SelectPanelItem3Click(Sender: TObject);
 begin
-  GameSound('Click', true);
   SelectItem(2);
 end;
 
