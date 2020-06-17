@@ -348,6 +348,7 @@ end;
 
 procedure TMainForm.HelpImgClick(Sender: TObject);
 begin
+GameSound('Click', true);
 HelpForm.Show;
 end;
 

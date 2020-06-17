@@ -7,8 +7,8 @@ uses
   System.Classes, Vcl.Graphics, ShellApi,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
   Vcl.ExtCtrls, configurate, System.ImageList, Vcl.ImgList, Vcl.Imaging.jpeg,
-  GifImg, SelectDifficult, mmsystem,
-  NiceStuff, Vcl.OleCtrls, SHDocVw, Vcl.ComCtrls;
+  GifImg, SelectDifficult, MMSystem,
+  NiceStuff, Vcl.OleCtrls, SHDocVw, Vcl.ComCtrls, Vcl.MPlayer;
 
 type
   TMainForm = class(TForm)
@@ -36,6 +36,11 @@ type
     FormShowInputFreze: TTimer;
     LeftFireGif: TImage;
     RightFireGif: TImage;
+    PlayerDemoImages: TImageList;
+    AbilityDemoImages: TImageList;
+    MusicLoopTimer: TTimer;
+    HelpImg: TImage;
+    MsgHitBox: TImage;
     procedure FormResize(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CloseBtnImageMouseUp(Sender: TObject; Button: TMouseButton;
@@ -64,6 +69,11 @@ type
     procedure GamePadKeyDo();
     procedure FormShowInputFrezeTimer(Sender: TObject);
     procedure FormHide(Sender: TObject);
+    procedure MusicLoopTimerTimer(Sender: TObject);
+    procedure RightFireGifClick(Sender: TObject);
+    procedure LeftFireGifClick(Sender: TObject);
+    procedure HelpImgClick(Sender: TObject);
+    procedure MsgHitBoxClick(Sender: TObject);
   private
     SelectPlayerIndex: Integer;
     isFormActive: boolean;
@@ -71,6 +81,10 @@ type
 
   public
     function GetSelectedPlayerIndex(): Integer;
+    procedure AnimWindowBlend(oForm: TForm;
+      mode, blendPercent, maxCouter: Integer; var counter: Integer;
+      var animTimer: TTimer);
+    procedure RefreshIconImg();
   end;
 
 var
@@ -81,7 +95,7 @@ implementation
 
 {$R *.dfm}
 
-uses BackGround, selectplayer, selectability;
+uses BackGround, selectplayer, selectability, settings, info, help;
 
 function CentrX(weight: Integer): Integer;
 begin
@@ -95,14 +109,15 @@ end;
 
 procedure TMainForm.AbilitySelectImageClick(Sender: TObject);
 begin
+  GameSound('Click', true);
   SelectAbillityForm.Show;
 end;
 
 procedure TMainForm.AchiveBtnImageClick(Sender: TObject);
 begin
-  Msg('trophey');
-  // TakeScreenShot();
-end;
+  GameSound('Click', true);
+  BackGroundForm.SaveGameData;
+  end;
 
 procedure TMainForm.AchiveBtnImageMouseEnter(Sender: TObject);
 begin
@@ -118,6 +133,8 @@ end;
 procedure TMainForm.CloseBtnImageMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
+GameSound('Click', true);
+Sleep(50);
   BackGroundForm.Close;
 
 end;
@@ -143,6 +160,7 @@ var
   tGif: TGIFImage;
 begin
   InitForm(self);
+  RefreshIconImg;
 end;
 
 procedure TMainForm.FormHide(Sender: TObject);
@@ -153,12 +171,15 @@ end;
 procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-   case Key of
-     113 : TakeScreenShot();
-     27 : BackGroundForm.Close;
-   end;
+  case Key of
+    113:
+      TakeScreenShot();
+    27:
+      BackGroundForm.Close;
+  end;
   case KeyToChar(Key) of
-    ' ' : GameStart(false);
+    ' ':
+      GameStart(false);
   end;
 end;
 
@@ -172,28 +193,36 @@ end;
 procedure TMainForm.FormShow(Sender: TObject);
 begin
   // BackGroundForm.Show();
+  GameSound('MenuTheme', true); MusicLoopTimer.Enabled := true;
   GAME_PAD_CONNECTED := IsGamePadIsConnected;
   if not GAME_PAD_CONNECTED then
     UpDate.Interval := 5000;
   FormShowInputFreze.Enabled := true;
   CoinCountLabel.Caption := IntToStr(GameData.Money);
-
+  RefreshIconImg;
 end;
 
 procedure TMainForm.FormShowInputFrezeTimer(Sender: TObject);
 begin
   isFormActive := true;
-  FormShowInputFreze.Enabled := false
+  FormShowInputFreze.Enabled := false;
 end;
 
 procedure TMainForm.InfoBtnImageClick(Sender: TObject);
 begin
-  ShellExecute(Handle, 'open', 'www.nrtu.studio/projects/You-n-Dungeon', nil,
-    nil, SW_NORMAL);
+GameSound('Click', true);
+InfoForm.Show;
+end;
+
+procedure TMainForm.LeftFireGifClick(Sender: TObject);
+begin
+GameSound('Fire', False);
+  GameSound('Fire', true);
 end;
 
 procedure TMainForm.LiderBoardBtnImageClick(Sender: TObject);
 begin
+  GameSound('Click', true);
   showmessage('lider board');
 end;
 
@@ -208,10 +237,22 @@ begin
 
 end;
 
+procedure TMainForm.MsgHitBoxClick(Sender: TObject);
+begin
+msg('id jst wnt t d');
+end;
+
+procedure TMainForm.MusicLoopTimerTimer(Sender: TObject);
+begin
+         GameSound('MenuTheme', false);
+  GameSound('MenuTheme', true);
+end;
+
 procedure TMainForm.NewGameBtnImageMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 // New Game
 begin
+
   GameStart(false);
 end;
 
@@ -227,18 +268,20 @@ end;
 
 procedure TMainForm.PlayerSelectImageClick(Sender: TObject);
 begin
+  GameSound('Click', true);
   SelectPlayerForm.Show;
 end;
 
 procedure TMainForm.SettingsBtnImageClick(Sender: TObject);
 begin
-
-  showmessage('settings');
+  GameSound('Click', true);
+  SettingsForm.Show;
 end;
 
 procedure TMainForm.UpDateTimer(Sender: TObject);
 begin
-GamePadKeyDo;
+  GamePadKeyDo;
+
 end;
 
 procedure TMainForm.GamePadKeyDo();
@@ -246,7 +289,7 @@ var
   gamePad: tjoyinfo;
   keypad: Integer;
 begin
-  if not isFormActive or not SETT_GAMEPAD_ON then
+  if not isFormActive or not GameData.GamePadIsOn then
     exit;
 
   joygetpos(joystickid1, @gamePad);
@@ -256,7 +299,7 @@ begin
     if not IsGamePadIsConnected then
     begin
       GAME_PAD_CONNECTED := false;
-      Msg('Похоже, что геймпад был отключен...');
+      if GameData.HintIsOn then Msg('Похоже, что геймпад был отключен...');
       UpDate.Interval := 1000;
       exit;
     end;
@@ -267,7 +310,7 @@ begin
     if IsGamePadIsConnected then
     begin
       GAME_PAD_CONNECTED := true;
-      Msg('Был обнаружен подключенный GamePad. Вы можете играть в игру с его помощью.');
+      if GameData.HintIsOn then Msg('Был обнаружен подключенный GamePad. Вы можете играть в игру с его помощью.');
       UpDate.Interval := 15;
     end;
     exit;
@@ -285,9 +328,9 @@ begin
   end;
 end;
 
-
 procedure TMainForm.GameStart(mode: BOOL);
 begin
+  GameSound('Click', true);
   if mode then
   else
   begin
@@ -301,6 +344,82 @@ begin
 
   SelectPlayerIndex := 0;
   GetSelectedPlayerIndex := SelectPlayerIndex;
+end;
+
+procedure TMainForm.HelpImgClick(Sender: TObject);
+begin
+HelpForm.Show;
+end;
+
+procedure TMainForm.AnimWindowBlend(oForm: TForm;
+  mode, blendPercent, maxCouter: Integer; var counter: Integer;
+  var animTimer: TTimer);
+
+var
+  stepNormValue, normalizevValue, minValue: real;
+begin
+  stepNormValue := blendPercent / 100;
+  minValue := maxCouter / stepNormValue - maxCouter;
+  normalizevValue := 256 / (maxCouter + minValue);
+
+  case mode of
+    1:
+      begin
+        if counter <= maxCouter then
+        begin
+          oForm.AlphaBlendValue := round(counter * normalizevValue);
+          MainForm.AlphaBlendValue :=
+            round((maxCouter - counter * stepNormValue) * normalizevValue);
+          inc(counter);
+        end
+        else
+        begin
+          animTimer.Enabled := false;
+          oForm.AlphaBlendValue := 255;
+        end;
+      end;
+    2:
+      begin
+        if counter <= maxCouter then
+        begin
+          oForm.AlphaBlendValue :=
+            round((maxCouter - counter) * normalizevValue);
+          MainForm.AlphaBlendValue :=
+            round((minValue + counter * stepNormValue) * normalizevValue);
+          inc(counter);
+        end
+        else
+        begin
+          oForm.Close;
+          animTimer.Enabled := false;
+          MainForm.AlphaBlendValue := 255;
+          // Msg();
+        end;
+      end;
+  end;
+end;
+
+procedure TMainForm.RefreshIconImg();
+var
+  bm: TBitmap;
+begin
+  bm := TBitmap.Create;
+  bm.Width := PlayerSelectImage.Width;
+  bm.height := PlayerSelectImage.height;
+  // какого черта этот чертов язык не может работать номально?
+  // без доп переменной он банально не рефрешает его во второй раз
+  PlayerDemoImages.GetBitmap(GameData.HeroSelected, bm);
+  PlayerSelectImage.Picture.Bitmap := bm;
+  AbilityDemoImages.GetBitmap(GameData.AbilitySelected, bm);
+  AbilitySelectImage.Picture.Bitmap := bm;
+  bm.Free;
+end;
+
+procedure TMainForm.RightFireGifClick(Sender: TObject);
+begin
+
+  GameSound('Fire', False);
+  GameSound('Fire', true);
 end;
 
 end.
