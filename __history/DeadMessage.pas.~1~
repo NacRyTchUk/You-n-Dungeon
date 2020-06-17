@@ -1,0 +1,30 @@
+unit DeadMessage;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
+  Vcl.ExtCtrls;
+
+type
+  TDeadMessageForm = class(TForm)
+    BackGroundImage: TImage;
+    YouDiedImage: TImage;
+    OkBtn: TImage;
+    BackToMenuImg: TImage;
+    StatsLabel: TLabel;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  DeadMessageForm: TDeadMessageForm;
+
+implementation
+
+{$R *.dfm}
+
+end.

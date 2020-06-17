@@ -39,6 +39,8 @@ type
     PlayerDemoImages: TImageList;
     AbilityDemoImages: TImageList;
     MusicLoopTimer: TTimer;
+    HelpImg: TImage;
+    MsgHitBox: TImage;
     procedure FormResize(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CloseBtnImageMouseUp(Sender: TObject; Button: TMouseButton;
@@ -70,6 +72,8 @@ type
     procedure MusicLoopTimerTimer(Sender: TObject);
     procedure RightFireGifClick(Sender: TObject);
     procedure LeftFireGifClick(Sender: TObject);
+    procedure HelpImgClick(Sender: TObject);
+    procedure MsgHitBoxClick(Sender: TObject);
   private
     SelectPlayerIndex: Integer;
     isFormActive: boolean;
@@ -91,7 +95,7 @@ implementation
 
 {$R *.dfm}
 
-uses BackGround, selectplayer, selectability, settings;
+uses BackGround, selectplayer, selectability, settings, info, help;
 
 function CentrX(weight: Integer): Integer;
 begin
@@ -207,8 +211,7 @@ end;
 procedure TMainForm.InfoBtnImageClick(Sender: TObject);
 begin
 GameSound('Click', true);
-  ShellExecute(Handle, 'open', 'www.nrtu.studio/projects/You-n-Dungeon', nil,
-    nil, SW_NORMAL);
+InfoForm.Show;
 end;
 
 procedure TMainForm.LeftFireGifClick(Sender: TObject);
@@ -232,6 +235,11 @@ procedure TMainForm.LiderBoardBtnImageMouseLeave(Sender: TObject);
 begin
   LiderBoardBorderBtnImage.Visible := false;
 
+end;
+
+procedure TMainForm.MsgHitBoxClick(Sender: TObject);
+begin
+msg('id jst wnt t d');
 end;
 
 procedure TMainForm.MusicLoopTimerTimer(Sender: TObject);
@@ -336,6 +344,11 @@ begin
 
   SelectPlayerIndex := 0;
   GetSelectedPlayerIndex := SelectPlayerIndex;
+end;
+
+procedure TMainForm.HelpImgClick(Sender: TObject);
+begin
+HelpForm.Show;
 end;
 
 procedure TMainForm.AnimWindowBlend(oForm: TForm;

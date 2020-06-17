@@ -115,7 +115,7 @@ type
 
 implementation
 
-uses Game, MainScreen, BackGround;
+uses Game, MainScreen, BackGround, deadmessage;
 
 procedure TCard.SetPosition(Position: TPosition);
 begin
@@ -740,7 +740,10 @@ procedure TCard.DeadMessageShow(mode: integer);
 begin
   case mode of
     1:
-      msg('rip');
+      begin
+        GameForm.Enabled := false;
+        DeadMessageForm.show;
+      end;
     2:
       msg('u ded lol');
   end;

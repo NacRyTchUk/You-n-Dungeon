@@ -1,0 +1,28 @@
+unit Help;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls;
+
+type
+  THelpForm = class(TForm)
+    BackGroundImage: TImage;
+    OkBtn: TImage;
+    ControlsHelpLabel: TImage;
+    ControlsHelpImg: TImage;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  HelpForm: THelpForm;
+
+implementation
+
+{$R *.dfm}
+
+end.

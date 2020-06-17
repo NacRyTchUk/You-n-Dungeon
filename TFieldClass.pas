@@ -102,6 +102,7 @@ var
   SaveData: TFieldOfCardSaveData;
 begin
 
+  GameForm.StepsCountLabel.Visible := IsReloadVisible;
   SaveData.BaseDifficult := BaseDifficult;
   SaveData.PlayerCard := PlayerCard;
   SaveData.RecivedMoney := RecivedMoney;
@@ -133,6 +134,7 @@ var
 begin
   RefreshAbilValue;
   Self.BaseDifficult := BaseDifficult;
+  GameForm.StepsCountLabel.Visible := IsReloadVisible;
 
   PlayerCard.x := (FIELD_SIZE_X - 1) div 2;
   PlayerCard.y := (FIELD_SIZE_Y - 1) div 2;
@@ -436,6 +438,7 @@ begin
   str := GameForm.StepsCountLabel.Caption;
   delete(str, 1, 11);
 
+  GameForm.StepsCountLabel.Visible := IsReloadVisible;
   GameForm.StepsCountLabel.Caption := 'До сохранения: ' +
     tStr(GameData.ReloadInterval - Steps);
 end;

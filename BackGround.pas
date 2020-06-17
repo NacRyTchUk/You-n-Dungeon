@@ -38,7 +38,7 @@ procedure GameSoundMute(sName: string);
 
 var
   BackGroundForm: TBackGroundForm;
-  IsDebugOn, IsConsole: BOOL;
+  IsDebugOn, IsConsole, IsReloadVisible: BOOL;
 
 implementation
 
@@ -129,6 +129,8 @@ begin
 end;
 
 procedure TBackGroundForm.StartAnim();
+var
+  screenProp: real;
 begin
   inc(AnimCounter);
   if AnimCounter <= 25 then
@@ -136,6 +138,7 @@ begin
 
   if AnimCounter = 30 then
   begin
+
     LoadingBarLabel.Visible := true;
     LoadingBar.Visible := true;
 
@@ -149,8 +152,16 @@ begin
   if AnimCounter = 120 then
   begin
     AnimTimer.Enabled := false;
+
+    screenProp := Screen.Width / Screen.Height;
+    if GameData.HintIsOn and (round(screenProp * 10) <> 18) then
+      ShowException
+        (exception.Create
+        ('ВНИМАНИЕ!!! Вы запускаете игру на мониторе с не поддерживаемым соотношением сторон! Пожалуйста, по возможности, переключитесь на разрешение сторон близким к 16:9. Игра You''n''Dungeon продолжит работу с некоректным отображением UI.'),
+        0);
     MainForm.Show;
-    if IsConsole then ConsoleForm.Show;
+    if IsConsole then
+      ConsoleForm.Show;
 
     ImageForReload.Picture := BackGroundImage.Picture;
   end;
@@ -186,11 +197,6 @@ var
   keypad: Integer;
 begin
   LoadGameData();
-  screenProp := Screen.Width / Screen.Height;
-  if GameData.HintIsOn and (round(screenProp * 10) <> 18) then
-    ShowException(exception.Create
-      ('ВНИМАНИЕ!!! Вы запускаете игру на мониторе с не поддерживаемым соотношением сторон! Пожалуйста, по возможности, переключитесь на разрешение сторон близким к 16:9. Игра You''n''Dungeon продолжит работу с некоректным отображением UI.'),
-      0);
 
   AnimCounter := 0;
   AnimTimer.Enabled := true;

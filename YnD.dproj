@@ -118,6 +118,18 @@
             <Form>ConsoleForm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="DeadMessage.pas">
+            <Form>DeadMessageForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Info.pas">
+            <Form>InfoForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="Help.pas">
+            <Form>HelpForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

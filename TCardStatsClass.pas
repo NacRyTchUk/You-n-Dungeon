@@ -89,28 +89,11 @@ TrapsFacingStats[ItemId,2] := 1;
 TrapsFacingStats[ItemId,3] := 0;
 TrapsFacingStats[ItemId,4] := 1;
 
-Inc(ItemId);                     //10
-TrapsFacingStats[ItemId,1] := -1;
-TrapsFacingStats[ItemId,2] := -1;
-TrapsFacingStats[ItemId,3] := -1;
-TrapsFacingStats[ItemId,4] := -1;
 
 Inc(ItemId);
 TrapsFacingStats[ItemId,1] := 1;
 TrapsFacingStats[ItemId,2] := 0;
 TrapsFacingStats[ItemId,3] := 1;
-TrapsFacingStats[ItemId,4] := 0;
-
-Inc(ItemId);
-TrapsFacingStats[ItemId,1] := 1;
-TrapsFacingStats[ItemId,2] := 1;
-TrapsFacingStats[ItemId,3] := 1;
-TrapsFacingStats[ItemId,4] := 1;
-
-Inc(ItemId);
-TrapsFacingStats[ItemId,1] := 0;
-TrapsFacingStats[ItemId,2] := 0;
-TrapsFacingStats[ItemId,3] := 0;
 TrapsFacingStats[ItemId,4] := 0;
 
 Inc(ItemId);

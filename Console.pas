@@ -14,6 +14,7 @@ type
   TConsoleForm = class(TForm)
     InputBox: TLabeledEdit;
     ResponseLabel: TLabel;
+    BackGround: TImage;
     procedure InputBoxKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
   private
@@ -116,6 +117,52 @@ begin
         Cmd := InputBox.Text;
         delete(Cmd, 1, 5);
         GameSoundMute(cmd);
+        InputBox.Text := '';
+        ResponseLabel.Caption := 'Успех';
+      except
+        ResponseLabel.Caption := 'Ошибка';
+      end
+    else
+      ResponseLabel.Caption := 'Ошибка: Режим отладки отключен';
+  end;
+
+  if Cmd = '-rld' then
+  begin
+    if IsDebugOn then
+      try
+        Cmd := InputBox.Text;
+        delete(Cmd, 1, 5);
+        IsReloadVisible := not IsReloadVisible;
+        InputBox.Text := '';
+        ResponseLabel.Caption := 'Успех';
+      except
+        ResponseLabel.Caption := 'Ошибка';
+      end
+    else
+      ResponseLabel.Caption := 'Ошибка: Режим отладки отключен';
+  end;
+
+  if Cmd = '-m' then
+  begin
+    if IsDebugOn then
+      try
+        Cmd := InputBox.Text;
+        delete(Cmd, 1, 5);
+        InputBox.Text := '';
+        ResponseLabel.Caption := 'Успех: ' + tstr(GameData.Money);
+      except
+        ResponseLabel.Caption := 'Ошибка';
+      end
+    else
+      ResponseLabel.Caption := 'Ошибка: Режим отладки отключен';
+  end;
+
+  if Cmd = '-del' then
+  begin
+    if IsDebugOn then
+      try
+        DeleteFile(GAMEDATA_FILENAME);
+        BackGroundForm.Free;
         InputBox.Text := '';
         ResponseLabel.Caption := 'Успех';
       except

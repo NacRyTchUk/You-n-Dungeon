@@ -18,7 +18,10 @@ uses
   SelectPlayer in 'SelectPlayer.pas' {SelectPlayerForm},
   SelectAbility in 'SelectAbility.pas' {SelectAbillityForm},
   Settings in 'Settings.pas' {SettingsForm},
-  Console in 'Console.pas' {ConsoleForm};
+  Console in 'Console.pas' {ConsoleForm},
+  DeadMessage in 'DeadMessage.pas' {DeadMessageForm},
+  Info in 'Info.pas' {InfoForm},
+  Help in 'Help.pas' {HelpForm};
 
 {$R *.res}
 
@@ -35,5 +38,8 @@ begin
   Application.CreateForm(TSelectAbillityForm, SelectAbillityForm);
   Application.CreateForm(TSettingsForm, SettingsForm);
   Application.CreateForm(TConsoleForm, ConsoleForm);
+  Application.CreateForm(TDeadMessageForm, DeadMessageForm);
+  Application.CreateForm(TInfoForm, InfoForm);
+  Application.CreateForm(THelpForm, HelpForm);
   Application.Run;
 end.

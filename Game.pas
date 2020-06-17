@@ -46,10 +46,10 @@ type
     GameStartMode: Integer;
     isFormActive: Boolean;
     BufferLoadData: TFieldOfCardSaveData;
-    procedure BackToMenu();
-    procedure DoKeyDown(Key: Integer);
     procedure DoJoyKey();
   public
+    procedure DoKeyDown(Key: Integer);
+    procedure BackToMenu();
     procedure SetDifficult(Difficult: Integer);
     procedure GameStart(); overload;
     procedure GameStart(LoadData: TFieldOfCardSaveData); overload;
