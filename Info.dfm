@@ -96,7 +96,7 @@ object InfoForm: TInfoForm
     Stretch = True
   end
   object OkBtn: TImage
-    Left = 326
+    Left = 204
     Top = 194
     Width = 40
     Height = 40
@@ -135,21 +135,14 @@ object InfoForm: TInfoForm
   end
   object LinksLabel: TLabel
     Left = 59
-    Top = 115
+    Top = 150
     Width = 128
     Height = 19
     Caption = #1057#1072#1081#1090' '#1087#1088#1086#1101#1082#1090#1072':'#9
   end
-  object DevLabel: TLabel
-    Left = 59
-    Top = 166
-    Width = 114
-    Height = 19
-    Caption = #1056#1072#1079#1088#1072#1073#1086#1090#1095#1080#1082':'
-  end
   object SiteImg: TImage
     Left = 193
-    Top = 103
+    Top = 138
     Width = 45
     Height = 45
     Center = True
@@ -204,7 +197,7 @@ object InfoForm: TInfoForm
   end
   object GameJoltImg: TImage
     Left = 244
-    Top = 103
+    Top = 138
     Width = 45
     Height = 45
     Center = True
@@ -302,25 +295,6 @@ object InfoForm: TInfoForm
     Proportional = True
     Stretch = True
     OnClick = GameJoltImgClick
-  end
-  object VkImg: TImage
-    Left = 217
-    Top = 154
-    Width = 45
-    Height = 45
-    Center = True
-    Picture.Data = {
-      0954506E67496D61676589504E470D0A1A0A0000000D494844520000002D0000
-      002D08060000003A1AE29A000000097048597300000B1300000B1301009A9C18
-      000000914944415478DAEDD6ED0D80200C4551D9C5597420D7D0819C4577D109
-      30AFD06009F7FD6EE190F09596FD7AA6CE92408306FD7F4083061D20A0410F81
-      3EB739DBB01EB75C9BEB517B737DA0BB41D74CEE8AB60EE859FB85050DBA066D
-      01A9E8D283E78EF68A0A061D0ADD72016E7BBA7B740BB8822FFE4F5BF0EA95A7
-      E2C7425BF0D61711749480060D3A404083061D202FC074F36ACAC88280000000
-      0049454E44AE426082}
-    Proportional = True
-    Stretch = True
-    OnClick = VkImgClick
   end
   object AnimTimer: TTimer
     Enabled = False

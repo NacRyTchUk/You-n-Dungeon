@@ -7,7 +7,6 @@ uses
   GifImg,
   Winapi.Windows,
   MainScreen in 'MainScreen.pas' {MainForm},
-  Configurate in 'Configurate.pas',
   SelectDifficult in 'SelectDifficult.pas' {SelectDifficultForm},
   BackGround in 'BackGround.pas' {BackGroundForm},
   Game in 'Game.pas' {GameForm},

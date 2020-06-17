@@ -42,7 +42,6 @@ type
 
     procedure SelectItem(Number: Integer);
   public
-    { Public declarations }
   end;
 
 var
@@ -54,6 +53,18 @@ implementation
 
 uses mainscreen, BackGround;
 
+procedure TSelectAbillityForm.SelectItem(Number: Integer);
+// Выбор персоонажа и обновление визуального ряда
+begin
+  GameSound('Click', true);
+  SelectPanelBorder1.Visible := (Number = 0);
+  SelectPanelBorder2.Visible := (Number = 1);
+  SelectPanelBorder3.Visible := (Number = 2);
+  DescriptionLabel.Caption := DiscriptionList.Items[Number].Caption.Replace
+    (';', #10);
+  ItemSelected := Number;
+end;
+
 procedure TSelectAbillityForm.AnimTimerTimer(Sender: TObject);
 begin
   MainForm.AnimWindowBlend(Self, AnimMode, 75, 10, AnimCounter, AnimTimer);
@@ -61,17 +72,17 @@ end;
 
 procedure TSelectAbillityForm.ArrowBackClick(Sender: TObject);
 begin
-SelectItem(Delta(ItemSelected, -1 , 0,2));
+  SelectItem(Delta(ItemSelected, -1, 0, 2));
 end;
 
 procedure TSelectAbillityForm.ArrowForwardClick(Sender: TObject);
 begin
-SelectItem(Delta(ItemSelected, 1 , 0,2));
+  SelectItem(Delta(ItemSelected, 1, 0, 2));
 end;
 
 procedure TSelectAbillityForm.BackBtnImageClick(Sender: TObject);
 begin
-GameSound('Click', true);
+  GameSound('Click', true);
   GameData.AbilitySelected := ItemSelected;
   MainForm.RefreshIconImg;
 
@@ -88,7 +99,6 @@ end;
 
 procedure TSelectAbillityForm.FormShow(Sender: TObject);
 begin
-
   SelectItem(GameData.AbilitySelected);
   AnimCounter := 0;
   AnimMode := 1;
@@ -109,16 +119,6 @@ end;
 procedure TSelectAbillityForm.SelectPanelItem3Click(Sender: TObject);
 begin
   SelectItem(2);
-end;
-
-procedure TSelectAbillityForm.SelectItem(Number: Integer);
-begin
-  GameSound('Click', true);
-  SelectPanelBorder1.Visible := (Number = 0);
-  SelectPanelBorder2.Visible := (Number = 1);
-  SelectPanelBorder3.Visible := (Number = 2);
-DescriptionLabel.Caption := DiscriptionList.Items[Number].Caption.Replace(';',#10);
-ItemSelected := Number;
 end;
 
 end.

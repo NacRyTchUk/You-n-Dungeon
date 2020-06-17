@@ -19,14 +19,8 @@ Coordinates=265,10,77,58
 [CardsImagesList]
 Coordinates=216,174,111,36
 
-[Button1]
-Coordinates=10,10,59,58
-
 [BackBtnImage]
 Coordinates=10,78,98,58
-
-[Button2]
-Coordinates=196,10,59,58
 
 [CoinCountLabel]
 Coordinates=79,10,107,58
@@ -41,6 +35,6 @@ Coordinates=499,111,146,36
 Coordinates=157,173,58,36
 
 []
-Coordinates=249,78,95,36
+Coordinates=196,10,59,58
 Visible=True
 

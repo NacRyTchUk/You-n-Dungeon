@@ -8,10 +8,6 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
   TCardClass, nicestuff;
 
-// 14    110x145
-// 145  606
-// 41   463
-
 type
   TFieldOfCards = array [0 .. FIELD_SIZE_X - 1, 0 .. FIELD_SIZE_Y - 1] of TCard;
 
@@ -61,41 +57,20 @@ type
     procedure DoStep();
     procedure ChargeTheAbilityOn(cValue: integer);
 
-    procedure BrokePlayerItem();
     function SaveField(): TFieldOfCardSaveData;
-    procedure LoadField(LoadData: TFieldOfCardSaveData);
 
     Constructor Create(BaseDifficult: integer); overload;
     Constructor Create(BaseDifficult: integer;
       LoadData: TFieldOfCardSaveData); overload;
-    // Destructor  Destroy;
   end;
 
 implementation
 
 uses Game, SelectDifficult, MainScreen, BackGround;
 
-function TField.GetFieldSize;
-begin
-  GetFieldSize := Size;
-end;
-
-function TField.GetPlayerPos(): TPosition;
-begin
-  GetPlayerPos := PlayerCard;
-end;
-
-function TField.GetFieldOfCards(): TFieldOfCards;
-begin
-  GetFieldOfCards := FieldOfCards;
-end;
-
-function TField.GetMoneyRecived(): integer;
-begin
-  GetMoneyRecived := RecivedMoney;
-end;
 
 function TField.SaveField(): TFieldOfCardSaveData;
+//Сохранение поля
 var
   i, j, x, y: integer;
   cardisplayer: bool;
@@ -122,12 +97,9 @@ begin
   SaveField := SaveData;
 end;
 
-procedure TField.LoadField(LoadData: TFieldOfCardSaveData);
-begin
-  //
-end;
 
 Constructor TField.Create(BaseDifficult: integer);
+//Безусловный конструктор создания поля
 var
   i, j, x, y: integer;
   cardisplayer: bool;
@@ -155,6 +127,7 @@ end;
 
 Constructor TField.Create(BaseDifficult: integer;
   LoadData: TFieldOfCardSaveData);
+//Конструктор поля с исходными данными
 var
   i, j, x, y: integer;
   cardisplayer: bool;
@@ -174,17 +147,8 @@ begin
     end;
 end;
 
-function TField.IsCardAnimPlayed(): bool;
-begin
-  IsCardAnimPlayed := CardAnimState[0];
-end;
-
-function TField.IsCardAnimPlayed(AnimIndex: integer): bool;
-begin
-  IsCardAnimPlayed := CardAnimState[AnimIndex];
-end;
-
 procedure TField.ToggleAnimOn(AnimIndex, x, y: integer);
+//Запуск анимации карты на поле
 begin
   if (AnimIndex <= CARD_ANIM_COUNT) and (not CardAnimState[AnimIndex]) then
   begin
@@ -192,10 +156,10 @@ begin
     CardAnimIndex[AnimIndex, 2] := y;
     CardAnimState[AnimIndex] := true;
   end;
-
 end;
 
 procedure TField.ToggleAnimOn(AnimIndex, x, y, data: integer);
+//Запуск анимации карты на поле с дополнительными данными
 begin
   if (AnimIndex <= CARD_ANIM_COUNT) and (not CardAnimState[AnimIndex]) then
   begin
@@ -207,6 +171,7 @@ begin
 end;
 
 procedure TField.ToggleAnimOn(AnimIndex: integer);
+//Запуск анимации поля
 begin
   if (AnimIndex <= CARD_ANIM_COUNT) and (not CardAnimState[AnimIndex]) then
   begin
@@ -215,6 +180,7 @@ begin
 end;
 
 procedure TField.UpdateAnim();
+//Отрисовывание кадра запущенных анимаций
 var
   i: integer;
 begin
@@ -230,10 +196,10 @@ begin
   if CardAnimState[5] then
     PlayAnim_ChangeCard(CardAnimIndex[5, 1], CardAnimIndex[5, 2],
       CardAnimIndex[5, 3]);
-
 end;
 
 procedure TField.PlayAnim_SizeOut(x, y: integer);
+//Анимация уменьшения карты
 const
   OneStageStepsAmount = 1;
   FrameAmount = SPEED_OF_ANIM_SIZE_OUT;
@@ -256,6 +222,7 @@ begin
 end;
 
 procedure TField.PlayAnim_SizeIn(x, y: integer);
+//Анимация увелечения карты
 const
   OneStageStepsAmount = 2;
   FrameAmount = SPEED_OF_ANIM_SIZE_IN;
@@ -279,6 +246,7 @@ begin
 end;
 
 procedure TField.PlayAnim_SlideFromTo(x, y, side: integer);
+//Анимация движения карты игрока
 const
   OneStageStepsAmount = 2;
   FrameAmount = SPEED_OF_ANIM_SLIDE_FROM_TO;
@@ -304,8 +272,6 @@ begin
   FieldOfCards[x, y].MoveOn(dx, dy);
   if CardAnimFrame[AnimID] > FrameAmount then
   begin
-    // FieldOfCards[x, y]
-
     PlayerCard.x := PlayerCard.x + VectorToCoord(side).x;
     PlayerCard.y := PlayerCard.y + VectorToCoord(side).y;
 
@@ -321,16 +287,13 @@ begin
     CardAnimStage[AnimID] := 0;
     CheckForNoAnim;
 
-    // if
     IsReloadTime;
-    // then
-    // exit;
-    // FieldOfCards[x, y].ReSetPosToMode(1);
   end;
 
 end;
 
 procedure TField.PlayAnim_FieldSizeIn();
+//Анимация появления поля
 const
   OneStageStepsAmount = 8;
   FrameAmount = SPEED_OF_ANIM_FIELD_SIZE_IN;
@@ -358,6 +321,7 @@ begin
 end;
 
 procedure TField.PlayAnim_ChangeCard(x, y, data: integer);
+//Анимация замены карты
 const
   OneStageStepsAmount = 8;
   FrameAmount = SPEED_OF_ANIM_CHANGE_CARD;
@@ -408,6 +372,7 @@ begin
 end;
 
 procedure TField.CheckForNoAnim();
+//ПРоверка на проигрывание каких-либо анимаций
 var
   i: integer;
 begin
@@ -431,6 +396,7 @@ begin
 end;
 
 procedure TField.DoStep();
+//Обработка счетчика шагов
 var
   str: string;
 begin
@@ -444,6 +410,7 @@ begin
 end;
 
 procedure TField.ChargeTheAbilityOn(cValue: integer);
+//Проверка на количество энергии и активацию навыков
 var
   boost: integer;
 begin
@@ -461,6 +428,7 @@ begin
 end;
 
 procedure TField.AbilityDo();
+//Активация навыка
 begin
   GameSound('Ability', true);
   case GameData.AbilitySelected of
@@ -474,6 +442,7 @@ begin
 end;
 
 procedure TField.RefreshAbilValue();
+//Обновление информации о энергии для активации навыка
 var
   boost: integer;
 begin
@@ -485,6 +454,7 @@ begin
 end;
 
 function TField.AnimProc(AnimIndex, AnimSpeed: integer): bool;
+//Базовая логика работы аниаций
 begin
   CardAnimState[0] := true;
 
@@ -509,6 +479,7 @@ begin
 end;
 
 procedure TField.SetFieldVisible(isVisible: bool);
+//Установка видимости карт на поле
 var
   i, j: integer;
 begin
@@ -520,16 +491,41 @@ begin
 end;
 
 procedure TField.AddMoneyOn(count: integer);
+//Добавления определенного количества денег
 begin
   RecivedMoney := RecivedMoney + count;
   GameForm.CoinCountLabel.Caption := tStr(RecivedMoney);
 end;
 
-procedure TField.BrokePlayerItem();
-begin
 
-  FieldOfCards[PlayerCard.x, PlayerCard.y].BrokeItem;
-  // FieldOfCards[PlayerCard.X, PlayerCard.Y].HasAItem := 0;
+function TField.GetFieldSize;
+begin
+  GetFieldSize := Size;
+end;
+
+function TField.GetPlayerPos(): TPosition;
+begin
+  GetPlayerPos := PlayerCard;
+end;
+
+function TField.GetFieldOfCards(): TFieldOfCards;
+begin
+  GetFieldOfCards := FieldOfCards;
+end;
+
+function TField.GetMoneyRecived(): integer;
+begin
+  GetMoneyRecived := RecivedMoney;
+end;
+
+function TField.IsCardAnimPlayed(): bool;
+begin
+  IsCardAnimPlayed := CardAnimState[0];
+end;
+
+function TField.IsCardAnimPlayed(AnimIndex: integer): bool;
+begin
+  IsCardAnimPlayed := CardAnimState[AnimIndex];
 end;
 
 end.

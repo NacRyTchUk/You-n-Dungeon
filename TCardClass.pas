@@ -53,11 +53,10 @@ type
 
     procedure ImMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
-    procedure ImMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: integer);
     procedure ImMouseEnter(Sender: TObject);
     procedure ImMouseLeave(Sender: TObject);
     procedure DeadMessageShow(mode: integer);
+
     procedure EndStep();
 
     function DamageDealAnsw(Damage: integer): integer;
@@ -65,15 +64,12 @@ type
     function GenerateItemIndex(Difficult: integer): integer;
 
     function ChangeHealhOn(Value: integer): integer;
-    function ChangeWepHealhOn(Value: integer): integer;
     function isTrapsFacing(trapP: TPosition): integer;
     function CardLootGen(KilledCard: TCardGen): TCardGen;
     function BonusPick(BonusItemPos: TPosition): integer;
 
   public
     procedure SetPosition(Position: TPosition);
-    procedure SetBorderIndex(BorderIndex: integer);
-    procedure SetItemIndex(ItemIndex: integer);
     procedure SetVisible(isVisible: bool);
     procedure SetCardStat(CardStat: TCard);
     procedure SetMinimized(Min: bool);
@@ -86,12 +82,8 @@ type
     function IsCurCardIsPlayer(): bool;
     function IsCardMinimized(): bool;
 
-    procedure BrokeItem();
 
     // ====
-    function OnClick(SCard: TCard): integer;
-    procedure OnMoveCursorIn();
-    procedure OnMoveCursorOut();
     procedure MoveOn(dx, dy: integer);
     procedure MoveAt(dx, dy: integer);
     procedure ScaleOn(ds: real);
@@ -101,7 +93,6 @@ type
     procedure GiveAItem();
 
     function SaveCardData(): TCardSaveData;
-    procedure LoadCardData(LoadData: TCardSaveData);
 
     procedure CardCreate(Position: TPosition; IsPlayer: bool;
       Difficult: integer);
@@ -117,72 +108,8 @@ implementation
 
 uses Game, MainScreen, BackGround, deadmessage;
 
-procedure TCard.SetPosition(Position: TPosition);
-begin
-  Self.Position := Position;
-end;
-
-procedure TCard.SetBorderIndex(BorderIndex: integer);
-begin
-  //
-end;
-
-procedure TCard.SetItemIndex(ItemIndex: integer);
-begin
-  //
-end;
-
-function TCard.GetPosition(): TPosition;
-begin
-  GetPosition := Position;
-end;
-
-function TCard.GetBorderIndex(): integer;
-var
-  pos: integer;
-begin
-  //
-  GetBorderIndex := pos;
-end;
-
-function TCard.GetItemIndex(): integer;
-var
-  pos: integer;
-begin
-  //
-  GetItemIndex := pos;
-end;
-
-function TCard.IsCurCardIsPlayer(): bool;
-begin
-  IsCurCardIsPlayer := IsCurCardIsPlayer;
-end;
-
-function TCard.IsCardMinimized(): bool;
-begin
-  IsCardMinimized := IsMinimized;
-
-end;
-
-// ====
-function TCard.OnClick(SCard: TCard): integer;
-// var
-// card: TCardMessage;
-begin
-  //
-end;
-
-procedure TCard.OnMoveCursorIn();
-begin
-  //
-end;
-
-procedure TCard.OnMoveCursorOut();
-begin
-  //
-end;
-
 function TCard.SaveCardData(): TCardSaveData;
+// Сохранение данных о карте
 var
   SD: TCardSaveData;
 begin
@@ -198,20 +125,16 @@ begin
   SaveCardData := SD;
 end;
 
-procedure TCard.LoadCardData(LoadData: TCardSaveData);
-begin
-  //
-end;
-
 procedure TCard.HealthUp(hValue: integer);
+// Восттанавливаем здоровье карты, если это игрок
 begin
   if IsCardIsPlayer then
     ChangeHealhOn(hValue);
 end;
 
 procedure TCard.GiveAItem();
+// Выдаем оружие карте, если это игрок
 begin
-
   if IsCardIsPlayer then
     if HasAItem = 0 then
     begin
@@ -228,12 +151,12 @@ begin
         PlayerItemValue := HasAItem * 3;
 
     end;
-
   ValueRefresh;
 end;
 
 procedure TCard.CardCreate(Position: TPosition; IsPlayer: bool;
   Difficult: integer);
+// Создание карты
 var
   RndMin, RndMax: integer;
 begin
@@ -271,22 +194,20 @@ end;
 
 Constructor TCard.Create(Position: TPosition; IsPlayer: bool;
   Difficult: integer);
-
+// Конструктор создания карты без исходных данных
 begin
-
   IsCardIsPlayer := IsPlayer;
   Self.ItemIndex := GenerateItemIndex(Difficult);
 
   Self.Position := Position;
 
   CardCreate(Position, IsPlayer, Difficult);
-
 end;
 
 Constructor TCard.Create(Position: TPosition; IsPlayer: bool;
   Difficult: integer; CardGen: TCardGen);
+// Конструктор создания карты с исходными данными для случайно генерации
 begin
-
   Self.Position := Position;
   IsCardIsPlayer := IsPlayer;
   Self.ItemIndex := CardGen.ItemIndex;
@@ -299,6 +220,7 @@ begin
 end;
 
 constructor TCard.Create(LoadData: TCardSaveData);
+// Конструктор создания карты с исходными данными
 var
   RndMin, RndMax: integer;
 begin
@@ -325,6 +247,7 @@ begin
 end;
 
 Destructor TCard.Destroy();
+//Деструктор карты
 begin
   CardBackIm.Free;
   CardItemIm.Free;
@@ -336,6 +259,7 @@ begin
 end;
 
 procedure TCard.CreateImage(var Image: timage);
+//Создание и настройка слоя-изображения для карты
 begin
   with Image do
   begin
@@ -349,6 +273,7 @@ begin
 end;
 
 procedure TCard.CreateLabel(var Labeel: tlabel; mode: integer);
+//Создание и настройка текста для карты
 begin
   with Labeel do
   begin
@@ -368,6 +293,7 @@ begin
 end;
 
 procedure TCard.CreateBackImage();
+//Создания фона карты
 begin
   CreateImage(CardBackIm);
   ScaleImageAt(CardBackIm, 0);
@@ -376,8 +302,8 @@ begin
 end;
 
 procedure TCard.CreateItemImage();
+//Создания содержимого карты
 begin
-
   CreateImage(CardItemIm);
   ScaleImageAt(CardItemIm, 0);
   CardItemIm.Visible := true;
@@ -405,13 +331,12 @@ begin
   end;
 
   CardItemIm.OnMouseDown := ImMouseDown;
-  CardItemIm.OnMouseUp := ImMouseUp;
   CardItemIm.OnMouseEnter := ImMouseEnter;
   CardItemIm.OnMouseLeave := ImMouseLeave;
 end;
 
 procedure TCard.CreateBorderImage();
-
+//Создание обводки карты
 begin
   CreateImage(CardBorderIm);
   ScaleImageAt(CardBorderIm, 0);
@@ -421,6 +346,7 @@ begin
 end;
 
 procedure TCard.CreatePlayerItemImage();
+//Создания предмета карты (Только у игрока)
 begin
   CreateImage(CardPlayerItemIm);
   ScaleImageAt(CardPlayerItemIm, 0);
@@ -431,6 +357,7 @@ begin
 end;
 
 procedure TCard.CreateValueLabel();
+//Создания текста о прочнсти карты
 begin
   CreateLabel(ValueText, 1);
   if (ItemType = TItemType.bonus) or (ItemType = TItemType.trap) then
@@ -438,25 +365,19 @@ begin
     if not((ItemIndex = CHEST_INDEX) and (ItemType = TItemType.bonus)) then
       ValueText.Visible := true;
   end;
-
 end;
 
 procedure TCard.CreateHealthValueLabel();
+//Создания текста о здоровье карты
 begin
   CreateLabel(HealthValueText, 0);
   if (ItemType = TItemType.enemy) or IsCardIsPlayer then
     HealthValueText.Visible := true;
-
-  HealthValueText.Caption := IntToStr(Value);
-  if IsCardIsPlayer then
-    HealthValueText.Caption := IntToStr(Value) + '/' +
-      IntToStr(PLAYER_CARD_BASE_HEALTH + MainForm.GetSelectedPlayerIndex * 2);
-
 end;
 
 procedure TCard.ValueRefresh();
+//Обновление информации о здоровье карты
 begin
-
   HealthValueText.Caption := IntToStr(Value);
   ValueText.Caption := IntToStr(Value);
 
@@ -469,11 +390,11 @@ begin
       IntToStr(PLAYER_CARD_BASE_HEALTH + GameData.HeroSelected * 2);
 
     CardPlayerItemIm.Visible := (HasAItem <> 0);
-
   end;
 end;
 
 procedure TCard.ReScaleToNormal(var Image: timage);
+//Сброс размера изображения до стандартного
 begin
   with Image do
   begin
@@ -488,6 +409,7 @@ begin
 end;
 
 procedure TCard.ReScaleToNone(var Image: timage);
+//Сброс размера изображения до Минимального
 begin
   with Image do
   begin
@@ -500,6 +422,7 @@ begin
 end;
 
 procedure TCard.ReScaleLabelToNormal(var Labeel: tlabel; mode: integer);
+//Сброс размера текста до стандартного
 begin
   with Labeel do
   begin
@@ -513,6 +436,7 @@ begin
 end;
 
 procedure TCard.ReScaleLabelToNone(var Labeel: tlabel);
+//Сброс размера текста до минимального
 begin
   with Labeel do
   begin
@@ -523,6 +447,7 @@ begin
 end;
 
 procedure TCard.ScaleOn(ds: real);
+//Изменение степени маштабирования карты НА
 begin
   ScaleImageOn(CardBackIm, ds);
   ScaleImageOn(CardItemIm, ds);
@@ -534,6 +459,7 @@ begin
 end;
 
 procedure TCard.ScaleAt(ds: real);
+//Установка степени маштабирования карты
 begin
   ScaleImageAt(CardBackIm, ds);
   ScaleImageAt(CardItemIm, ds);
@@ -545,6 +471,7 @@ begin
 end;
 
 procedure TCard.ReSetPosToMode(ScaleModeIndex: integer);
+//Сброс размеров и местоположения карты, взависимости от режима
 begin
   case ScaleModeIndex of
     1:
@@ -574,6 +501,7 @@ begin
 end;
 
 procedure TCard.MoveOn(dx, dy: integer);
+//Сдвинуть карту НА
 begin
   MoveImageOn(CardBackIm, dx, dy);
   MoveImageOn(CardItemIm, dx, dy);
@@ -585,6 +513,7 @@ begin
 end;
 
 procedure TCard.MoveAt(dx, dy: integer);
+//Установка местоположения карты
 begin
   MoveImageAt(CardBackIm, dx, dy);
   MoveImageAt(CardItemIm, dx, dy);
@@ -596,18 +525,21 @@ begin
 end;
 
 procedure TCard.MoveImageOn(var Image: timage; dx, dy: integer);
+//Сдвиг изображения НА
 begin
   Image.Left := Image.Left + dx;
   Image.Top := Image.Top + dy;
 end;
 
 procedure TCard.MoveImageAt(var Image: timage; dx, dy: integer);
+//Установка местоположения изображения
 begin
   Image.Left := dx;
   Image.Top := dy;
 end;
 
 procedure TCard.ScaleImageOn(var Image: timage; ds: real);
+//Изменить степени маштабирования изображения НА
 var
   wMultiple, hMultiple: integer;
 begin
@@ -620,6 +552,7 @@ begin
 end;
 
 procedure TCard.ScaleImageAt(var Image: timage; ds: real);
+//Установка степени маштабирования изображения
 var
   wMultiple, hMultiple: integer;
 begin
@@ -632,18 +565,21 @@ begin
 end;
 
 procedure TCard.MoveLabelOn(var Labeel: tlabel; dx, dy: integer);
+//Сдвинуть текст НА
 begin
   Labeel.Left := Labeel.Left + dx;
   Labeel.Top := Labeel.Top + dy;
 end;
 
 procedure TCard.MoveLabelAt(var Labeel: tlabel; dx, dy: integer);
+//Установка местоположения текста
 begin
   Labeel.Left := dx;
   Labeel.Top := dy;
 end;
 
 procedure TCard.ScaleLabelOn(var Labeel: tlabel; ds: real; mode: integer);
+//Изменить степени маштабирования текста НА
 var
   wMultiple, hMultiple: integer;
 begin
@@ -659,6 +595,7 @@ begin
 end;
 
 procedure TCard.ScaleLabelAt(var Labeel: tlabel; ds: real; mode: integer);
+//Установка степени маштабирования текста
 var
   wMultiple, hMultiple: integer;
 begin
@@ -673,6 +610,7 @@ begin
 end;
 
 procedure TCard.SetVisible(isVisible: bool);
+//Изменение видимости карты
 begin
   CardBackIm.Visible := isVisible;
   CardItemIm.Visible := isVisible;
@@ -684,6 +622,7 @@ begin
 end;
 
 procedure TCard.SetCardStat(CardStat: TCard);
+//Скопировать и установить данные карты из другой карты
 begin
   Position := CardStat.Position;
   BorderIndex := CardStat.BorderIndex;
@@ -715,7 +654,6 @@ begin
   HealthValueText.Caption := CardStat.HealthValueText.Caption;
 
   CardBorderIm.Visible := IsCardIsPlayer;
-
 end;
 
 procedure TCard.SetMinimized(Min: bool);
@@ -729,14 +667,13 @@ begin
 end;
 
 function TCard.DamageDealAnsw(Damage: integer): integer;
-var
-  dHP: integer;
-  plP: TPosition;
+//Нанесение и ответ о состоянии карты после получения урона
 begin
   DamageDealAnsw := ChangeHealhOn(-Damage);
 end;
 
 procedure TCard.DeadMessageShow(mode: integer);
+//Вывод сообщения о смерти
 begin
   case mode of
     1:
@@ -745,11 +682,12 @@ begin
         DeadMessageForm.show;
       end;
     2:
-      msg('u ded lol');
+      msg('u ded');
   end;
 end;
 
 procedure TCard.EndStep();
+//Завершения хода карты
 begin
   FieldOfCards.DoStep;
 end;
@@ -761,6 +699,7 @@ begin
 end;
 
 procedure TCard.DoClick();
+//Обработка клика игрока по карте
 var
   dx, dy, dHP, DDansw: integer;
   plP: TPosition;
@@ -768,6 +707,7 @@ begin
   dx := Abs(FieldOfCards.GetPlayerPos.X - Position.X);
   dy := Abs(FieldOfCards.GetPlayerPos.Y - Position.Y);
   plP := FieldOfCards.GetPlayerPos;
+
   if (((dx = 1) and (dy = 0)) or ((dx = 0) and (dy = 1))) and true and not IsCardIsPlayer
   then
   begin
@@ -779,19 +719,20 @@ begin
     dy := FieldOfCards.GetPlayerPos.Y - Position.Y;
 
     if FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value <= 0 then
+    // Если выдает ошибку на этой строке, то удалите и поставьте точку перед Value ("...Y].Value...")
     begin
       DeadMessageShow(2);
       exit;
     end;
 
-
-
     FieldOfCards.DoStep;
 
-    if IsGodMode then ItemType := TItemType.nothing;
+    if IsGodMode then
+      ItemType := TItemType.nothing;
 
 
-    case ItemType of
+    //Действуем в зависимости от типа карты
+     case ItemType of
       nothing:
         ;
       bonus:
@@ -809,7 +750,6 @@ begin
           if DDansw = 0 then
             exit;
         end;
-
       trap:
         begin
           if (isTrapsFacing(Position) = 1) then
@@ -828,6 +768,7 @@ begin
           end;
         end;
     end;
+
     FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
     ValueRefresh;
 
@@ -838,20 +779,10 @@ begin
   end;
 end;
 
-procedure TCard.ImMouseEnter(Sender: TObject);
-begin
-  if not IsCardIsPlayer then
-    CardBorderIm.Visible := (true);
-end;
 
-procedure TCard.ImMouseLeave(Sender: TObject);
-begin
-  if not IsCardIsPlayer then
-    CardBorderIm.Visible := false;
-end;
 
 function TCard.GenerateItemIndex(Difficult: integer): integer;
-
+//Генерация индекса карты
 var
   randomR: integer;
   CO_NO, CO_BO, CO_EN, CO_TR, CO_MX: integer;
@@ -862,8 +793,6 @@ begin
   end
   else
   begin
-    // Randomize;               d
-
     CO_NO := CHANCE_OF_NOTHING;
     CO_BO := round(CHANCE_OF_BONUS { * (0.5 + 1 / Difficult) } ) + CO_NO;
     CO_EN := round(CHANCE_OF_ENEMIES { * (Difficult * Difficult) } ) + CO_BO;
@@ -901,6 +830,7 @@ begin
 end;
 
 function TCard.ChangeHealhOn(Value: integer): integer;
+//Обработка изменение здоровья игрока, после клика по карте
 var
   plP: TPosition;
   dVal, maxHealth: integer;
@@ -912,7 +842,7 @@ begin
   if ((FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem <> 0) and
     (ItemType = TItemType.enemy)) then
   begin
-    GameSound('Sword',true);
+    GameSound('Sword', true);
     wepDeal := true;
     dVal := FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue + Value;
     maxHealth := dVal;
@@ -971,25 +901,12 @@ begin
   begin
     FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value := maxHealth;
     ChangeHealhOn := 0;
-
   end;
-
 end;
 
-procedure TCard.BrokeItem();
-begin
-  // if IsCurCardIsPlayer then
-  /// begin
-  // GameForm.CardWeaponImageList.GetBitmap(1, CardPlayerItemIm.Picture.Bitmap);
-  // end;
-end;
-
-function TCard.ChangeWepHealhOn(Value: integer): integer;
-begin
-
-end;
 
 function TCard.isTrapsFacing(trapP: TPosition): integer;
+//Проверка на то, получим ли мы урон от ловушки
 var
   plP: TPosition;
   vectorTo, trapCardIndex: integer;
@@ -1002,6 +919,7 @@ begin
 end;
 
 function TCard.CardLootGen(KilledCard: TCardGen): TCardGen;
+//Генерация предметов, выпадающих из карт-сундуков и враждебных карт
 var
   LootGenCard: TCardGen;
 begin
@@ -1025,6 +943,7 @@ begin
 end;
 
 function TCard.BonusPick(BonusItemPos: TPosition): integer;
+//Обработка нажатия по карте-бонусу
 var
   BonusItemCard: TCard;
   CardGen: TCardGen;
@@ -1041,7 +960,6 @@ begin
         GameSound('BadPotion', true);
         if DamageDealAnsw(Value) = -1 then
         begin
-
           FieldOfCards.GetFieldOfCards[FieldOfCards.GetPlayerPos.X,
             FieldOfCards.GetPlayerPos.Y].ValueRefresh;
           DeadMessageShow(1);
@@ -1068,7 +986,7 @@ begin
       end;
     1:
       begin
-      GameSound('Potion',true);
+        GameSound('Potion', true);
         ChangeAnsw := ChangeHealhOn(BonusItemCard.Value);
         BonusPick := 0;
       end;
@@ -1089,19 +1007,58 @@ begin
       end;
     3:
       begin
-      GameSound('Chest',true);
+        GameSound('Chest', true);
         FieldOfCards.ToggleAnimOn(5, BonusItemPos.X, BonusItemPos.Y,
           CGTDT(CardLootGen(CardGen)));
         BonusPick := 1;
       end;
-
   end;
 end;
 
-procedure TCard.ImMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: integer);
+procedure TCard.SetPosition(Position: TPosition);
 begin
-  //
+  Self.Position := Position;
+end;
+
+function TCard.GetPosition(): TPosition;
+begin
+  GetPosition := Position;
+end;
+
+function TCard.GetBorderIndex(): integer;
+var
+  pos: integer;
+begin
+  GetBorderIndex := pos;
+end;
+
+function TCard.GetItemIndex(): integer;
+var
+  pos: integer;
+begin
+  GetItemIndex := pos;
+end;
+
+function TCard.IsCurCardIsPlayer(): bool;
+begin
+  IsCurCardIsPlayer := IsCurCardIsPlayer;
+end;
+
+function TCard.IsCardMinimized(): bool;
+begin
+  IsCardMinimized := IsMinimized;
+end;
+
+procedure TCard.ImMouseEnter(Sender: TObject);
+begin
+  if not IsCardIsPlayer then
+    CardBorderIm.Visible := (true);
+end;
+
+procedure TCard.ImMouseLeave(Sender: TObject);
+begin
+  if not IsCardIsPlayer then
+    CardBorderIm.Visible := false;
 end;
 
 end.

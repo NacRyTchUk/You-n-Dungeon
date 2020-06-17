@@ -15,22 +15,18 @@ type
     OriginalLabel: TLabel;
     AdaptLabel: TLabel;
     LinksLabel: TLabel;
-    DevLabel: TLabel;
     SiteImg: TImage;
     GameJoltImg: TImage;
-    VkImg: TImage;
     AnimTimer: TTimer;
     procedure OkBtnClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure AnimTimerTimer(Sender: TObject);
     procedure SiteImgClick(Sender: TObject);
-    procedure VkImgClick(Sender: TObject);
     procedure GameJoltImgClick(Sender: TObject);
   private
     AnimCounter, AnimMode: Integer;
   public
-    { Public declarations }
   end;
 
 var
@@ -43,8 +39,8 @@ implementation
 uses MainScreen, BackGround;
 
 procedure TInfoForm.AnimTimerTimer(Sender: TObject);
+//Обработка анимаций
 begin
-
   MainForm.AnimWindowBlend(self, AnimMode, 50, 10, AnimCounter, AnimTimer);
 end;
 
@@ -55,7 +51,6 @@ end;
 
 procedure TInfoForm.FormShow(Sender: TObject);
 begin
-
   AnimCounter := 0;
   AnimMode := 1;
   AnimTimer.Enabled := true;
@@ -66,7 +61,6 @@ procedure TInfoForm.GameJoltImgClick(Sender: TObject);
 begin
   GameSound('Click', true);
   msg('Coming soon...');
-
 end;
 
 procedure TInfoForm.OkBtnClick(Sender: TObject);
@@ -85,11 +79,6 @@ begin
     nil, nil, SW_NORMAL);
 end;
 
-procedure TInfoForm.VkImgClick(Sender: TObject);
-begin
 
-  GameSound('Click', true);
-  Msg('No');
-end;
 
 end.

@@ -17,7 +17,6 @@ object MainForm: TMainForm
   OnCreate = FormCreate
   OnHide = FormHide
   OnKeyDown = FormKeyDown
-  OnResize = FormResize
   OnShow = FormShow
   DesignSize = (
     896
@@ -1304,22 +1303,19 @@ object MainForm: TMainForm
   object UpDate: TTimer
     Interval = 60
     OnTimer = UpDateTimer
-    Left = 840
-    Top = 320
+    Left = 488
   end
   object FormShowInputFreze: TTimer
     Enabled = False
     Interval = 500
     OnTimer = FormShowInputFrezeTimer
-    Left = 824
-    Top = 376
+    Left = 528
   end
   object PlayerDemoImages: TImageList
     DrawingStyle = dsTransparent
     Height = 80
     Width = 80
-    Left = 728
-    Top = 152
+    Left = 160
     Bitmap = {
       494C010103000800040050005000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400100005000000001002000000000000090
@@ -4631,8 +4627,7 @@ object MainForm: TMainForm
   object AbilityDemoImages: TImageList
     Height = 80
     Width = 80
-    Left = 832
-    Top = 144
+    Left = 200
     Bitmap = {
       494C010103000800040050005000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400100005000000001002000000000000090
@@ -7945,7 +7940,6 @@ object MainForm: TMainForm
     Enabled = False
     Interval = 84500
     OnTimer = MusicLoopTimerTimer
-    Left = 832
-    Top = 264
+    Left = 448
   end
 end

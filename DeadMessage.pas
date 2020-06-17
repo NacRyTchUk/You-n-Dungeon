@@ -3,7 +3,8 @@ unit DeadMessage;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
   Vcl.ExtCtrls, NiceStuff;
 
@@ -14,14 +15,13 @@ type
     OkBtn: TImage;
     BackToMenuImg: TImage;
     StatsLabel: TLabel;
+    RetryLabel: TLabel;
     procedure FormShow(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure BackToMenuImgClick(Sender: TObject);
     procedure OkBtnClick(Sender: TObject);
   private
-    { Private declarations }
   public
-    { Public declarations }
   end;
 
 var
@@ -35,9 +35,9 @@ uses game, BackGround;
 
 procedure TDeadMessageForm.BackToMenuImgClick(Sender: TObject);
 begin
-    GameForm.Enabled := true;
-   GameForm.BackToMenu;
-   close;
+  GameForm.Enabled := true;
+  GameForm.BackToMenu;
+  close;
 end;
 
 procedure TDeadMessageForm.FormCreate(Sender: TObject);
@@ -46,16 +46,18 @@ begin
 end;
 
 procedure TDeadMessageForm.FormShow(Sender: TObject);
+//Выводим количество заработанных монет
 begin
   GameSound('Boom', true);
-  StatsLabel.Caption := 'Заработано: ' + tStr(FieldOfCards.GetMoneyRecived) + ' C.';
+  StatsLabel.Caption := 'Заработано: ' +
+    tStr(FieldOfCards.GetMoneyRecived) + ' C.';
   GameForm.Enabled := false;
 end;
 
 procedure TDeadMessageForm.OkBtnClick(Sender: TObject);
 begin
-GameForm.DoKeyDown(Ord('R'));
-Close;
+  GameForm.DoKeyDown(Ord('R'));
+  close;
 end;
 
 end.

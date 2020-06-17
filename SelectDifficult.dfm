@@ -656,13 +656,13 @@ object SelectDifficultForm: TSelectDifficultForm
     Interval = 1
     OnTimer = ReloadTimerTimer
     Left = 848
-    Top = 344
+    Top = 336
   end
   object MusicLoopTimer: TTimer
     Enabled = False
     Interval = 247000
     OnTimer = MusicLoopTimerTimer
-    Left = 808
-    Top = 152
+    Left = 848
+    Top = 192
   end
 end

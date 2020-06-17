@@ -179,4 +179,11 @@ object DeadMessageForm: TDeadMessageForm
     Height = 19
     Caption = 'StatsLabel'
   end
+  object RetryLabel: TLabel
+    Left = 152
+    Top = 139
+    Width = 132
+    Height = 19
+    Caption = #1053#1072#1095#1072#1090#1100' '#1079#1072#1085#1086#1075#1086'?'
+  end
 end

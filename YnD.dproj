@@ -90,7 +90,6 @@
         <DCCReference Include="MainScreen.pas">
             <Form>MainForm</Form>
         </DCCReference>
-        <DCCReference Include="Configurate.pas"/>
         <DCCReference Include="SelectDifficult.pas">
             <Form>SelectDifficultForm</Form>
         </DCCReference>

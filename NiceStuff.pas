@@ -25,6 +25,12 @@ const
   CHANCE_OF_TRAPS = 15;
   CHEST_INDEX = 3;
 
+  CHANCE_TRASH = 40;
+  CHANCE_COMMON = 20;
+  CHANCE_BASE = 10;
+  CHANCE_RARE = 5;
+  CHANCE_ULTRA_RARE = 1;
+
   SPEED_OF_ANIM_SIZE_OUT = 10;
   SPEED_OF_ANIM_SIZE_IN = 10;
   SPEED_OF_ANIM_SLIDE_FROM_TO = 10;
@@ -57,18 +63,21 @@ const
   DEF_HINT = true;
   DEF_GAMEPAD_ON = false;
 
-
-
   HARD_LEVEL_PRICE = 100;
   ULTRAHARD_LEVEL_PRICE = 500;
 
-type
+  MinimizeWinWight = 896;
+  MinimizeWinHeight = 504;
+
+
+
+type // Ответ карты
   TIndexOfCardMsg = (OK, OutOfBorder, FAIL);
 
 type
   TItemType = (nothing, bonus, enemy, trap);
 
-type
+type // Информация и данные карты
   TCardStat = record
     CardName: string;
     CardType: TItemType;
@@ -91,7 +100,6 @@ type
     DontNeedbeNear: Boolean;
     EventCard: Boolean;
     OneClick: Boolean;
-
   end;
 
 type
@@ -100,31 +108,31 @@ type
     Y: integer;
   end;
 
-type
+type // Данные для генерации карты
   TCardGen = record
     ItemType: TItemType;
     ItemIndex: integer;
   end;
 
-type
+type // Информация, отправляемая картой
   TCardSendingData = record
     IntData: integer;
     CardGenData: TCardGen;
   end;
 
-type
+type // Игровые данные для сохранения
   TSaveData = record
     Money: integer;
     HeroSelected: integer;
     AbilitySelected: integer;
-    MusicIsOn : bool;
-    SoundIsOn : bool;
-    ReloadInterval : Integer;
-    HintIsOn : BOOL;
-    GamePadIsOn : BOOL;
+    MusicIsOn: bool;
+    SoundIsOn: bool;
+    ReloadInterval: integer;
+    HintIsOn: bool;
+    GamePadIsOn: bool;
   end;
 
-type
+type // Данные карты для сохранения
   TCardSaveData = record
     Position: TPosition;
     BorderIndex: integer;
@@ -137,7 +145,7 @@ type
     IsMinimized: Boolean;
   end;
 
-type
+type // Данные поля для сохранения
   TFieldOfCardSaveData = record
     FieldOfCardsSaveData: array [0 .. FIELD_SIZE_X - 1, 0 .. FIELD_SIZE_Y - 1]
       of TCardSaveData;
@@ -148,12 +156,6 @@ type
     RecivedMoney: integer;
   end;
 
-type
-  TMediaName = record
-    FileName: string;
-    MediaName: string;
-  end;
-
 procedure Msg(text: string); overload;
 procedure Msg(numb: integer); overload;
 function tStr(i: integer): string; overload;
@@ -161,8 +163,7 @@ function tStr(i: Boolean): string; overload;
 function tInt(s: string): integer;
 function CTP(X, Y: integer): TPosition;
 procedure ReSizeResolution(oForm: TForm);
-procedure InitForm(oForm: TForm); overload;
-procedure InitForm(oForm: TForm; Param: string); overload;
+procedure InitForm(oForm: TForm);
 function CoordToVector(Coord: TPosition): integer;
 function VectorToCoord(vector: integer): TPosition;
 function Rnd(min, max: integer): integer; overload;
@@ -175,60 +176,35 @@ function IsGamePadIsConnected(): Boolean;
 procedure TakeScreenShot(var bitm: TBitmap); overload;
 procedure TakeScreenShot(); overload;
 procedure GlobalInit();
-function Delta(Value ,DealValue, Min, Max : Integer)  : Integer;
+function Delta(Value, DealValue, min, max: integer): integer;
 
-procedure SaveGameData(); overload;
-procedure SaveGameData(path: string); overload;
-procedure LoadGameDataFrom(); overload;
-procedure LoadGameDataFrom(path: string); overload;
-
-const
-  MinimizeWinWight = 896;
-  MinimizeWinHeight = 504;
 
 var
   iPercentage: integer;
   SFX_NAMES: array [1 .. SFX_COUNT] of string;
   GAME_PAD_CONNECTED: Boolean = false;
   SETT_GAMEPAD_ON: Boolean = true;
-  IsGodMode : BOOL = false;
-  IsNoIntro : bool = true;
+  IsGodMode: bool = false;
+  IsNoIntro: bool = true;
 
 implementation
 
 uses mainscreen, game;
 
-procedure GlobalInit();
-var
-  count: integer;
+function Delta(Value, DealValue, min, max: integer): integer;
+// Обработка изменений параметров, с учетом границ значений
 begin
-  count := 1;
-  SFX_NAMES[count] := 'MenuTheme';  inc(count);
-  SFX_NAMES[count] := 'GameTheme';  inc(count);
-  SFX_NAMES[count] := 'Ability';  inc(count);
-  SFX_NAMES[count] := 'BadPotion';  inc(count);
-  SFX_NAMES[count] := 'Bonus';  inc(count);
-  SFX_NAMES[count] := 'Boom';  inc(count);
-  SFX_NAMES[count] := 'Chest';  inc(count);
-  SFX_NAMES[count] := 'Click';  inc(count);
-  SFX_NAMES[count] := 'Coin';  inc(count);
-  SFX_NAMES[count] := 'GoldOre';  inc(count);
-  SFX_NAMES[count] := 'Potion';  inc(count);
-  SFX_NAMES[count] := 'Step';  inc(count);
-  SFX_NAMES[count] := 'Swap';  inc(count);
-  SFX_NAMES[count] := 'Sword';  inc(count);
-  SFX_NAMES[count] := 'Fire';  inc(count);
-end;
-
-
-function Delta(Value ,DealValue, Min, Max : Integer)  : Integer;
-begin
-Value := Value + DealValue;
-if Value < min then Delta := min else
-if Value > max then Delta := max else Delta := Value;
+  Value := Value + DealValue;
+  if Value < min then
+    Delta := min
+  else if Value > max then
+    Delta := max
+  else
+    Delta := Value;
 end;
 
 procedure TakeScreenShot();
+// Создание скриншота в папку
 var
   hWin: HWND;
   dc: HDC;
@@ -253,15 +229,14 @@ begin
 
   ReleaseDC(hWin, dc);
   bmp.Free;
-
 end;
 
 procedure TakeScreenShot(var bitm: TBitmap);
+// Создание скриншота в переменную
 var
   hWin: HWND;
   dc: HDC;
 begin
-
   hWin := GetForegroundWindow;
   dc := GetWindowDC(hWin);
 
@@ -274,6 +249,7 @@ begin
 end;
 
 procedure ReSizeResolution(oForm: TForm);
+// Маштабирование формы под размер экрана
 begin
   if Screen.Width > MinimizeWinWight then
   begin
@@ -281,10 +257,10 @@ begin
       * 100) + 100;
     oForm.ScaleBy(iPercentage + 1, 100);
   end;
-
 end;
 
 procedure InitForm(oForm: TForm);
+// Инициализация формы
 begin
   ReSizeResolution(oForm);
   oForm.DoubleBuffered := true;
@@ -292,20 +268,9 @@ begin
   oForm.Font.Color := RGB(222, 185, 56);
 end;
 
-procedure InitForm(oForm: TForm; Param: string);
-begin
-  { case Param of
-    '-resize':
-    begin
-    oForm.DoubleBuffered := true;
-    oForm.Font.Name := 'Gnomoria_rus';
-    end;
-    end; }
-end;
-
 function CoordToVector(Coord: TPosition): integer;
+// Перевод координат в вектор (1,0) -> (2)
 begin
-
   case Coord.X of
     1:
       begin
@@ -318,7 +283,6 @@ begin
         else
           CoordToVector := 3;
       end;
-
     -1:
       begin
         CoordToVector := 4;
@@ -327,6 +291,7 @@ begin
 end;
 
 function VectorToCoord(vector: integer): TPosition;
+//Преобразование вектора в координаты (3) -> (0,1)
 begin
   case vector of
     1:
@@ -341,16 +306,19 @@ begin
 end;
 
 function Rnd(min, max: integer): integer;
+//Короткая запись рандома с включительным диапозоном значений
 begin
   Rnd := Random(abs(max - min + 1)) + min;
 end;
 
 function Rnd(max: integer): integer;
+//Короткая запись рандома с включительным диапозоном значений от 0
 begin
   Rnd := Random(max + 1);
 end;
 
 function Rnd(min, max, wmin, wmax: integer): integer;
+//Короткая запись рандома с исключающим диапозоном значений
 var
   RndNumb: integer;
 begin
@@ -362,6 +330,7 @@ begin
 end;
 
 function CTP(X, Y: integer): TPosition;
+//Координаты в Позицию (тип)
 var
   pos: TPosition;
 begin
@@ -371,21 +340,25 @@ begin
 end;
 
 procedure Msg(text: string); overload;
+//Краткая запись вывода сообщения
 begin
   showmessage(text);
 end;
 
 procedure Msg(numb: integer); overload;
+//Краткая запись вывода числа
 begin
   showmessage(IntToStr(numb));
 end;
 
 function tStr(i: integer): string;
+//Краткая запись преобразования в строку
 begin
   tStr := IntToStr(i);
 end;
 
 function tStr(i: Boolean): string;
+//Краткая запись преобразования в строку
 begin
   if i then
     tStr := 'true'
@@ -394,11 +367,13 @@ begin
 end;
 
 function tInt(s: string): integer;
+//Краткая запись преобразования в число
 begin
   tInt := StrToInt(s);
 end;
 
 function RndWWeight(var weight: array of integer): integer;
+//Функция генерации случайного числа, с использованием весов
 var
   lenghtOfArray: integer;
   i, n: integer;
@@ -424,10 +399,10 @@ begin
       exit;
     end;
   end;
-
 end;
 
 function CGTDT(CardGen: TCardGen): integer;
+//Преобразование тип для генерации карты, в данные для анимации
 var
   data: integer;
 begin
@@ -446,27 +421,10 @@ begin
   CGTDT := data;
 end;
 
-procedure SaveGameData();
-begin
-  //
-end;
 
-procedure SaveGameData(path: string);
-begin
-  //
-end;
-
-procedure LoadGameDataFrom();
-begin
-  //
-end;
-
-procedure LoadGameDataFrom(path: string);
-begin
-  //
-end;
 
 function KeyToChar(Key: integer): Char;
+//Контролируемый перевод Int To Char
 var
   chKey: Char;
 begin
@@ -486,12 +444,51 @@ begin
 end;
 
 function IsGamePadIsConnected(): Boolean;
+//Проверка на подключение геймпада
 var
   gamePad: tjoyinfo;
   jr: Cardinal;
 begin
   jr := joygetpos(joystickid1, @gamePad);
   IsGamePadIsConnected := jr = JOYERR_NOERROR;
+end;
+
+procedure GlobalInit();
+//Инициализация названия файлов звуковых дорожек
+var
+  count: integer;
+begin
+  count := 1;
+  SFX_NAMES[count] := 'MenuTheme';
+  inc(count);
+  SFX_NAMES[count] := 'GameTheme';
+  inc(count);
+  SFX_NAMES[count] := 'Ability';
+  inc(count);
+  SFX_NAMES[count] := 'BadPotion';
+  inc(count);
+  SFX_NAMES[count] := 'Bonus';
+  inc(count);
+  SFX_NAMES[count] := 'Boom';
+  inc(count);
+  SFX_NAMES[count] := 'Chest';
+  inc(count);
+  SFX_NAMES[count] := 'Click';
+  inc(count);
+  SFX_NAMES[count] := 'Coin';
+  inc(count);
+  SFX_NAMES[count] := 'GoldOre';
+  inc(count);
+  SFX_NAMES[count] := 'Potion';
+  inc(count);
+  SFX_NAMES[count] := 'Step';
+  inc(count);
+  SFX_NAMES[count] := 'Swap';
+  inc(count);
+  SFX_NAMES[count] := 'Sword';
+  inc(count);
+  SFX_NAMES[count] := 'Fire';
+  inc(count);
 end;
 
 end.

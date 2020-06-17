@@ -26,7 +26,6 @@ type
   private
     AnimCounter, AnimMode: Integer;
   public
-    { Public declarations }
   end;
 
 var

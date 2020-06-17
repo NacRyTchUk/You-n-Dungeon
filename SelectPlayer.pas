@@ -42,7 +42,6 @@ type
 
     procedure SelectItem(Number: Integer);
   public
-    { Public declarations }
   end;
 
 var
@@ -54,14 +53,26 @@ implementation
 
 uses mainscreen, BackGround;
 
+procedure TSelectPlayerForm.SelectItem(Number: Integer);
+// Выбор персоонажа и обновление визуального ряда
+begin
+  GameSound('Click', true);
+  SelectPanelBorder1.Visible := (Number = 0);
+  SelectPanelBorder2.Visible := (Number = 1);
+  SelectPanelBorder3.Visible := (Number = 2);
+  DescriptionLabel.Caption := DiscriptionList.Items[Number].Caption.Replace
+    (';', #10);
+  ItemSelected := Number;
+end;
+
 procedure TSelectPlayerForm.ArrowBackClick(Sender: TObject);
 begin
-SelectItem(Delta(ItemSelected, -1 , 0,2));
+  SelectItem(Delta(ItemSelected, -1, 0, 2));
 end;
 
 procedure TSelectPlayerForm.ArrowForwardClick(Sender: TObject);
 begin
-SelectItem(Delta(ItemSelected, 1 , 0,2));
+  SelectItem(Delta(ItemSelected, 1, 0, 2));
 end;
 
 procedure TSelectPlayerForm.BackBtnImageClick(Sender: TObject);
@@ -93,18 +104,6 @@ end;
 procedure TSelectPlayerForm.AnimTimerTimer(Sender: TObject);
 begin
   MainForm.AnimWindowBlend(self, AnimMode, 75, 10, AnimCounter, AnimTimer);
-end;
-
-procedure TSelectPlayerForm.SelectItem(Number: Integer);
-begin
-
-  GameSound('Click', true);
-  SelectPanelBorder1.Visible := (Number = 0);
-  SelectPanelBorder2.Visible := (Number = 1);
-  SelectPanelBorder3.Visible := (Number = 2);
-  DescriptionLabel.Caption := DiscriptionList.Items[Number].Caption.Replace
-    (';', #10);
-  ItemSelected := Number;
 end;
 
 procedure TSelectPlayerForm.SelectPanelItem1Click(Sender: TObject);

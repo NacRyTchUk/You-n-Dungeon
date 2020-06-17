@@ -1,0 +1,1075 @@
+unit TCardClass;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics, Vcl.StdCtrls,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
+  nicestuff, math, tcardstatsclass;
+
+type
+  TCard = class
+  private
+    Position: TPosition;
+    BorderIndex: integer;
+    ItemIndex: integer;
+    ItemType: TItemType;
+    CardBackIm: timage;
+    CardItemIm: timage;
+    CardBorderIm: timage;
+    CardPlayerItemIm: timage;
+
+    HealthValueText: tlabel;
+    ValueText: tlabel;
+    IsCardIsPlayer: bool;
+    Value: integer;
+    HasAItem: integer;
+    PlayerItemValue: integer;
+    IsMinimized: bool;
+
+    procedure CreateImage(var Image: timage);
+    procedure CreateBackImage();
+    procedure CreateItemImage();
+    procedure CreateBorderImage();
+    procedure CreatePlayerItemImage();
+    procedure CreateLabel(var Labeel: tlabel; mode: integer);
+    procedure CreateValueLabel();
+    procedure CreateHealthValueLabel();
+
+    procedure MoveImageOn(var Image: timage; dx, dy: integer);
+    procedure MoveImageAt(var Image: timage; dx, dy: integer);
+    procedure ScaleImageOn(var Image: timage; ds: real);
+    procedure ScaleImageAt(var Image: timage; ds: real);
+    procedure MoveLabelOn(var Labeel: tlabel; dx, dy: integer);
+    procedure MoveLabelAt(var Labeel: tlabel; dx, dy: integer);
+    procedure ScaleLabelOn(var Labeel: tlabel; ds: real; mode: integer);
+    procedure ScaleLabelAt(var Labeel: tlabel; ds: real; mode: integer);
+    procedure ReScaleToNormal(var Image: timage);
+    procedure ReScaleToNone(var Image: timage);
+    procedure ReScaleLabelToNormal(var Labeel: tlabel; mode: integer);
+    procedure ReScaleLabelToNone(var Labeel: tlabel);
+    procedure ValueRefresh();
+
+    procedure ImMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: integer);
+    procedure ImMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: integer);
+    procedure ImMouseEnter(Sender: TObject);
+    procedure ImMouseLeave(Sender: TObject);
+    procedure DeadMessageShow(mode: integer);
+
+    procedure EndStep();
+
+    function DamageDealAnsw(Damage: integer): integer;
+
+    function GenerateItemIndex(Difficult: integer): integer;
+
+    function ChangeHealhOn(Value: integer): integer;
+    function ChangeWepHealhOn(Value: integer): integer;
+    function isTrapsFacing(trapP: TPosition): integer;
+    function CardLootGen(KilledCard: TCardGen): TCardGen;
+    function BonusPick(BonusItemPos: TPosition): integer;
+
+  public
+    procedure SetPosition(Position: TPosition);
+    procedure SetBorderIndex(BorderIndex: integer);
+    procedure SetItemIndex(ItemIndex: integer);
+    procedure SetVisible(isVisible: bool);
+    procedure SetCardStat(CardStat: TCard);
+    procedure SetMinimized(Min: bool);
+    procedure DoClick();
+
+    function GetCardStat(): TCard;
+    function GetPosition(): TPosition;
+    function GetBorderIndex(): integer;
+    function GetItemIndex(): integer;
+    function IsCurCardIsPlayer(): bool;
+    function IsCardMinimized(): bool;
+
+    procedure BrokeItem();
+
+    // ====
+    function OnClick(SCard: TCard): integer;
+    procedure OnMoveCursorIn();
+    procedure OnMoveCursorOut();
+    procedure MoveOn(dx, dy: integer);
+    procedure MoveAt(dx, dy: integer);
+    procedure ScaleOn(ds: real);
+    procedure ScaleAt(ds: real);
+    procedure ReSetPosToMode(ScaleModeIndex: integer);
+    procedure HealthUp(hValue: integer);
+    procedure GiveAItem();
+
+    function SaveCardData(): TCardSaveData;
+    procedure LoadCardData(LoadData: TCardSaveData);
+
+    procedure CardCreate(Position: TPosition; IsPlayer: bool;
+      Difficult: integer);
+    Constructor Create(Position: TPosition; IsPlayer: bool;
+      Difficult: integer); overload;
+    Constructor Create(Position: TPosition; IsPlayer: bool; Difficult: integer;
+      CardGen: TCardGen); overload;
+    constructor Create(LoadData: TCardSaveData); overload;
+    Destructor Destroy();
+  end;
+
+implementation
+
+uses Game, MainScreen, BackGround, deadmessage;
+
+function TCard.SaveCardData(): TCardSaveData;
+// Сохранение данных о карте
+var
+  SD: TCardSaveData;
+begin
+  SD.Position := Position;
+  SD.BorderIndex := BorderIndex;
+  SD.ItemIndex := ItemIndex;
+  SD.ItemType := ItemType;
+  SD.IsCardIsPlayer := IsCardIsPlayer;
+  SD.Value := Value;
+  SD.HasAItem := HasAItem;
+  SD.PlayerItemValue := PlayerItemValue;
+  SD.IsMinimized := IsMinimized;
+  SaveCardData := SD;
+end;
+
+procedure TCard.HealthUp(hValue: integer);
+// Восттанавливаем здоровье карты, если это игрок
+begin
+  if IsCardIsPlayer then
+    ChangeHealhOn(hValue);
+end;
+
+procedure TCard.GiveAItem();
+// Выдаем оружие карте, если это игрок
+begin
+  if IsCardIsPlayer then
+    if HasAItem = 0 then
+    begin
+      HasAItem := rnd(6, 14, 10, 11);
+      PlayerItemValue := Value;
+      CardPlayerItemIm.Visible := true;
+      GameForm.CardWeaponImageList.GetBitmap(HasAItem,
+        CardPlayerItemIm.Picture.Bitmap);
+    end
+    else
+    begin
+      PlayerItemValue := PlayerItemValue + round(HasAItem * 1.5);
+      if HasAItem * 3 < PlayerItemValue then
+        PlayerItemValue := HasAItem * 3;
+
+    end;
+  ValueRefresh;
+end;
+
+procedure TCard.CardCreate(Position: TPosition; IsPlayer: bool;
+  Difficult: integer);
+// Создание карты
+var
+  RndMin, RndMax: integer;
+begin
+  if IsCardIsPlayer then
+  begin
+    ItemIndex := GameData.HeroSelected;
+    BorderIndex := 1;
+    Self.Value := 10 + ItemIndex * 2;
+  end
+  else
+  begin
+
+    RndMin := round(sqrt(1 + (0.05 + Difficult / 100) * power(ItemIndex, 2.5)) +
+      Difficult div 2);
+    RndMax := round(sqrt(3 + (0.1 + Difficult / 100) * power(ItemIndex, 2.5)) +
+      2 + Difficult);
+    Self.Value := rnd(RndMin, RndMax);
+
+    if (ItemType = TItemType.bonus) and (ItemIndex = 5) then
+      Self.Value := Self.Value * 2;
+
+    BorderIndex := 0;
+  end;
+
+  CreateBorderImage();
+  CreateBackImage();
+  CreateItemImage();
+  if IsCardIsPlayer then
+    CreatePlayerItemImage();
+  CreateValueLabel();
+  CreateHealthValueLabel();
+  ValueRefresh;
+  ReSetPosToMode(2);
+end;
+
+Constructor TCard.Create(Position: TPosition; IsPlayer: bool;
+  Difficult: integer);
+// Конструктор создания карты без исходных данных
+begin
+  IsCardIsPlayer := IsPlayer;
+  Self.ItemIndex := GenerateItemIndex(Difficult);
+
+  Self.Position := Position;
+
+  CardCreate(Position, IsPlayer, Difficult);
+end;
+
+Constructor TCard.Create(Position: TPosition; IsPlayer: bool;
+  Difficult: integer; CardGen: TCardGen);
+// Конструктор создания карты с исходными данными для случайно генерации
+begin
+  Self.Position := Position;
+  IsCardIsPlayer := IsPlayer;
+  Self.ItemIndex := CardGen.ItemIndex;
+  Self.ItemType := CardGen.ItemType;
+
+  if (ItemType = TItemType.bonus) then
+    Value := round(Value * rnd(15, 20) / 10);
+
+  CardCreate(Position, IsPlayer, Difficult);
+end;
+
+constructor TCard.Create(LoadData: TCardSaveData);
+// Конструктор создания карты с исходными данными
+var
+  RndMin, RndMax: integer;
+begin
+  Self.Position := LoadData.Position;
+  IsCardIsPlayer := LoadData.IsCardIsPlayer;
+  Self.ItemIndex := LoadData.ItemIndex;
+  Self.ItemType := LoadData.ItemType;
+
+  Self.Value := LoadData.Value;
+  Self.BorderIndex := LoadData.BorderIndex;
+  Self.HasAItem := LoadData.HasAItem;
+  Self.PlayerItemValue := LoadData.PlayerItemValue;
+  Self.IsMinimized := LoadData.IsMinimized;
+
+  CreateBorderImage();
+  CreateBackImage();
+  CreateItemImage();
+  if IsCardIsPlayer then
+    CreatePlayerItemImage();
+  CreateValueLabel();
+  CreateHealthValueLabel();
+  ValueRefresh;
+  ReSetPosToMode(1);
+end;
+
+Destructor TCard.Destroy();
+//Деструктор карты
+begin
+  CardBackIm.Free;
+  CardItemIm.Free;
+  CardBorderIm.Free;
+  if IsCardIsPlayer then
+    CardPlayerItemIm.Free;
+  ValueText.Free;
+  HealthValueText.Free;
+end;
+
+procedure TCard.CreateImage(var Image: timage);
+//Создание и настройка слоя-изображения для карты
+begin
+  with Image do
+  begin
+    Image := timage.Create(GameForm);
+    Parent := GameForm;
+
+    Visible := false;
+    Stretch := true;
+    Proportional := true;
+  end;
+end;
+
+procedure TCard.CreateLabel(var Labeel: tlabel; mode: integer);
+//Создание и настройка текста для карты
+begin
+  with Labeel do
+  begin
+    Labeel := tlabel.Create(GameForm);
+    Parent := GameForm;
+
+    if (mode = 0) then
+      Font.Color := RGB(222, 185, 56)
+    else
+      Font.Color := RGB(105, 128, 156);
+
+    Visible := false;
+    Caption := IntToStr(Value);
+    BringToFront;
+  end;
+
+end;
+
+procedure TCard.CreateBackImage();
+//Создания фона карты
+begin
+  CreateImage(CardBackIm);
+  ScaleImageAt(CardBackIm, 0);
+  CardBackIm.Visible := true;
+  GameForm.CardBorderList.GetBitmap(3, CardBackIm.Picture.Bitmap);
+end;
+
+procedure TCard.CreateItemImage();
+//Создания содержимого карты
+begin
+  CreateImage(CardItemIm);
+  ScaleImageAt(CardItemIm, 0);
+  CardItemIm.Visible := true;
+
+  CardItemIm.Transparent := true;
+
+  if IsCardIsPlayer then
+    GameForm.CardPlayersImageList.GetBitmap(ItemIndex,
+      CardItemIm.Picture.Bitmap)
+  else
+  begin
+    case ItemType of
+      nothing:
+        GameForm.CardsImagesList.GetBitmap(0, CardItemIm.Picture.Bitmap);
+      bonus:
+        GameForm.CardBonusImageList.GetBitmap(ItemIndex,
+          CardItemIm.Picture.Bitmap);
+      enemy:
+        GameForm.CardEnemyImageList.GetBitmap(ItemIndex,
+          CardItemIm.Picture.Bitmap);
+      trap:
+        GameForm.CardTrapsImageList.GetBitmap(ItemIndex,
+          CardItemIm.Picture.Bitmap);
+    end;
+  end;
+
+  CardItemIm.OnMouseDown := ImMouseDown;
+  CardItemIm.OnMouseUp := ImMouseUp;
+  CardItemIm.OnMouseEnter := ImMouseEnter;
+  CardItemIm.OnMouseLeave := ImMouseLeave;
+end;
+
+procedure TCard.CreateBorderImage();
+//Создание обводки карты
+begin
+  CreateImage(CardBorderIm);
+  ScaleImageAt(CardBorderIm, 0);
+  CardBorderIm.Visible := IsCardIsPlayer;
+
+  GameForm.CardBorderList.GetBitmap(BorderIndex, CardBorderIm.Picture.Bitmap);
+end;
+
+procedure TCard.CreatePlayerItemImage();
+//Создания предмета карты (Только у игрока)
+begin
+  CreateImage(CardPlayerItemIm);
+  ScaleImageAt(CardPlayerItemIm, 0);
+  CardPlayerItemIm.Transparent := true;
+  if HasAItem <> 0 then
+    GameForm.CardWeaponImageList.GetBitmap(HasAItem,
+      CardPlayerItemIm.Picture.Bitmap);
+end;
+
+procedure TCard.CreateValueLabel();
+//Создания текста о прочнсти карты
+begin
+  CreateLabel(ValueText, 1);
+  if (ItemType = TItemType.bonus) or (ItemType = TItemType.trap) then
+  begin
+    if not((ItemIndex = CHEST_INDEX) and (ItemType = TItemType.bonus)) then
+      ValueText.Visible := true;
+  end;
+end;
+
+procedure TCard.CreateHealthValueLabel();
+//Создания текста о здоровье карты
+begin
+  CreateLabel(HealthValueText, 0);
+  if (ItemType = TItemType.enemy) or IsCardIsPlayer then
+    HealthValueText.Visible := true;
+end;
+
+procedure TCard.ValueRefresh();
+//Обновление информации о здоровье карты
+begin
+  HealthValueText.Caption := IntToStr(Value);
+  ValueText.Caption := IntToStr(Value);
+
+  if IsCardIsPlayer then
+  begin
+    ValueText.Visible := (HasAItem <> 0);
+    ValueText.Caption := IntToStr(PlayerItemValue);
+
+    HealthValueText.Caption := HealthValueText.Caption + '/' +
+      IntToStr(PLAYER_CARD_BASE_HEALTH + GameData.HeroSelected * 2);
+
+    CardPlayerItemIm.Visible := (HasAItem <> 0);
+  end;
+end;
+
+procedure TCard.ReScaleToNormal(var Image: timage);
+//Сброс размера изображения до стандартного
+begin
+  with Image do
+  begin
+    Width := SIZE_CARD_X * iPercentage div 100;
+    Height := SIZE_CARD_Y * iPercentage div 100;
+
+    Left := SIZE_TAB_X * iPercentage div 100 + (SIZE_SPACE + SIZE_CARD_X) *
+      Position.X * iPercentage div 100;
+    Top := SIZE_TAB_Y * iPercentage div 100 + (SIZE_SPACE + SIZE_CARD_Y) *
+      Position.Y * iPercentage div 100;
+  end;
+end;
+
+procedure TCard.ReScaleToNone(var Image: timage);
+//Сброс размера изображения до Минимального
+begin
+  with Image do
+  begin
+    Left := Left + Width div 2;
+    Top := Top + Height div 2;
+
+    Width := 0;
+    Height := 0;
+  end;
+end;
+
+procedure TCard.ReScaleLabelToNormal(var Labeel: tlabel; mode: integer);
+//Сброс размера текста до стандартного
+begin
+  with Labeel do
+  begin
+    Font.Size := 10;
+    Left := CardItemIm.Left + CardItemIm.Width div 10;
+    if mode = 0 then
+      Labeel.Top := CardItemIm.Top + CardItemIm.Height div 20
+    else
+      Labeel.Top := CardItemIm.Top + 8 * CardItemIm.Height div 10;
+  end;
+end;
+
+procedure TCard.ReScaleLabelToNone(var Labeel: tlabel);
+//Сброс размера текста до минимального
+begin
+  with Labeel do
+  begin
+    Left := Left + Width div 2;
+    Top := Top + Height div 2;
+    Font.Size := 1;
+  end;
+end;
+
+procedure TCard.ScaleOn(ds: real);
+//Изменение степени маштабирования карты НА
+begin
+  ScaleImageOn(CardBackIm, ds);
+  ScaleImageOn(CardItemIm, ds);
+  ScaleImageOn(CardBorderIm, ds);
+  if IsCardIsPlayer then
+    ScaleImageOn(CardPlayerItemIm, ds);
+  ScaleLabelOn(HealthValueText, ds, 0);
+  ScaleLabelOn(ValueText, ds, 1);
+end;
+
+procedure TCard.ScaleAt(ds: real);
+//Установка степени маштабирования карты
+begin
+  ScaleImageAt(CardBackIm, ds);
+  ScaleImageAt(CardItemIm, ds);
+  ScaleImageAt(CardBorderIm, ds + ds * 0.08);
+  if IsCardIsPlayer then
+    ScaleImageAt(CardPlayerItemIm, ds);
+  ScaleLabelAt(HealthValueText, 0.1, 0);
+  ScaleLabelAt(ValueText, 0.1, 1);
+end;
+
+procedure TCard.ReSetPosToMode(ScaleModeIndex: integer);
+//Сброс размеров и местоположения карты, взависимости от режима
+begin
+  case ScaleModeIndex of
+    1:
+      begin
+        ReScaleToNormal(CardBackIm);
+        ReScaleToNormal(CardItemIm);
+        ReScaleToNormal(CardBorderIm);
+        if IsCardIsPlayer then
+          ReScaleToNormal(CardPlayerItemIm);
+        ReScaleLabelToNormal(HealthValueText, 0);
+        ReScaleLabelToNormal(ValueText, 1);
+
+        ScaleImageOn(CardBorderIm, 1.08);
+      end;
+    2:
+      begin
+        ReSetPosToMode(1);
+        ReScaleToNone(CardBackIm);
+        ReScaleToNone(CardItemIm);
+        ReScaleToNone(CardBorderIm);
+        if IsCardIsPlayer then
+          ReScaleToNone(CardPlayerItemIm);
+        ReScaleLabelToNone(HealthValueText);
+        ReScaleLabelToNone(ValueText);
+      end;
+  end;
+end;
+
+procedure TCard.MoveOn(dx, dy: integer);
+//Сдвинуть карту НА
+begin
+  MoveImageOn(CardBackIm, dx, dy);
+  MoveImageOn(CardItemIm, dx, dy);
+  MoveImageOn(CardBorderIm, dx, dy);
+  if IsCardIsPlayer then
+    MoveImageOn(CardPlayerItemIm, dx, dy);
+  MoveLabelOn(HealthValueText, dx, dy);
+  MoveLabelOn(ValueText, dx, dy);
+end;
+
+procedure TCard.MoveAt(dx, dy: integer);
+//Установка местоположения карты
+begin
+  MoveImageAt(CardBackIm, dx, dy);
+  MoveImageAt(CardItemIm, dx, dy);
+  MoveImageAt(CardBorderIm, dx, dy);
+  if IsCardIsPlayer then
+    MoveImageAt(CardPlayerItemIm, dx, dy);
+  MoveLabelAt(HealthValueText, dx, dy);
+  MoveLabelAt(ValueText, dx, dy);
+end;
+
+procedure TCard.MoveImageOn(var Image: timage; dx, dy: integer);
+//Сдвиг изображения НА
+begin
+  Image.Left := Image.Left + dx;
+  Image.Top := Image.Top + dy;
+end;
+
+procedure TCard.MoveImageAt(var Image: timage; dx, dy: integer);
+//Установка местоположения изображения
+begin
+  Image.Left := dx;
+  Image.Top := dy;
+end;
+
+procedure TCard.ScaleImageOn(var Image: timage; ds: real);
+//Изменить степени маштабирования изображения НА
+var
+  wMultiple, hMultiple: integer;
+begin
+  wMultiple := round(Image.Width * ds);
+  hMultiple := round(Image.Height * ds);
+  Image.Left := Image.Left + (Image.Width - wMultiple) div 2;
+  Image.Top := Image.Top + (Image.Height - hMultiple) div 2;
+  Image.Width := wMultiple;
+  Image.Height := hMultiple;
+end;
+
+procedure TCard.ScaleImageAt(var Image: timage; ds: real);
+//Установка степени маштабирования изображения
+var
+  wMultiple, hMultiple: integer;
+begin
+  wMultiple := round(SIZE_CARD_X * iPercentage * ds / 100);
+  hMultiple := round(SIZE_CARD_Y * iPercentage * ds / 100);
+  Image.Left := Image.Left + (Image.Width - wMultiple) div 2;
+  Image.Top := Image.Top + (Image.Height - hMultiple) div 2;
+  Image.Width := wMultiple;
+  Image.Height := hMultiple;
+end;
+
+procedure TCard.MoveLabelOn(var Labeel: tlabel; dx, dy: integer);
+//Сдвинуть текст НА
+begin
+  Labeel.Left := Labeel.Left + dx;
+  Labeel.Top := Labeel.Top + dy;
+end;
+
+procedure TCard.MoveLabelAt(var Labeel: tlabel; dx, dy: integer);
+//Установка местоположения текста
+begin
+  Labeel.Left := dx;
+  Labeel.Top := dy;
+end;
+
+procedure TCard.ScaleLabelOn(var Labeel: tlabel; ds: real; mode: integer);
+//Изменить степени маштабирования текста НА
+var
+  wMultiple, hMultiple: integer;
+begin
+  wMultiple := round(ds * 10);
+  Labeel.Font.Size := wMultiple;
+  Labeel.Left := CardItemIm.Left + CardItemIm.Width div 10;
+  if mode = 0 then
+    Labeel.Top := CardItemIm.Top + CardItemIm.Height div 20
+  else
+    Labeel.Top := CardItemIm.Top + 9 * CardItemIm.Height div 10;
+
+  Labeel.BringToFront;
+end;
+
+procedure TCard.ScaleLabelAt(var Labeel: tlabel; ds: real; mode: integer);
+//Установка степени маштабирования текста
+var
+  wMultiple, hMultiple: integer;
+begin
+  wMultiple := round(ds * 10);
+  Labeel.Font.Size := wMultiple;
+  Labeel.Left := CardItemIm.Left + CardItemIm.Width div 10;
+  if mode = 0 then
+    Labeel.Top := CardItemIm.Top + CardItemIm.Height div 20
+  else
+    Labeel.Top := CardItemIm.Top + 9 * CardItemIm.Height div 10;
+  Labeel.BringToFront;
+end;
+
+procedure TCard.SetVisible(isVisible: bool);
+//Изменение видимости карты
+begin
+  CardBackIm.Visible := isVisible;
+  CardItemIm.Visible := isVisible;
+  CardBorderIm.Visible := isVisible;
+  if IsCardIsPlayer then
+    CardPlayerItemIm.Visible := isVisible;
+  HealthValueText.Visible := isVisible;
+  ValueText.Visible := isVisible;
+end;
+
+procedure TCard.SetCardStat(CardStat: TCard);
+//Скопировать и установить данные карты из другой карты
+begin
+  Position := CardStat.Position;
+  BorderIndex := CardStat.BorderIndex;
+  ItemIndex := CardStat.ItemIndex;
+  IsCardIsPlayer := CardStat.IsCardIsPlayer;
+  CardBackIm.Picture.Bitmap := CardStat.CardBackIm.Picture.Bitmap;
+  CardItemIm.Picture.Bitmap := CardStat.CardItemIm.Picture.Bitmap;
+  CardBorderIm.Picture.Bitmap := CardStat.CardBorderIm.Picture.Bitmap;
+  if IsCardIsPlayer then
+  begin
+    CreateImage(CardPlayerItemIm);
+    ScaleImageAt(CardPlayerItemIm, 1);
+
+    CardPlayerItemIm.Transparent := true;
+    CardPlayerItemIm.Left := CardStat.CardPlayerItemIm.Left;
+    CardPlayerItemIm.Top := CardStat.CardPlayerItemIm.Top;
+    CardPlayerItemIm.Visible := CardStat.CardPlayerItemIm.Visible;
+    CardPlayerItemIm.Picture.Bitmap := CardStat.CardPlayerItemIm.Picture.Bitmap;
+    CardStat.CardPlayerItemIm.Free;
+  end;
+  Value := CardStat.Value;
+  HasAItem := CardStat.HasAItem;
+  PlayerItemValue := CardStat.PlayerItemValue;
+  IsMinimized := CardStat.IsMinimized;
+
+  ValueText.Visible := CardStat.ValueText.Visible;
+  HealthValueText.Visible := CardStat.HealthValueText.Visible;
+  ValueText.Caption := CardStat.ValueText.Caption;
+  HealthValueText.Caption := CardStat.HealthValueText.Caption;
+
+  CardBorderIm.Visible := IsCardIsPlayer;
+end;
+
+procedure TCard.SetMinimized(Min: bool);
+begin
+  IsMinimized := Min;
+end;
+
+function TCard.GetCardStat(): TCard;
+begin
+  GetCardStat := Self;
+end;
+
+function TCard.DamageDealAnsw(Damage: integer): integer;
+//Нанесение и ответ о состоянии карты после получения урона
+begin
+  DamageDealAnsw := ChangeHealhOn(-Damage);
+end;
+
+procedure TCard.DeadMessageShow(mode: integer);
+//Вывод сообщения о смерти
+begin
+  case mode of
+    1:
+      begin
+        GameForm.Enabled := false;
+        DeadMessageForm.show;
+      end;
+    2:
+      msg('u ded');
+  end;
+end;
+
+procedure TCard.EndStep();
+//Завершения хода карты
+begin
+  FieldOfCards.DoStep;
+end;
+
+procedure TCard.ImMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: integer);
+begin
+  DoClick;
+end;
+
+procedure TCard.DoClick();
+//Обработка клика игрока по карте
+var
+  dx, dy, dHP, DDansw: integer;
+  plP: TPosition;
+begin
+  dx := Abs(FieldOfCards.GetPlayerPos.X - Position.X);
+  dy := Abs(FieldOfCards.GetPlayerPos.Y - Position.Y);
+  plP := FieldOfCards.GetPlayerPos;
+
+  if (((dx = 1) and (dy = 0)) or ((dx = 0) and (dy = 1))) and true and not IsCardIsPlayer
+  then
+  begin
+
+    if FieldOfCards.IsCardAnimPlayed(3) or FieldOfCards.IsCardAnimPlayed(1) then
+      exit;
+
+    dx := Position.X - FieldOfCards.GetPlayerPos.X;
+    dy := FieldOfCards.GetPlayerPos.Y - Position.Y;
+
+    if FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value <= 0 then
+    // Если выдает ошибку на этой строке, то удалите и поставьте точку перед Value ("...Y].Value...")
+    begin
+      DeadMessageShow(2);
+      exit;
+    end;
+
+    FieldOfCards.DoStep;
+
+    if IsGodMode then
+      ItemType := TItemType.nothing;
+
+
+    //Действуем в зависимости от типа карты
+     case ItemType of
+      nothing:
+        ;
+      bonus:
+        if (BonusPick(Position) = 1) then
+          exit;
+      enemy:
+        begin
+          DDansw := DamageDealAnsw(Value);
+          FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
+          if DDansw = -1 then
+          begin
+            DeadMessageShow(1);
+            exit;
+          end;
+          if DDansw = 0 then
+            exit;
+        end;
+      trap:
+        begin
+          if (isTrapsFacing(Position) = 1) then
+          begin
+            DDansw := DamageDealAnsw(Value);
+
+            FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
+            if DDansw = 0 then
+              exit;
+
+            if DDansw = -1 then
+            begin
+              DeadMessageShow(1);
+              exit;
+            end;
+          end;
+        end;
+    end;
+
+    FieldOfCards.GetFieldOfCards[plP.X, plP.Y].ValueRefresh;
+    ValueRefresh;
+
+    GameSound('Step', true);
+    FieldOfCards.ToggleAnimOn(3, FieldOfCards.GetPlayerPos.X,
+      FieldOfCards.GetPlayerPos.Y, CoordToVector(CTP(dx, dy)));
+    FieldOfCards.ToggleAnimOn(1, Position.X, Position.Y);
+  end;
+end;
+
+
+
+function TCard.GenerateItemIndex(Difficult: integer): integer;
+//Генерация индекса карты
+var
+  randomR: integer;
+  CO_NO, CO_BO, CO_EN, CO_TR, CO_MX: integer;
+begin
+  if IsCardIsPlayer then
+  begin
+    GenerateItemIndex := 0;
+  end
+  else
+  begin
+    CO_NO := CHANCE_OF_NOTHING;
+    CO_BO := round(CHANCE_OF_BONUS { * (0.5 + 1 / Difficult) } ) + CO_NO;
+    CO_EN := round(CHANCE_OF_ENEMIES { * (Difficult * Difficult) } ) + CO_BO;
+    CO_TR := round(CHANCE_OF_TRAPS { * (Difficult * Difficult) } ) + CO_EN;
+
+    randomR := rnd(0, CO_TR);
+
+    if (0 <= randomR) and (randomR < CO_NO) then
+      ItemType := TItemType.nothing
+    else if (CO_NO <= randomR) and (randomR < CO_BO) then
+      ItemType := TItemType.bonus
+    else if (CO_BO <= randomR) and (randomR < CO_EN) then
+      ItemType := TItemType.enemy
+    else if (CO_EN <= randomR) and (randomR <= CO_TR) then
+      ItemType := TItemType.trap
+    else
+      msg('rand ind err');
+
+    case ItemType of
+      nothing:
+        GenerateItemIndex := 0;
+      bonus:
+        GenerateItemIndex :=
+          rnd(1, round(COUNT_OF_BONUS_CARDS * Difficult / 30) + 7);
+      enemy:
+        GenerateItemIndex := rnd(1, COUNT_OF_ENEMIES - 15 + Difficult);
+      trap:
+        GenerateItemIndex := rnd(1, COUNT_OF_TRAPS);
+    else
+      msg('rand ind err');
+    end;
+
+  end;
+
+end;
+
+function TCard.ChangeHealhOn(Value: integer): integer;
+//Обработка изменение здоровья игрока, после клика по карте
+var
+  plP: TPosition;
+  dVal, maxHealth: integer;
+  wepDeal: bool;
+  CardGen: TCardGen;
+  PItemIm: TBitmap;
+begin
+  plP := FieldOfCards.GetPlayerPos;
+  if ((FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem <> 0) and
+    (ItemType = TItemType.enemy)) then
+  begin
+    GameSound('Sword', true);
+    wepDeal := true;
+    dVal := FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue + Value;
+    maxHealth := dVal;
+  end
+  else
+  begin
+    wepDeal := false;
+    dVal := FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value + Value;
+    maxHealth := (PLAYER_CARD_BASE_HEALTH + GameData.HeroSelected * 2);
+  end;
+
+  CardGen.ItemType := ItemType;
+  CardGen.ItemIndex := ItemIndex;
+  CardGen := CardLootGen(CardGen);
+
+  if (dVal > 0) and (dVal <= maxHealth) then
+  begin
+
+    ChangeHealhOn := 0;
+    if wepDeal then
+    begin
+
+      FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue := dVal;
+      FieldOfCards.ToggleAnimOn(5, Position.X, Position.Y, CGTDT(CardGen));
+    end
+    else
+    begin
+      FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value := dVal;
+      ChangeHealhOn := 1;
+    end;
+
+  end
+  else if (dVal <= 0) then
+  begin
+    if not wepDeal then
+    begin
+      ChangeHealhOn := -1;
+      Self.Value := -dVal;
+      FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value := 0;
+    end
+    else
+    begin
+      if dVal = 0 then
+        FieldOfCards.ToggleAnimOn(5, Position.X, Position.Y, CGTDT(CardGen));
+
+      Self.Value := -dVal;
+      FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem := 0;
+      FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue := 0;
+      ValueRefresh;
+
+      ChangeHealhOn := 0;
+    end;
+
+  end
+  else if (dVal > maxHealth) then
+  begin
+    FieldOfCards.GetFieldOfCards[plP.X, plP.Y].Value := maxHealth;
+    ChangeHealhOn := 0;
+  end;
+end;
+
+
+function TCard.isTrapsFacing(trapP: TPosition): integer;
+//Проверка на то, получим ли мы урон от ловушки
+var
+  plP: TPosition;
+  vectorTo, trapCardIndex: integer;
+begin
+  plP := FieldOfCards.GetPlayerPos;
+  vectorTo := CoordToVector(CTP(plP.X - trapP.X, trapP.Y - plP.Y));
+  trapCardIndex := FieldOfCards.GetFieldOfCards[trapP.X, trapP.Y].ItemIndex;
+
+  isTrapsFacing := TrapsFacingStats[trapCardIndex, vectorTo];
+end;
+
+function TCard.CardLootGen(KilledCard: TCardGen): TCardGen;
+//Генерация предметов, выпадающих из карт-сундуков и враждебных карт
+var
+  LootGenCard: TCardGen;
+begin
+  if (KilledCard.ItemType = TItemType.bonus) and
+    (KilledCard.ItemIndex = CHEST_INDEX) then
+  begin
+    LootGenCard.ItemType := TItemType.bonus;
+    LootGenCard.ItemIndex := rnd(1, COUNT_OF_BONUS_CARDS, CHEST_INDEX,
+      CHEST_INDEX);
+  end;
+  if (KilledCard.ItemType = TItemType.enemy) then
+  begin
+    LootGenCard.ItemIndex := rnd(0, 5);
+    if LootGenCard.ItemIndex = 0 then
+      LootGenCard.ItemType := TItemType.nothing
+    else
+      LootGenCard.ItemType := TItemType.bonus;
+
+  end;
+  CardLootGen := LootGenCard;
+end;
+
+function TCard.BonusPick(BonusItemPos: TPosition): integer;
+//Обработка нажатия по карте-бонусу
+var
+  BonusItemCard: TCard;
+  CardGen: TCardGen;
+  ChangeAnsw: integer;
+  plP: TPosition;
+begin
+  BonusItemCard := FieldOfCards.GetFieldOfCards[BonusItemPos.X, BonusItemPos.Y];
+  plP := FieldOfCards.GetPlayerPos;
+  CardGen.ItemType := BonusItemCard.ItemType;
+  CardGen.ItemIndex := BonusItemCard.ItemIndex;
+  case BonusTypesStats[BonusItemCard.ItemIndex] of
+    - 1:
+      begin
+        GameSound('BadPotion', true);
+        if DamageDealAnsw(Value) = -1 then
+        begin
+          FieldOfCards.GetFieldOfCards[FieldOfCards.GetPlayerPos.X,
+            FieldOfCards.GetPlayerPos.Y].ValueRefresh;
+          DeadMessageShow(1);
+          ChangeAnsw := 0;
+        end
+        else
+          ChangeAnsw := 1;
+        BonusPick := 0;
+      end;
+    0:
+      begin
+        FieldOfCards.AddMoneyOn(Value);
+        if ItemIndex = 5 then
+        begin
+          FieldOfCards.ChargeTheAbilityOn(3);
+          GameSound('Bonus', true);
+        end
+        else
+        begin
+          FieldOfCards.ChargeTheAbilityOn(1);
+          GameSound('Coin', true);
+        end;
+        BonusPick := 0;
+      end;
+    1:
+      begin
+        GameSound('Potion', true);
+        ChangeAnsw := ChangeHealhOn(BonusItemCard.Value);
+        BonusPick := 0;
+      end;
+    2:
+      begin
+        if Value > FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue
+        then
+        begin
+          FieldOfCards.GetFieldOfCards[plP.X, plP.Y].HasAItem := ItemIndex;
+          FieldOfCards.GetFieldOfCards[plP.X, plP.Y].PlayerItemValue := Value;
+          FieldOfCards.GetFieldOfCards[plP.X, plP.Y]
+            .CardPlayerItemIm.Visible := true;
+          GameForm.CardWeaponImageList.GetBitmap(ItemIndex,
+            FieldOfCards.GetFieldOfCards[plP.X, plP.Y]
+            .CardPlayerItemIm.Picture.Bitmap);
+        end;
+        BonusPick := 0;
+      end;
+    3:
+      begin
+        GameSound('Chest', true);
+        FieldOfCards.ToggleAnimOn(5, BonusItemPos.X, BonusItemPos.Y,
+          CGTDT(CardLootGen(CardGen)));
+        BonusPick := 1;
+      end;
+  end;
+end;
+
+procedure TCard.SetPosition(Position: TPosition);
+begin
+  Self.Position := Position;
+end;
+
+function TCard.GetPosition(): TPosition;
+begin
+  GetPosition := Position;
+end;
+
+function TCard.GetBorderIndex(): integer;
+var
+  pos: integer;
+begin
+  GetBorderIndex := pos;
+end;
+
+function TCard.GetItemIndex(): integer;
+var
+  pos: integer;
+begin
+  GetItemIndex := pos;
+end;
+
+function TCard.IsCurCardIsPlayer(): bool;
+begin
+  IsCurCardIsPlayer := IsCurCardIsPlayer;
+end;
+
+function TCard.IsCardMinimized(): bool;
+begin
+  IsCardMinimized := IsMinimized;
+end;
+
+procedure TCard.ImMouseEnter(Sender: TObject);
+begin
+  if not IsCardIsPlayer then
+    CardBorderIm.Visible := (true);
+end;
+
+procedure TCard.ImMouseLeave(Sender: TObject);
+begin
+  if not IsCardIsPlayer then
+    CardBorderIm.Visible := false;
+end;
+
+end.

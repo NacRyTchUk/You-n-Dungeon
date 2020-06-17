@@ -20,7 +20,6 @@ type
   private
     procedure DoCommand();
   public
-    { Public declarations }
   end;
 
 var
@@ -31,13 +30,6 @@ implementation
 {$R *.dfm}
 
 uses mainscreen, BackGround;
-
-procedure TConsoleForm.InputBoxKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
-  if Key = 13 then
-    DoCommand;
-end;
 
 procedure TConsoleForm.DoCommand();
 var
@@ -94,12 +86,10 @@ begin
       ResponseLabel.Caption := 'Ошибка: Режим отладки отключен';
   end;
 
-   if Cmd = '-god' then
+  if Cmd = '-god' then
   begin
     if IsDebugOn then
       try
-        Cmd := InputBox.Text;
-        delete(Cmd, 1, 5);
         IsGodMode := not IsGodMode;
         InputBox.Text := '';
         ResponseLabel.Caption := 'Успех';
@@ -116,7 +106,7 @@ begin
       try
         Cmd := InputBox.Text;
         delete(Cmd, 1, 5);
-        GameSoundMute(cmd);
+        GameSoundMute(Cmd);
         InputBox.Text := '';
         ResponseLabel.Caption := 'Успех';
       except
@@ -130,8 +120,6 @@ begin
   begin
     if IsDebugOn then
       try
-        Cmd := InputBox.Text;
-        delete(Cmd, 1, 5);
         IsReloadVisible := not IsReloadVisible;
         InputBox.Text := '';
         ResponseLabel.Caption := 'Успех';
@@ -146,8 +134,6 @@ begin
   begin
     if IsDebugOn then
       try
-        Cmd := InputBox.Text;
-        delete(Cmd, 1, 5);
         InputBox.Text := '';
         ResponseLabel.Caption := 'Успех: ' + tstr(GameData.Money);
       except
@@ -157,21 +143,13 @@ begin
       ResponseLabel.Caption := 'Ошибка: Режим отладки отключен';
   end;
 
-  if Cmd = '-del' then
-  begin
-    if IsDebugOn then
-      try
-        DeleteFile(GAMEDATA_FILENAME);
-        BackGroundForm.Free;
-        InputBox.Text := '';
-        ResponseLabel.Caption := 'Успех';
-      except
-        ResponseLabel.Caption := 'Ошибка';
-      end
-    else
-      ResponseLabel.Caption := 'Ошибка: Режим отладки отключен';
-  end;
+end;
 
+procedure TConsoleForm.InputBoxKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = 13 then
+    DoCommand;
 end;
 
 end.

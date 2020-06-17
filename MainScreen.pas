@@ -41,7 +41,6 @@ type
     MusicLoopTimer: TTimer;
     HelpImg: TImage;
     MsgHitBox: TImage;
-    procedure FormResize(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure CloseBtnImageMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
@@ -78,7 +77,6 @@ type
     SelectPlayerIndex: Integer;
     isFormActive: boolean;
     procedure GameStart(mode: BOOL);
-
   public
     function GetSelectedPlayerIndex(): Integer;
     procedure AnimWindowBlend(oForm: TForm;
@@ -97,14 +95,128 @@ implementation
 
 uses BackGround, selectplayer, selectability, settings, info, help;
 
-function CentrX(weight: Integer): Integer;
+procedure TMainForm.GameStart(mode: BOOL);
+// Запуск игры (В данном случае только новой игры)
 begin
-  CentrX := round((MainForm.Width - weight) / 2);
+  GameSound('Click', true);
+  if mode then
+  else
+  begin
+    SelectDifficultForm.Show;
+    MainForm.hide;
+  end;
 end;
 
-function CentrY(height: Integer): Integer;
+function TMainForm.GetSelectedPlayerIndex(): Integer;
 begin
-  CentrY := round((MainForm.height - height) / 2);
+  SelectPlayerIndex := 0;
+  GetSelectedPlayerIndex := SelectPlayerIndex;
+end;
+
+procedure TMainForm.AnimWindowBlend(oForm: TForm;
+  mode, blendPercent, maxCouter: Integer; var counter: Integer;
+  var animTimer: TTimer);
+//Обработчик анимации для окон в меню, с настройкой скорости, силы и режима
+var
+  stepNormValue, normalizevValue, minValue: real;
+begin
+  stepNormValue := blendPercent / 100;
+  minValue := maxCouter / stepNormValue - maxCouter;
+  normalizevValue := 256 / (maxCouter + minValue);
+
+  case mode of
+    1:    //Появление
+      begin
+        if counter <= maxCouter then
+        begin
+          oForm.AlphaBlendValue := round(counter * normalizevValue);
+          MainForm.AlphaBlendValue :=
+            round((maxCouter - counter * stepNormValue) * normalizevValue);
+          inc(counter);
+        end
+        else
+        begin
+          animTimer.Enabled := false;
+          oForm.AlphaBlendValue := 255;
+        end;
+      end;
+    2:  //Изчезновение
+      begin
+        if counter <= maxCouter then
+        begin
+          oForm.AlphaBlendValue :=
+            round((maxCouter - counter) * normalizevValue);
+          MainForm.AlphaBlendValue :=
+            round((minValue + counter * stepNormValue) * normalizevValue);
+          inc(counter);
+        end
+        else
+        begin
+          oForm.Close;
+          animTimer.Enabled := false;
+          MainForm.AlphaBlendValue := 255;
+        end;
+      end;
+  end;
+end;
+
+
+procedure TMainForm.RefreshIconImg();
+//Обновление иконок выбранных персоонажей и навыков
+var
+  bm: TBitmap;
+begin
+  bm := TBitmap.Create;
+  bm.Width := PlayerSelectImage.Width;
+  bm.height := PlayerSelectImage.height;
+  PlayerDemoImages.GetBitmap(GameData.HeroSelected, bm);
+  PlayerSelectImage.Picture.Bitmap := bm;
+  AbilityDemoImages.GetBitmap(GameData.AbilitySelected, bm);
+  AbilitySelectImage.Picture.Bitmap := bm;
+  bm.Free;
+end;
+
+
+procedure TMainForm.GamePadKeyDo();
+//Обработка нажатий клавиш контроллера
+var
+  gamePad: tjoyinfo;
+  keypad: Integer;
+begin
+  if not isFormActive or not GameData.GamePadIsOn then
+    exit;
+
+  joygetpos(joystickid1, @gamePad);
+
+  if GAME_PAD_CONNECTED then
+  begin
+    if not IsGamePadIsConnected then
+    begin
+      GAME_PAD_CONNECTED := false;
+      if GameData.HintIsOn then
+        msg('Похоже, что геймпад был отключен...');
+      UpDate.Interval := 1000;
+      exit;
+    end;
+  end
+  else
+  begin
+    if IsGamePadIsConnected then
+    begin
+      GAME_PAD_CONNECTED := true;
+      if GameData.HintIsOn then
+        msg('Был обнаружен подключенный GamePad. Вы можете играть в игру с его помощью.');
+      UpDate.Interval := 15;
+    end;
+    exit;
+  end;
+
+  case gamePad.wButtons of
+    128:
+      GameStart(false);
+    64:
+      BackGroundForm.Close;
+  end;
 end;
 
 procedure TMainForm.AbilitySelectImageClick(Sender: TObject);
@@ -117,12 +229,11 @@ procedure TMainForm.AchiveBtnImageClick(Sender: TObject);
 begin
   GameSound('Click', true);
   BackGroundForm.SaveGameData;
-  end;
+end;
 
 procedure TMainForm.AchiveBtnImageMouseEnter(Sender: TObject);
 begin
   AchiveBorderBtnImage.Visible := true;
-
 end;
 
 procedure TMainForm.AchiveBtnImageMouseLeave(Sender: TObject);
@@ -133,10 +244,9 @@ end;
 procedure TMainForm.CloseBtnImageMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-GameSound('Click', true);
-Sleep(50);
+  GameSound('Click', true);
+  Sleep(50);
   BackGroundForm.Close;
-
 end;
 
 procedure TMainForm.ContinueBtnImageMouseDown(Sender: TObject;
@@ -170,6 +280,7 @@ end;
 
 procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
+  //Обработка нажатий с клавиатуры
 begin
   case Key of
     113:
@@ -177,28 +288,27 @@ begin
     27:
       BackGroundForm.Close;
   end;
+
   case KeyToChar(Key) of
     ' ':
       GameStart(false);
   end;
 end;
 
-procedure TMainForm.FormResize(Sender: TObject);
-var
-  i: Integer;
-begin
 
-end;
 
 procedure TMainForm.FormShow(Sender: TObject);
 begin
-  // BackGroundForm.Show();
-  GameSound('MenuTheme', true); MusicLoopTimer.Enabled := true;
+  GameSound('MenuTheme', true);
+  MusicLoopTimer.Enabled := true;
+
   GAME_PAD_CONNECTED := IsGamePadIsConnected;
   if not GAME_PAD_CONNECTED then
     UpDate.Interval := 5000;
+
   FormShowInputFreze.Enabled := true;
   CoinCountLabel.Caption := IntToStr(GameData.Money);
+
   RefreshIconImg;
 end;
 
@@ -210,13 +320,13 @@ end;
 
 procedure TMainForm.InfoBtnImageClick(Sender: TObject);
 begin
-GameSound('Click', true);
-InfoForm.Show;
+  GameSound('Click', true);
+  InfoForm.Show;
 end;
 
 procedure TMainForm.LeftFireGifClick(Sender: TObject);
 begin
-GameSound('Fire', False);
+  GameSound('Fire', false);
   GameSound('Fire', true);
 end;
 
@@ -234,25 +344,23 @@ end;
 procedure TMainForm.LiderBoardBtnImageMouseLeave(Sender: TObject);
 begin
   LiderBoardBorderBtnImage.Visible := false;
-
 end;
 
 procedure TMainForm.MsgHitBoxClick(Sender: TObject);
 begin
-msg('id jst wnt t d');
+  msg('id jst wnt t d');
 end;
 
 procedure TMainForm.MusicLoopTimerTimer(Sender: TObject);
 begin
-         GameSound('MenuTheme', false);
+  GameSound('MenuTheme', false);
   GameSound('MenuTheme', true);
 end;
 
 procedure TMainForm.NewGameBtnImageMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-// New Game
+//Новая игра
 begin
-
   GameStart(false);
 end;
 
@@ -281,145 +389,20 @@ end;
 procedure TMainForm.UpDateTimer(Sender: TObject);
 begin
   GamePadKeyDo;
-
-end;
-
-procedure TMainForm.GamePadKeyDo();
-var
-  gamePad: tjoyinfo;
-  keypad: Integer;
-begin
-  if not isFormActive or not GameData.GamePadIsOn then
-    exit;
-
-  joygetpos(joystickid1, @gamePad);
-
-  if GAME_PAD_CONNECTED then
-  begin
-    if not IsGamePadIsConnected then
-    begin
-      GAME_PAD_CONNECTED := false;
-      if GameData.HintIsOn then Msg('Похоже, что геймпад был отключен...');
-      UpDate.Interval := 1000;
-      exit;
-    end;
-  end
-  else
-  begin
-
-    if IsGamePadIsConnected then
-    begin
-      GAME_PAD_CONNECTED := true;
-      if GameData.HintIsOn then Msg('Был обнаружен подключенный GamePad. Вы можете играть в игру с его помощью.');
-      UpDate.Interval := 15;
-    end;
-    exit;
-  end;
-
-  case gamePad.wButtons of
-    128:
-      GameStart(false);
-    64:
-      BackGroundForm.Close;
-    4:
-      ; // L
-    8:
-      ; // R
-  end;
-end;
-
-procedure TMainForm.GameStart(mode: BOOL);
-begin
-  GameSound('Click', true);
-  if mode then
-  else
-  begin
-    SelectDifficultForm.Show;
-    MainForm.hide;
-  end;
-end;
-
-function TMainForm.GetSelectedPlayerIndex(): Integer;
-begin
-
-  SelectPlayerIndex := 0;
-  GetSelectedPlayerIndex := SelectPlayerIndex;
 end;
 
 procedure TMainForm.HelpImgClick(Sender: TObject);
 begin
-GameSound('Click', true);
-HelpForm.Show;
+  GameSound('Click', true);
+  HelpForm.Show;
 end;
 
-procedure TMainForm.AnimWindowBlend(oForm: TForm;
-  mode, blendPercent, maxCouter: Integer; var counter: Integer;
-  var animTimer: TTimer);
 
-var
-  stepNormValue, normalizevValue, minValue: real;
-begin
-  stepNormValue := blendPercent / 100;
-  minValue := maxCouter / stepNormValue - maxCouter;
-  normalizevValue := 256 / (maxCouter + minValue);
-
-  case mode of
-    1:
-      begin
-        if counter <= maxCouter then
-        begin
-          oForm.AlphaBlendValue := round(counter * normalizevValue);
-          MainForm.AlphaBlendValue :=
-            round((maxCouter - counter * stepNormValue) * normalizevValue);
-          inc(counter);
-        end
-        else
-        begin
-          animTimer.Enabled := false;
-          oForm.AlphaBlendValue := 255;
-        end;
-      end;
-    2:
-      begin
-        if counter <= maxCouter then
-        begin
-          oForm.AlphaBlendValue :=
-            round((maxCouter - counter) * normalizevValue);
-          MainForm.AlphaBlendValue :=
-            round((minValue + counter * stepNormValue) * normalizevValue);
-          inc(counter);
-        end
-        else
-        begin
-          oForm.Close;
-          animTimer.Enabled := false;
-          MainForm.AlphaBlendValue := 255;
-          // Msg();
-        end;
-      end;
-  end;
-end;
-
-procedure TMainForm.RefreshIconImg();
-var
-  bm: TBitmap;
-begin
-  bm := TBitmap.Create;
-  bm.Width := PlayerSelectImage.Width;
-  bm.height := PlayerSelectImage.height;
-  // какого черта этот чертов язык не может работать номально?
-  // без доп переменной он банально не рефрешает его во второй раз
-  PlayerDemoImages.GetBitmap(GameData.HeroSelected, bm);
-  PlayerSelectImage.Picture.Bitmap := bm;
-  AbilityDemoImages.GetBitmap(GameData.AbilitySelected, bm);
-  AbilitySelectImage.Picture.Bitmap := bm;
-  bm.Free;
-end;
 
 procedure TMainForm.RightFireGifClick(Sender: TObject);
 begin
 
-  GameSound('Fire', False);
+  GameSound('Fire', false);
   GameSound('Fire', true);
 end;
 

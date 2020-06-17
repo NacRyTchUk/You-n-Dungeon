@@ -39,13 +39,10 @@ type
     procedure FormShow(Sender: TObject);
     procedure AnimTimerTimer(Sender: TObject);
   private
-
     AnimCounter, AnimMode: Integer;
-
     procedure ReloadIntervalRefrsh();
     procedure CheckBoxClick(var CheckB: TImage);
   public
-    { Public declarations }
   end;
 
 var
@@ -104,17 +101,17 @@ begin
   AnimMode := 1;
   AnimTimer.Enabled := true;
   MainForm.Enabled := False;
+
   MusicCheckBoxOn.Visible := GameData.MusicIsOn;
   SoundCheckBoxOn.Visible := GameData.SoundIsOn;
   HintCheckBoxOn.Visible := GameData.HintIsOn;
   ControllerCheckBoxOn.Visible := GameData.GamePadIsOn;
   AutoSaveRateLabel.Caption := tStr(GameData.ReloadInterval);
-   ReloadIntervalRefrsh;
+  ReloadIntervalRefrsh;
 end;
 
 procedure TSettingsForm.ReloadIntervalRefrsh();
 begin
-
   AutoSaveMinus.Visible :=
     not(AutoSaveRateLabel.Caption = tStr(RELOAD_INTERVAL_MIN));
   AutoSavePlus.Visible :=
