@@ -11,19 +11,20 @@ object BackGroundForm: TBackGroundForm
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'Tahoma'
+  Font.Name = 'Gnomoria_rus'
   Font.Style = []
   OldCreateOrder = False
   Visible = True
   WindowState = wsMaximized
   OnClose = FormClose
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
   DesignSize = (
     896
     504)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 19
   object BackGroundImage: TImage
     Left = 0
     Top = 0
@@ -222,10 +223,11 @@ object BackGroundForm: TBackGroundForm
   object LoadingBarLabel: TLabel
     Left = 416
     Top = 469
-    Width = 37
-    Height = 13
+    Width = 64
+    Height = 19
     Anchors = [akLeft, akRight, akBottom]
     Caption = 'Loading'
+    Visible = False
   end
   object LoadingBar: TProgressBar
     Left = 40
@@ -239,6 +241,7 @@ object BackGroundForm: TBackGroundForm
     SmoothReverse = True
     State = pbsPaused
     TabOrder = 0
+    Visible = False
   end
   object StartTimer: TTimer
     Enabled = False

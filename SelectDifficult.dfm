@@ -9,7 +9,7 @@ object SelectDifficultForm: TSelectDifficultForm
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'Tahoma'
+  Font.Name = 'Gnomoria_rus'
   Font.Style = []
   OldCreateOrder = False
   OnCreate = FormCreate
@@ -19,7 +19,7 @@ object SelectDifficultForm: TSelectDifficultForm
     896
     504)
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 19
   object BackGroundImage: TImage
     Left = 0
     Top = 0
@@ -623,6 +623,20 @@ object SelectDifficultForm: TSelectDifficultForm
     OnClick = LevelSelectBrn4Click
     OnMouseEnter = LevelSelectBrn4MouseEnter
     OnMouseLeave = LevelSelectBrn4MouseLeave
+  end
+  object HardPrice: TLabel
+    Left = 598
+    Top = 328
+    Width = 45
+    Height = 19
+    Caption = '100 '#1057'.'
+  end
+  object Label1: TLabel
+    Left = 598
+    Top = 429
+    Width = 48
+    Height = 19
+    Caption = '500 '#1057'.'
   end
   object UpDate: TTimer
     Interval = 15

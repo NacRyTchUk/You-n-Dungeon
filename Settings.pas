@@ -41,6 +41,8 @@ type
   private
 
     AnimCounter, AnimMode: Integer;
+
+    procedure ReloadIntervalRefrsh();
     procedure CheckBoxClick(var CheckB: TImage);
   public
     { Public declarations }
@@ -65,6 +67,7 @@ begin
   GameSound('Click', true);
   AutoSaveRateLabel.Caption := tStr(Delta(tInt(AutoSaveRateLabel.Caption),
     -RELOAD_INTERVAL_STEP, RELOAD_INTERVAL_MIN, RELOAD_INTERVAL_MAX));
+  ReloadIntervalRefrsh;
 end;
 
 procedure TSettingsForm.AutoSavePlusClick(Sender: TObject);
@@ -72,6 +75,7 @@ begin
   GameSound('Click', true);
   AutoSaveRateLabel.Caption := tStr(Delta(tInt(AutoSaveRateLabel.Caption),
     RELOAD_INTERVAL_STEP, RELOAD_INTERVAL_MIN, RELOAD_INTERVAL_MAX));
+  ReloadIntervalRefrsh;
 end;
 
 procedure TSettingsForm.CancelBtnClick(Sender: TObject);
@@ -105,6 +109,16 @@ begin
   HintCheckBoxOn.Visible := GameData.HintIsOn;
   ControllerCheckBoxOn.Visible := GameData.GamePadIsOn;
   AutoSaveRateLabel.Caption := tStr(GameData.ReloadInterval);
+   ReloadIntervalRefrsh;
+end;
+
+procedure TSettingsForm.ReloadIntervalRefrsh();
+begin
+
+  AutoSaveMinus.Visible :=
+    not(AutoSaveRateLabel.Caption = tStr(RELOAD_INTERVAL_MIN));
+  AutoSavePlus.Visible :=
+    not(AutoSaveRateLabel.Caption = tStr(RELOAD_INTERVAL_MAX));
 end;
 
 procedure TSettingsForm.HintCheckBoxClick(Sender: TObject);

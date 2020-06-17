@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics, mmsystem,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Imaging.pngimage, Vcl.ExtCtrls,
-  nicestuff, System.ImageList, Vcl.ImgList;
+  nicestuff, System.ImageList, Vcl.ImgList, Vcl.StdCtrls;
 
 type
   TSelectDifficultForm = class(TForm)
@@ -24,6 +24,8 @@ type
     FormShowInputFreze: TTimer;
     ReloadTimer: TTimer;
     MusicLoopTimer: TTimer;
+    HardPrice: TLabel;
+    Label1: TLabel;
     procedure BackBtnImageClick(Sender: TObject);
     procedure LevelSelectBrn1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -127,8 +129,11 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn3Click(Sender: TObject);
 begin
-
-  GameStart(10);
+  if GameData.Money >= HARD_LEVEL_PRICE then
+  begin
+    GameData.Money := GameData.Money - HARD_LEVEL_PRICE;
+    GameStart(10);
+  end;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn3MouseEnter(Sender: TObject);
@@ -143,7 +148,11 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn4Click(Sender: TObject);
 begin
-  GameStart(15);
+  if GameData.Money >= ULTRAHARD_LEVEL_PRICE then
+  begin
+    GameData.Money := GameData.Money - ULTRAHARD_LEVEL_PRICE;
+    GameStart(15);
+  end;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn4MouseEnter(Sender: TObject);
@@ -158,7 +167,7 @@ end;
 
 procedure TSelectDifficultForm.MusicLoopTimerTimer(Sender: TObject);
 begin
-   GameSound('GameTheme', false);
+  GameSound('GameTheme', false);
   GameSound('GameTheme', true);
 end;
 
@@ -187,9 +196,17 @@ begin
     2:
       GameStart(5);
     4:
-      GameStart(10);
+      if GameData.Money >= HARD_LEVEL_PRICE then
+      begin
+        GameData.Money := GameData.Money - HARD_LEVEL_PRICE;
+        GameStart(10);
+      end;
     8:
-      GameStart(15);
+      if GameData.Money >= ULTRAHARD_LEVEL_PRICE then
+      begin
+        GameData.Money := GameData.Money - ULTRAHARD_LEVEL_PRICE;
+        GameStart(15);
+      end;
   end;
 end;
 
@@ -209,6 +226,21 @@ end;
 procedure TSelectDifficultForm.GameReset(Difficult: integer);
 begin
   GameSound('Swap', true);
+  if (Difficult >= 10) and (Difficult < 15) then
+  begin
+    if GameData.Money >= HARD_LEVEL_PRICE then
+      GameData.Money := GameData.Money - HARD_LEVEL_PRICE
+    else
+      exit;
+  end
+  else if (Difficult >= 15) then
+  begin
+    if GameData.Money >= ULTRAHARD_LEVEL_PRICE then
+      GameData.Money := GameData.Money - ULTRAHARD_LEVEL_PRICE
+    else
+      exit;
+  end;
+
   GameData.Money := GameData.Money + FieldOfCards.GetMoneyRecived;
   GameForm.Free;
 

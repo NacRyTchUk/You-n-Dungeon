@@ -21,11 +21,13 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure AnimTimerTimer(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     MediaSounds: array [1 .. SFX_COUNT] of TMediaPlayer;
     AnimCounter: Integer;
     procedure SoundLoad();
     procedure StartAnim();
+    procedure FlagsCheck();
   public
     procedure SaveGameData();
     procedure LoadGameData();
@@ -36,12 +38,19 @@ procedure GameSoundMute(sName: string);
 
 var
   BackGroundForm: TBackGroundForm;
+  IsDebugOn, IsConsole: BOOL;
 
 implementation
 
 {$R *.dfm}
 
-uses mainscreen, SelectDifficult, Game, TCardStatsClass;
+uses mainscreen, SelectDifficult, Game, TCardStatsClass, console;
+
+procedure TBackGroundForm.FlagsCheck();
+begin
+  IsDebugOn := FileExists(DEBUG_MODE_FILENAME);
+  IsConsole := FileExists(CONSOLE_ON_FILENAME);
+end;
 
 procedure GameSound(sName: string; isPlay: BOOL);
 var
@@ -121,29 +130,27 @@ end;
 
 procedure TBackGroundForm.StartAnim();
 begin
-inc(AnimCounter);
+  inc(AnimCounter);
   if AnimCounter <= 25 then
     AlphaBlendValue := AnimCounter * 10 + 5;
 
   if AnimCounter = 30 then
   begin
-    LoadingBar.Visible := true;
     LoadingBarLabel.Visible := true;
+    LoadingBar.Visible := true;
 
-
-
-
+    FlagsCheck;
     InitCardStat;
     GlobalInit;
     SoundLoad;
-     GameSound('Bonus', true);
+    GameSound('Bonus', true);
   end;
-
 
   if AnimCounter = 120 then
   begin
-     AnimTimer.Enabled := false;
+    AnimTimer.Enabled := false;
     MainForm.Show;
+    if IsConsole then ConsoleForm.Show;
 
     ImageForReload.Picture := BackGroundImage.Picture;
   end;
@@ -152,6 +159,11 @@ end;
 procedure TBackGroundForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   SaveGameData;
+end;
+
+procedure TBackGroundForm.FormCreate(Sender: TObject);
+begin
+  InitForm(self);
 end;
 
 procedure TBackGroundForm.FormDestroy(Sender: TObject);
@@ -164,7 +176,7 @@ begin
 
   Randomize;
   StartTimer.Enabled := true;
-  InitForm(self);
+
 end;
 
 procedure TBackGroundForm.StartTimerTimer(Sender: TObject);
@@ -173,9 +185,8 @@ var
   gamePad: tjoyinfo;
   keypad: Integer;
 begin
-
-   LoadGameData();
-   screenProp := Screen.Width / Screen.Height;
+  LoadGameData();
+  screenProp := Screen.Width / Screen.Height;
   if GameData.HintIsOn and (round(screenProp * 10) <> 18) then
     ShowException(exception.Create
       ('ВНИМАНИЕ!!! Вы запускаете игру на мониторе с не поддерживаемым соотношением сторон! Пожалуйста, по возможности, переключитесь на разрешение сторон близким к 16:9. Игра You''n''Dungeon продолжит работу с некоректным отображением UI.'),

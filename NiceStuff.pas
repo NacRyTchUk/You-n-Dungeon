@@ -42,7 +42,9 @@ const
 
   GAMEDATA_FILENAME = 'Ñonfig.ini';
   GAMEPROGRESS_FILENAME = 'Save.ini';
-  SKIP_INTRO_FILENAME = 'NoIntro.sett';
+  SKIP_INTRO_FILENAME = 'NoIntro.flag';
+  CONSOLE_ON_FILENAME = 'Console.flag';
+  DEBUG_MODE_FILENAME = 'Debug.flag';
 
   YNL_BOOST = 2;
 
@@ -54,6 +56,11 @@ const
   RELOAD_INTERVAL_STEP = 5;
   DEF_HINT = true;
   DEF_GAMEPAD_ON = false;
+
+
+
+  HARD_LEVEL_PRICE = 100;
+  ULTRAHARD_LEVEL_PRICE = 500;
 
 type
   TIndexOfCardMsg = (OK, OutOfBorder, FAIL);

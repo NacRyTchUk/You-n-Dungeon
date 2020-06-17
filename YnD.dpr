@@ -17,7 +17,8 @@ uses
   TCardStatsClass in 'TCardStatsClass.pas',
   SelectPlayer in 'SelectPlayer.pas' {SelectPlayerForm},
   SelectAbility in 'SelectAbility.pas' {SelectAbillityForm},
-  Settings in 'Settings.pas' {SettingsForm};
+  Settings in 'Settings.pas' {SettingsForm},
+  Console in 'Console.pas' {ConsoleForm};
 
 {$R *.res}
 
@@ -33,5 +34,6 @@ begin
   Application.CreateForm(TSelectPlayerForm, SelectPlayerForm);
   Application.CreateForm(TSelectAbillityForm, SelectAbillityForm);
   Application.CreateForm(TSettingsForm, SettingsForm);
+  Application.CreateForm(TConsoleForm, ConsoleForm);
   Application.Run;
 end.
