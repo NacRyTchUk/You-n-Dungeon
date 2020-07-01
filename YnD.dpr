@@ -25,7 +25,7 @@ uses
 {$R *.res}
 
 begin
-  AddFontResourceEx('Assets\Fonts\Gnomoria.ttf', FR_PRIVATE, 0);
+  AddFontResourceEx('Assets\Fonts\Gnomoria.ttf', FR_PRIVATE, NIL);
   GIFImageDefaultAnimate := True;
   Application.Initialize;
   Application.MainFormOnTaskbar := True;

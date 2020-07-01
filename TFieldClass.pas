@@ -17,7 +17,6 @@ type
     Size: TPosition;
     PlayerCard: TPosition;
     FieldOfCards: TFieldOfCards;
-    BufferCard: TCard;
     BaseDifficult: integer;
     RecivedMoney: integer;
     Energy: integer;
@@ -37,6 +36,7 @@ type
     procedure AddMoneyOn(count: integer);
 
     function GetFieldSize(): TPosition;
+    function GetBaseDifficult(): integer;
     function GetPlayerPos(): TPosition;
     function GetFieldOfCards(): TFieldOfCards;
     function GetMoneyRecived(): integer;
@@ -68,12 +68,10 @@ implementation
 
 uses Game, SelectDifficult, MainScreen, BackGround;
 
-
 function TField.SaveField(): TFieldOfCardSaveData;
-//Сохранение поля
+// Сохранение поля
 var
-  i, j, x, y: integer;
-  cardisplayer: bool;
+  i, j: integer;
   SaveData: TFieldOfCardSaveData;
 begin
 
@@ -97,11 +95,10 @@ begin
   SaveField := SaveData;
 end;
 
-
 Constructor TField.Create(BaseDifficult: integer);
-//Безусловный конструктор создания поля
+// Безусловный конструктор создания поля
 var
-  i, j, x, y: integer;
+  i, j: integer;
   cardisplayer: bool;
 begin
   RefreshAbilValue;
@@ -127,10 +124,9 @@ end;
 
 Constructor TField.Create(BaseDifficult: integer;
   LoadData: TFieldOfCardSaveData);
-//Конструктор поля с исходными данными
+// Конструктор поля с исходными данными
 var
-  i, j, x, y: integer;
-  cardisplayer: bool;
+  i, j: integer;
 begin
   Self.BaseDifficult := BaseDifficult;
   Energy := LoadData.Energy;
@@ -148,7 +144,7 @@ begin
 end;
 
 procedure TField.ToggleAnimOn(AnimIndex, x, y: integer);
-//Запуск анимации карты на поле
+// Запуск анимации карты на поле
 begin
   if (AnimIndex <= CARD_ANIM_COUNT) and (not CardAnimState[AnimIndex]) then
   begin
@@ -159,7 +155,7 @@ begin
 end;
 
 procedure TField.ToggleAnimOn(AnimIndex, x, y, data: integer);
-//Запуск анимации карты на поле с дополнительными данными
+// Запуск анимации карты на поле с дополнительными данными
 begin
   if (AnimIndex <= CARD_ANIM_COUNT) and (not CardAnimState[AnimIndex]) then
   begin
@@ -171,7 +167,7 @@ begin
 end;
 
 procedure TField.ToggleAnimOn(AnimIndex: integer);
-//Запуск анимации поля
+// Запуск анимации поля
 begin
   if (AnimIndex <= CARD_ANIM_COUNT) and (not CardAnimState[AnimIndex]) then
   begin
@@ -180,9 +176,7 @@ begin
 end;
 
 procedure TField.UpdateAnim();
-//Отрисовывание кадра запущенных анимаций
-var
-  i: integer;
+// Отрисовывание кадра запущенных анимаций
 begin
   if CardAnimState[1] then
     PlayAnim_SizeOut(CardAnimIndex[1, 1], CardAnimIndex[1, 2]);
@@ -199,7 +193,7 @@ begin
 end;
 
 procedure TField.PlayAnim_SizeOut(x, y: integer);
-//Анимация уменьшения карты
+// Анимация уменьшения карты
 const
   OneStageStepsAmount = 1;
   FrameAmount = SPEED_OF_ANIM_SIZE_OUT;
@@ -222,7 +216,7 @@ begin
 end;
 
 procedure TField.PlayAnim_SizeIn(x, y: integer);
-//Анимация увелечения карты
+// Анимация увелечения карты
 const
   OneStageStepsAmount = 2;
   FrameAmount = SPEED_OF_ANIM_SIZE_IN;
@@ -246,7 +240,7 @@ begin
 end;
 
 procedure TField.PlayAnim_SlideFromTo(x, y, side: integer);
-//Анимация движения карты игрока
+// Анимация движения карты игрока
 const
   OneStageStepsAmount = 2;
   FrameAmount = SPEED_OF_ANIM_SLIDE_FROM_TO;
@@ -293,7 +287,7 @@ begin
 end;
 
 procedure TField.PlayAnim_FieldSizeIn();
-//Анимация появления поля
+// Анимация появления поля
 const
   OneStageStepsAmount = 8;
   FrameAmount = SPEED_OF_ANIM_FIELD_SIZE_IN;
@@ -321,7 +315,7 @@ begin
 end;
 
 procedure TField.PlayAnim_ChangeCard(x, y, data: integer);
-//Анимация замены карты
+// Анимация замены карты
 const
   OneStageStepsAmount = 8;
   FrameAmount = SPEED_OF_ANIM_CHANGE_CARD;
@@ -372,7 +366,7 @@ begin
 end;
 
 procedure TField.CheckForNoAnim();
-//ПРоверка на проигрывание каких-либо анимаций
+// ПРоверка на проигрывание каких-либо анимаций
 var
   i: integer;
 begin
@@ -396,7 +390,7 @@ begin
 end;
 
 procedure TField.DoStep();
-//Обработка счетчика шагов
+// Обработка счетчика шагов
 var
   str: string;
 begin
@@ -410,10 +404,11 @@ begin
 end;
 
 procedure TField.ChargeTheAbilityOn(cValue: integer);
-//Проверка на количество энергии и активацию навыков
+// Проверка на количество энергии и активацию навыков
 var
   boost: integer;
 begin
+  boost := 0;
   if GameData.HeroSelected = 0 then
     boost := YNL_BOOST;
 
@@ -428,7 +423,7 @@ begin
 end;
 
 procedure TField.AbilityDo();
-//Активация навыка
+// Активация навыка
 begin
   GameSound('Ability', true);
   case GameData.AbilitySelected of
@@ -442,7 +437,7 @@ begin
 end;
 
 procedure TField.RefreshAbilValue();
-//Обновление информации о энергии для активации навыка
+// Обновление информации о энергии для активации навыка
 var
   boost: integer;
 begin
@@ -454,7 +449,7 @@ begin
 end;
 
 function TField.AnimProc(AnimIndex, AnimSpeed: integer): bool;
-//Базовая логика работы аниаций
+// Базовая логика работы аниаций
 begin
   CardAnimState[0] := true;
 
@@ -479,7 +474,7 @@ begin
 end;
 
 procedure TField.SetFieldVisible(isVisible: bool);
-//Установка видимости карт на поле
+// Установка видимости карт на поле
 var
   i, j: integer;
 begin
@@ -491,12 +486,11 @@ begin
 end;
 
 procedure TField.AddMoneyOn(count: integer);
-//Добавления определенного количества денег
+// Добавления определенного количества денег
 begin
   RecivedMoney := RecivedMoney + count;
   GameForm.CoinCountLabel.Caption := tStr(RecivedMoney);
 end;
-
 
 function TField.GetFieldSize;
 begin
@@ -526,6 +520,11 @@ end;
 function TField.IsCardAnimPlayed(AnimIndex: integer): bool;
 begin
   IsCardAnimPlayed := CardAnimState[AnimIndex];
+end;
+
+function TField.GetBaseDifficult(): integer;
+begin
+  GetBaseDifficult := BaseDifficult;
 end;
 
 end.

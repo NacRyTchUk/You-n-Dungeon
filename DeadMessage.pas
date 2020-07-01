@@ -31,7 +31,7 @@ implementation
 
 {$R *.dfm}
 
-uses game, BackGround;
+uses game, BackGround, SelectDifficult;
 
 procedure TDeadMessageForm.BackToMenuImgClick(Sender: TObject);
 begin
@@ -56,7 +56,7 @@ end;
 
 procedure TDeadMessageForm.OkBtnClick(Sender: TObject);
 begin
-  GameForm.DoKeyDown(Ord('R'));
+  if SelectDifficultForm.GameReset(FieldOfCards.GetBaseDifficult) then
   close;
 end;
 

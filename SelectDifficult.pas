@@ -51,7 +51,8 @@ type
     isFormActive: boolean;
     procedure GameStart(Difficult: integer);
   public
-    procedure GameReset(Difficult: integer);
+    function BuyLevelEnter(Difficult: integer): bool;
+    function GameReset(Difficult: integer): bool;
     procedure GameSave();
     procedure GameLoad();
     procedure GameReload();
@@ -80,27 +81,25 @@ begin
   SelectDifficultForm.Close;
 end;
 
-procedure TSelectDifficultForm.GameReset(Difficult: integer);
+function TSelectDifficultForm.GameReset(Difficult: integer): bool;
 // Обработка рестарта уровня
 begin
-  GameSound('Swap', true);
-  if (Difficult >= 10) and (Difficult < 15) then
-  begin
-    if GameData.Money >= HARD_LEVEL_PRICE then
-      GameData.Money := GameData.Money - HARD_LEVEL_PRICE
-    else
-      exit;
-  end
-  else if (Difficult >= 15) then
-  begin
-    if GameData.Money >= ULTRAHARD_LEVEL_PRICE then
-      GameData.Money := GameData.Money - ULTRAHARD_LEVEL_PRICE
-    else
-      exit;
+  GameReset := false;
+
+
+
+  case Difficult of
+    10 : if not BuyLevelEnter(Difficult) then exit;
+    15 : if not BuyLevelEnter(Difficult) then exit;
   end;
 
   GameData.Money := GameData.Money + FieldOfCards.GetMoneyRecived;
+
+  GameSound('Swap', true);
+
   GameForm.Free;
+
+  GameReset := true;
 
   GameForm := TGameForm.Create(Application);
   GameForm.SetDifficult(Difficult);
@@ -155,17 +154,39 @@ begin
     2:
       GameStart(5);
     4:
-      if GameData.Money >= HARD_LEVEL_PRICE then
-      begin
-        GameData.Money := GameData.Money - HARD_LEVEL_PRICE;
+      if BuyLevelEnter(10) then
         GameStart(10);
-      end;
     8:
-      if GameData.Money >= ULTRAHARD_LEVEL_PRICE then
-      begin
-        GameData.Money := GameData.Money - ULTRAHARD_LEVEL_PRICE;
+      if BuyLevelEnter(15) then
         GameStart(15);
+  end;
+end;
+
+function TSelectDifficultForm.BuyLevelEnter(Difficult: integer): bool;
+var
+  price, diff: integer;
+begin
+  case Difficult of
+    10:
+      begin
+        price := HARD_LEVEL_PRICE;
+        diff := 10;
       end;
+    15:
+      begin
+        price := ULTRAHARD_LEVEL_PRICE;
+        diff := 15;
+      end;
+  end;
+  BuyLevelEnter := GameData.Money >= price;
+  if GameData.Money >= price then
+  begin
+    GameSound('Coin', true);
+    GameData.Money := GameData.Money - price;
+  end
+  else
+  begin
+    GameSound('BadPotion', true);
   end;
 end;
 
@@ -251,20 +272,14 @@ end;
 
 procedure TSelectDifficultForm.LevelSelectBrn3Click(Sender: TObject);
 begin
-  if GameData.Money >= HARD_LEVEL_PRICE then
-  begin
-    GameData.Money := GameData.Money - HARD_LEVEL_PRICE;
+  if BuyLevelEnter(10) then
     GameStart(10);
-  end;
 end;
 
 procedure TSelectDifficultForm.LevelSelectBrn4Click(Sender: TObject);
 begin
-  if GameData.Money >= ULTRAHARD_LEVEL_PRICE then
-  begin
-    GameData.Money := GameData.Money - ULTRAHARD_LEVEL_PRICE;
+  if BuyLevelEnter(15) then
     GameStart(15);
-  end;
 end;
 
 procedure TSelectDifficultForm.MusicLoopTimerTimer(Sender: TObject);

@@ -3,7 +3,8 @@ unit Info;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.Imaging.pngimage,
   Vcl.ExtCtrls, nicestuff, shellapi;
 
@@ -39,7 +40,7 @@ implementation
 uses MainScreen, BackGround;
 
 procedure TInfoForm.AnimTimerTimer(Sender: TObject);
-//Обработка анимаций
+// Обработка анимаций
 begin
   MainForm.AnimWindowBlend(self, AnimMode, 50, 10, AnimCounter, AnimTimer);
 end;
@@ -60,7 +61,8 @@ end;
 procedure TInfoForm.GameJoltImgClick(Sender: TObject);
 begin
   GameSound('Click', true);
-  msg('Coming soon...');
+  ShellExecute(Handle, 'open',
+    'https://gamejolt.com/games/You-n-Dungeon/507988', nil, nil, SW_NORMAL);
 end;
 
 procedure TInfoForm.OkBtnClick(Sender: TObject);
@@ -75,10 +77,8 @@ end;
 procedure TInfoForm.SiteImgClick(Sender: TObject);
 begin
   GameSound('Click', true);
-  ShellExecute(Handle, 'open', 'www.nrtu.studio/projects/You-n-Dungeon',
-    nil, nil, SW_NORMAL);
+  ShellExecute(Handle, 'open', 'www.nrtu.studio/projects/you-n-dungeon', nil,
+    nil, SW_NORMAL);
 end;
-
-
 
 end.

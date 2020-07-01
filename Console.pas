@@ -143,6 +143,22 @@ begin
       ResponseLabel.Caption := 'Ошибка: Режим отладки отключен';
   end;
 
+
+  if Cmd = '-rls' then
+  begin
+    if IsDebugOn then
+      try
+        InputBox.Text := '';
+        MainForm.AchiveBtnImage.Visible := not MainForm.AchiveBtnImage.Visible;
+        MainForm.LiderBoardBtnImage.Visible := not MainForm.LiderBoardBtnImage.Visible;
+        ResponseLabel.Caption := 'Успех';
+      except
+        ResponseLabel.Caption := 'Ошибка';
+      end
+    else
+      ResponseLabel.Caption := 'Ошибка: Режим отладки отключен';
+  end;
+
 end;
 
 procedure TConsoleForm.InputBoxKeyDown(Sender: TObject; var Key: Word;

@@ -117,7 +117,7 @@ object InfoForm: TInfoForm
     Top = 28
     Width = 309
     Height = 19
-    Caption = 'You'#39'n'#39'Dungeon              v0.12 (Pre-demo)'
+    Caption = 'You'#39'n'#39'Dungeon                    v0.13.2 (Demo)'
   end
   object OriginalLabel: TLabel
     Left = 59

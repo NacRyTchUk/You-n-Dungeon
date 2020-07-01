@@ -74,7 +74,7 @@ end;
 procedure THelpForm.SiteLabelClick(Sender: TObject);
 begin
   GameSound('Click', true);
-  ShellExecute(Handle, 'open', 'www.nrtu.studio/projects/You-n-Dungeon/Help',
+  ShellExecute(Handle, 'open', 'www.nrtu.studio/projects/you-n-dungeon/help',
     nil, nil, SW_NORMAL);
 end;
 

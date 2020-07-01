@@ -64,7 +64,6 @@ procedure TGameForm.DoJoyKey();
 // Обработка нажатий с контроллера
 var
   gamePad: tjoyinfo;
-  keypad: Integer;
 begin
   if InputLockcooldown.Enabled or not GAME_PAD_CONNECTED or not GameData.GamePadIsOn
   then

@@ -1,32 +1,60 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899.12.30 00:00:00.000.632,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.196,F:\OnI\DelProj\You'n'Dungeon\YnD.dproj=F:\OnI\DelProj\You'n'Dungeon\YnD.dproj</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.273,F:\OnI\DelProj\You'n'Dungeon\SelectAbility.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.273,F:\OnI\DelProj\You'n'Dungeon\SelectAbility.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.185,F:\OnI\DelProj\You'n'Dungeon\Help.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.138,F:\OnI\DelProj\You'n'Dungeon\Configurate.pas=</Transaction>
     <Transaction>1899.12.30 00:00:00.000.005,F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm=F:\OnI\DelProj\You'n'Dungeon\SelectPlayer.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.273,F:\OnI\DelProj\You'n'Dungeon\SelectAbility.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.199,F:\OnI\DelProj\You'n'Dungeon\Info.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.347,F:\OnI\DelProj\You'n'Dungeon\Settings.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.273,F:\OnI\DelProj\You'n'Dungeon\SelectAbility.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.954,F:\OnI\DelProj\You'n'Dungeon\Console.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.347,F:\OnI\DelProj\You'n'Dungeon\Settings.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.199,F:\OnI\DelProj\You'n'Dungeon\Info.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.196,F:\OnI\DelProj\You'n'Dungeon\YnD.dproj=F:\OnI\DelProj\You'n'Dungeon\YnD.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.185,F:\OnI\DelProj\You'n'Dungeon\Help.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.954,F:\OnI\DelProj\You'n'Dungeon\Console.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.171,F:\OnI\DelProj\You'n'Dungeon\DeadMessage.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.120,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.115,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.476,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.868,F:\OnI\DelProj\You'n'Dungeon\DeadMessage.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.171,F:\OnI\DelProj\You'n'Dungeon\DeadMessage.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.922,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.005,F:\OnI\DelProj\You'n'Dungeon\Unit2.pas=F:\OnI\DelProj\You'n'Dungeon\SelectPlayer.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.731,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.632,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.868,F:\OnI\DelProj\You'n'Dungeon\DeadMessage.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.960,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.970,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.807,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.16 11:05:49.731,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.16 11:08:11.347,F:\OnI\DelProj\You'n'Dungeon\Settings.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.16 11:08:11.347,F:\OnI\DelProj\You'n'Dungeon\Settings.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
-    <Transaction>2020.06.17 03:20:08.970,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.17 03:21:46.954,F:\OnI\DelProj\You'n'Dungeon\Console.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.17 03:21:46.954,F:\OnI\DelProj\You'n'Dungeon\Console.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
-    <Transaction>2020.06.17 08:06:10.120,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.17 08:07:52.115,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.17 08:09:00.868,F:\OnI\DelProj\You'n'Dungeon\DeadMessage.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
-    <Transaction>2020.06.17 08:09:00.868,F:\OnI\DelProj\You'n'Dungeon\DeadMessage.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.17 08:14:43.922,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.17 08:15:15.171,F:\OnI\DelProj\You'n'Dungeon\DeadMessage.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.17 08:15:15.171,F:\OnI\DelProj\You'n'Dungeon\DeadMessage.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
-    <Transaction>2020.06.17 08:25:13.476,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.17 08:25:39.199,F:\OnI\DelProj\You'n'Dungeon\Info.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.17 08:25:39.199,F:\OnI\DelProj\You'n'Dungeon\Info.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
-    <Transaction>2020.06.17 08:42:38.960,=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.17 08:44:37.185,F:\OnI\DelProj\You'n'Dungeon\Help.dfm=F:\OnI\DelProj\You'n'Dungeon\Unit2.dfm</Transaction>
-    <Transaction>2020.06.17 08:44:37.185,F:\OnI\DelProj\You'n'Dungeon\Help.pas=F:\OnI\DelProj\You'n'Dungeon\Unit2.pas</Transaction>
-    <Transaction>2020.06.17 22:34:29.138,F:\OnI\DelProj\You'n'Dungeon\Configurate.pas=</Transaction>
   </Transactions>
+	<ProjectSortOrder AutoSort="0" SortType="0">
+    <File Path="BackGround.pas"/>
+    <File Path="BackGround.dfm"/>
+    <File Path="DeadMessage.pas"/>
+    <File Path="DeadMessage.dfm"/>
+    <File Path="Console.pas"/>
+    <File Path="Console.dfm"/>
+    <File Path="Game.pas"/>
+    <File Path="Game.dfm"/>
+    <File Path="Help.pas"/>
+    <File Path="Help.dfm"/>
+    <File Path="Info.pas"/>
+    <File Path="Info.dfm"/>
+    <File Path="MainScreen.pas"/>
+    <File Path="MainScreen.dfm"/>
+    <File Path="NiceStuff.pas"/>
+    <File Path="SelectAbility.pas"/>
+    <File Path="SelectAbility.dfm"/>
+    <File Path="SelectDifficult.pas"/>
+    <File Path="SelectDifficult.dfm"/>
+    <File Path="SelectPlayer.pas"/>
+    <File Path="SelectPlayer.dfm"/>
+    <File Path="Settings.pas"/>
+    <File Path="Settings.dfm"/>
+    <File Path="TCardClass.pas"/>
+    <File Path="TCardStatsClass.pas"/>
+    <File Path="TFieldClass.pas"/>
+  </ProjectSortOrder>
 </BorlandProject>

@@ -952,7 +952,6 @@ object MainForm: TMainForm
       AE71E01A07AE711F29806F7885E8D2E50000000049454E44AE426082}
     Proportional = True
     Stretch = True
-    Visible = False
     OnClick = LiderBoardBtnImageClick
     OnMouseEnter = LiderBoardBtnImageMouseEnter
     OnMouseLeave = LiderBoardBtnImageMouseLeave
@@ -993,7 +992,6 @@ object MainForm: TMainForm
       82}
     Proportional = True
     Stretch = True
-    Visible = False
     OnClick = AchiveBtnImageClick
     OnMouseEnter = AchiveBtnImageMouseEnter
     OnMouseLeave = AchiveBtnImageMouseLeave

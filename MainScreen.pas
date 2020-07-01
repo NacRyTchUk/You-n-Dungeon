@@ -77,6 +77,7 @@ type
     SelectPlayerIndex: Integer;
     isFormActive: boolean;
     procedure GameStart(mode: BOOL);
+    procedure DemoWarn();
   public
     function GetSelectedPlayerIndex(): Integer;
     procedure AnimWindowBlend(oForm: TForm;
@@ -116,7 +117,7 @@ end;
 procedure TMainForm.AnimWindowBlend(oForm: TForm;
   mode, blendPercent, maxCouter: Integer; var counter: Integer;
   var animTimer: TTimer);
-//Обработчик анимации для окон в меню, с настройкой скорости, силы и режима
+// Обработчик анимации для окон в меню, с настройкой скорости, силы и режима
 var
   stepNormValue, normalizevValue, minValue: real;
 begin
@@ -125,7 +126,7 @@ begin
   normalizevValue := 256 / (maxCouter + minValue);
 
   case mode of
-    1:    //Появление
+    1: // Появление
       begin
         if counter <= maxCouter then
         begin
@@ -140,7 +141,7 @@ begin
           oForm.AlphaBlendValue := 255;
         end;
       end;
-    2:  //Изчезновение
+    2: // Изчезновение
       begin
         if counter <= maxCouter then
         begin
@@ -160,9 +161,8 @@ begin
   end;
 end;
 
-
 procedure TMainForm.RefreshIconImg();
-//Обновление иконок выбранных персоонажей и навыков
+// Обновление иконок выбранных персоонажей и навыков
 var
   bm: TBitmap;
 begin
@@ -176,9 +176,8 @@ begin
   bm.Free;
 end;
 
-
 procedure TMainForm.GamePadKeyDo();
-//Обработка нажатий клавиш контроллера
+// Обработка нажатий клавиш контроллера
 var
   gamePad: tjoyinfo;
   keypad: Integer;
@@ -228,7 +227,7 @@ end;
 procedure TMainForm.AchiveBtnImageClick(Sender: TObject);
 begin
   GameSound('Click', true);
-  BackGroundForm.SaveGameData;
+  DemoWarn;
 end;
 
 procedure TMainForm.AchiveBtnImageMouseEnter(Sender: TObject);
@@ -280,7 +279,7 @@ end;
 
 procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
-  //Обработка нажатий с клавиатуры
+// Обработка нажатий с клавиатуры
 begin
   case Key of
     113:
@@ -294,8 +293,6 @@ begin
       GameStart(false);
   end;
 end;
-
-
 
 procedure TMainForm.FormShow(Sender: TObject);
 begin
@@ -333,7 +330,14 @@ end;
 procedure TMainForm.LiderBoardBtnImageClick(Sender: TObject);
 begin
   GameSound('Click', true);
-  showmessage('lider board');
+  DemoWarn;
+end;
+
+procedure TMainForm.DemoWarn();
+begin
+  msg('О нет, что-то пошло не так в этой Demo версии...' + #10 + 'Попробуй кликнуть еще раз!');
+  LiderBoardBtnImage.Visible := false;
+  AchiveBtnImage.Visible := false;
 end;
 
 procedure TMainForm.LiderBoardBtnImageMouseEnter(Sender: TObject);
@@ -359,7 +363,7 @@ end;
 
 procedure TMainForm.NewGameBtnImageMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-//Новая игра
+// Новая игра
 begin
   GameStart(false);
 end;
@@ -396,8 +400,6 @@ begin
   GameSound('Click', true);
   HelpForm.Show;
 end;
-
-
 
 procedure TMainForm.RightFireGifClick(Sender: TObject);
 begin

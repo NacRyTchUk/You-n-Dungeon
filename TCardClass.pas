@@ -82,7 +82,6 @@ type
     function IsCurCardIsPlayer(): bool;
     function IsCardMinimized(): bool;
 
-
     // ====
     procedure MoveOn(dx, dy: integer);
     procedure MoveAt(dx, dy: integer);
@@ -221,8 +220,6 @@ end;
 
 constructor TCard.Create(LoadData: TCardSaveData);
 // Конструктор создания карты с исходными данными
-var
-  RndMin, RndMax: integer;
 begin
   Self.Position := LoadData.Position;
   IsCardIsPlayer := LoadData.IsCardIsPlayer;
@@ -247,7 +244,7 @@ begin
 end;
 
 Destructor TCard.Destroy();
-//Деструктор карты
+// Деструктор карты
 begin
   CardBackIm.Free;
   CardItemIm.Free;
@@ -259,7 +256,7 @@ begin
 end;
 
 procedure TCard.CreateImage(var Image: timage);
-//Создание и настройка слоя-изображения для карты
+// Создание и настройка слоя-изображения для карты
 begin
   with Image do
   begin
@@ -273,7 +270,7 @@ begin
 end;
 
 procedure TCard.CreateLabel(var Labeel: tlabel; mode: integer);
-//Создание и настройка текста для карты
+// Создание и настройка текста для карты
 begin
   with Labeel do
   begin
@@ -293,7 +290,7 @@ begin
 end;
 
 procedure TCard.CreateBackImage();
-//Создания фона карты
+// Создания фона карты
 begin
   CreateImage(CardBackIm);
   ScaleImageAt(CardBackIm, 0);
@@ -302,7 +299,7 @@ begin
 end;
 
 procedure TCard.CreateItemImage();
-//Создания содержимого карты
+// Создания содержимого карты
 begin
   CreateImage(CardItemIm);
   ScaleImageAt(CardItemIm, 0);
@@ -336,7 +333,7 @@ begin
 end;
 
 procedure TCard.CreateBorderImage();
-//Создание обводки карты
+// Создание обводки карты
 begin
   CreateImage(CardBorderIm);
   ScaleImageAt(CardBorderIm, 0);
@@ -346,7 +343,7 @@ begin
 end;
 
 procedure TCard.CreatePlayerItemImage();
-//Создания предмета карты (Только у игрока)
+// Создания предмета карты (Только у игрока)
 begin
   CreateImage(CardPlayerItemIm);
   ScaleImageAt(CardPlayerItemIm, 0);
@@ -357,7 +354,7 @@ begin
 end;
 
 procedure TCard.CreateValueLabel();
-//Создания текста о прочнсти карты
+// Создания текста о прочнсти карты
 begin
   CreateLabel(ValueText, 1);
   if (ItemType = TItemType.bonus) or (ItemType = TItemType.trap) then
@@ -368,7 +365,7 @@ begin
 end;
 
 procedure TCard.CreateHealthValueLabel();
-//Создания текста о здоровье карты
+// Создания текста о здоровье карты
 begin
   CreateLabel(HealthValueText, 0);
   if (ItemType = TItemType.enemy) or IsCardIsPlayer then
@@ -376,7 +373,7 @@ begin
 end;
 
 procedure TCard.ValueRefresh();
-//Обновление информации о здоровье карты
+// Обновление информации о здоровье карты
 begin
   HealthValueText.Caption := IntToStr(Value);
   ValueText.Caption := IntToStr(Value);
@@ -394,7 +391,7 @@ begin
 end;
 
 procedure TCard.ReScaleToNormal(var Image: timage);
-//Сброс размера изображения до стандартного
+// Сброс размера изображения до стандартного
 begin
   with Image do
   begin
@@ -409,7 +406,7 @@ begin
 end;
 
 procedure TCard.ReScaleToNone(var Image: timage);
-//Сброс размера изображения до Минимального
+// Сброс размера изображения до Минимального
 begin
   with Image do
   begin
@@ -422,7 +419,7 @@ begin
 end;
 
 procedure TCard.ReScaleLabelToNormal(var Labeel: tlabel; mode: integer);
-//Сброс размера текста до стандартного
+// Сброс размера текста до стандартного
 begin
   with Labeel do
   begin
@@ -436,7 +433,7 @@ begin
 end;
 
 procedure TCard.ReScaleLabelToNone(var Labeel: tlabel);
-//Сброс размера текста до минимального
+// Сброс размера текста до минимального
 begin
   with Labeel do
   begin
@@ -447,7 +444,7 @@ begin
 end;
 
 procedure TCard.ScaleOn(ds: real);
-//Изменение степени маштабирования карты НА
+// Изменение степени маштабирования карты НА
 begin
   ScaleImageOn(CardBackIm, ds);
   ScaleImageOn(CardItemIm, ds);
@@ -459,7 +456,7 @@ begin
 end;
 
 procedure TCard.ScaleAt(ds: real);
-//Установка степени маштабирования карты
+// Установка степени маштабирования карты
 begin
   ScaleImageAt(CardBackIm, ds);
   ScaleImageAt(CardItemIm, ds);
@@ -471,7 +468,7 @@ begin
 end;
 
 procedure TCard.ReSetPosToMode(ScaleModeIndex: integer);
-//Сброс размеров и местоположения карты, взависимости от режима
+// Сброс размеров и местоположения карты, взависимости от режима
 begin
   case ScaleModeIndex of
     1:
@@ -501,7 +498,7 @@ begin
 end;
 
 procedure TCard.MoveOn(dx, dy: integer);
-//Сдвинуть карту НА
+// Сдвинуть карту НА
 begin
   MoveImageOn(CardBackIm, dx, dy);
   MoveImageOn(CardItemIm, dx, dy);
@@ -513,7 +510,7 @@ begin
 end;
 
 procedure TCard.MoveAt(dx, dy: integer);
-//Установка местоположения карты
+// Установка местоположения карты
 begin
   MoveImageAt(CardBackIm, dx, dy);
   MoveImageAt(CardItemIm, dx, dy);
@@ -525,21 +522,21 @@ begin
 end;
 
 procedure TCard.MoveImageOn(var Image: timage; dx, dy: integer);
-//Сдвиг изображения НА
+// Сдвиг изображения НА
 begin
   Image.Left := Image.Left + dx;
   Image.Top := Image.Top + dy;
 end;
 
 procedure TCard.MoveImageAt(var Image: timage; dx, dy: integer);
-//Установка местоположения изображения
+// Установка местоположения изображения
 begin
   Image.Left := dx;
   Image.Top := dy;
 end;
 
 procedure TCard.ScaleImageOn(var Image: timage; ds: real);
-//Изменить степени маштабирования изображения НА
+// Изменить степени маштабирования изображения НА
 var
   wMultiple, hMultiple: integer;
 begin
@@ -552,7 +549,7 @@ begin
 end;
 
 procedure TCard.ScaleImageAt(var Image: timage; ds: real);
-//Установка степени маштабирования изображения
+// Установка степени маштабирования изображения
 var
   wMultiple, hMultiple: integer;
 begin
@@ -565,23 +562,23 @@ begin
 end;
 
 procedure TCard.MoveLabelOn(var Labeel: tlabel; dx, dy: integer);
-//Сдвинуть текст НА
+// Сдвинуть текст НА
 begin
   Labeel.Left := Labeel.Left + dx;
   Labeel.Top := Labeel.Top + dy;
 end;
 
 procedure TCard.MoveLabelAt(var Labeel: tlabel; dx, dy: integer);
-//Установка местоположения текста
+// Установка местоположения текста
 begin
   Labeel.Left := dx;
   Labeel.Top := dy;
 end;
 
 procedure TCard.ScaleLabelOn(var Labeel: tlabel; ds: real; mode: integer);
-//Изменить степени маштабирования текста НА
+// Изменить степени маштабирования текста НА
 var
-  wMultiple, hMultiple: integer;
+  wMultiple: integer;
 begin
   wMultiple := round(ds * 10);
   Labeel.Font.Size := wMultiple;
@@ -595,9 +592,9 @@ begin
 end;
 
 procedure TCard.ScaleLabelAt(var Labeel: tlabel; ds: real; mode: integer);
-//Установка степени маштабирования текста
+// Установка степени маштабирования текста
 var
-  wMultiple, hMultiple: integer;
+  wMultiple: integer;
 begin
   wMultiple := round(ds * 10);
   Labeel.Font.Size := wMultiple;
@@ -610,7 +607,7 @@ begin
 end;
 
 procedure TCard.SetVisible(isVisible: bool);
-//Изменение видимости карты
+// Изменение видимости карты
 begin
   CardBackIm.Visible := isVisible;
   CardItemIm.Visible := isVisible;
@@ -622,7 +619,7 @@ begin
 end;
 
 procedure TCard.SetCardStat(CardStat: TCard);
-//Скопировать и установить данные карты из другой карты
+// Скопировать и установить данные карты из другой карты
 begin
   Position := CardStat.Position;
   BorderIndex := CardStat.BorderIndex;
@@ -667,13 +664,13 @@ begin
 end;
 
 function TCard.DamageDealAnsw(Damage: integer): integer;
-//Нанесение и ответ о состоянии карты после получения урона
+// Нанесение и ответ о состоянии карты после получения урона
 begin
   DamageDealAnsw := ChangeHealhOn(-Damage);
 end;
 
 procedure TCard.DeadMessageShow(mode: integer);
-//Вывод сообщения о смерти
+// Вывод сообщения о смерти
 begin
   case mode of
     1:
@@ -687,7 +684,7 @@ begin
 end;
 
 procedure TCard.EndStep();
-//Завершения хода карты
+// Завершения хода карты
 begin
   FieldOfCards.DoStep;
 end;
@@ -699,9 +696,9 @@ begin
 end;
 
 procedure TCard.DoClick();
-//Обработка клика игрока по карте
+// Обработка клика игрока по карте
 var
-  dx, dy, dHP, DDansw: integer;
+  dx, dy, DDansw: integer;
   plP: TPosition;
 begin
   dx := Abs(FieldOfCards.GetPlayerPos.X - Position.X);
@@ -730,9 +727,8 @@ begin
     if IsGodMode then
       ItemType := TItemType.nothing;
 
-
-    //Действуем в зависимости от типа карты
-     case ItemType of
+    // Действуем в зависимости от типа карты
+    case ItemType of
       nothing:
         ;
       bonus:
@@ -779,58 +775,49 @@ begin
   end;
 end;
 
-
-
 function TCard.GenerateItemIndex(Difficult: integer): integer;
-//Генерация индекса карты
+// Генерация индекса карты
 var
   randomR: integer;
   CO_NO, CO_BO, CO_EN, CO_TR, CO_MX: integer;
 begin
-  if IsCardIsPlayer then
-  begin
-    GenerateItemIndex := 0;
-  end
+  CO_NO := CHANCE_OF_NOTHING;
+  CO_BO := round(CHANCE_OF_BONUS { * (0.5 + 1 / Difficult) } ) + CO_NO;
+  CO_EN := round(CHANCE_OF_ENEMIES { * (Difficult * Difficult) } ) + CO_BO;
+  CO_TR := round(CHANCE_OF_TRAPS { * (Difficult * Difficult) } ) + CO_EN;
+
+  randomR := rnd(0, CO_TR);
+
+  if (0 <= randomR) and (randomR < CO_NO) then
+    ItemType := TItemType.nothing
+  else if (CO_NO <= randomR) and (randomR < CO_BO) then
+    ItemType := TItemType.bonus
+  else if (CO_BO <= randomR) and (randomR < CO_EN) then
+    ItemType := TItemType.enemy
+  else if (CO_EN <= randomR) and (randomR <= CO_TR) then
+    ItemType := TItemType.trap
   else
-  begin
-    CO_NO := CHANCE_OF_NOTHING;
-    CO_BO := round(CHANCE_OF_BONUS { * (0.5 + 1 / Difficult) } ) + CO_NO;
-    CO_EN := round(CHANCE_OF_ENEMIES { * (Difficult * Difficult) } ) + CO_BO;
-    CO_TR := round(CHANCE_OF_TRAPS { * (Difficult * Difficult) } ) + CO_EN;
+    msg('rand ind err');
 
-    randomR := rnd(0, CO_TR);
 
-    if (0 <= randomR) and (randomR < CO_NO) then
-      ItemType := TItemType.nothing
-    else if (CO_NO <= randomR) and (randomR < CO_BO) then
-      ItemType := TItemType.bonus
-    else if (CO_BO <= randomR) and (randomR < CO_EN) then
-      ItemType := TItemType.enemy
-    else if (CO_EN <= randomR) and (randomR <= CO_TR) then
-      ItemType := TItemType.trap
-    else
-      msg('rand ind err');
-
-    case ItemType of
-      nothing:
-        GenerateItemIndex := 0;
-      bonus:
-        GenerateItemIndex :=
-          rnd(1, round(COUNT_OF_BONUS_CARDS * Difficult / 30) + 7);
-      enemy:
-        GenerateItemIndex := rnd(1, COUNT_OF_ENEMIES - 15 + Difficult);
-      trap:
-        GenerateItemIndex := rnd(1, COUNT_OF_TRAPS);
-    else
-      msg('rand ind err');
-    end;
-
+  case ItemType of
+    nothing:
+      GenerateItemIndex := 0;
+    bonus:
+      GenerateItemIndex :=
+        rnd(1, round(COUNT_OF_BONUS_CARDS * Difficult / 30) + 7);
+    enemy:
+      GenerateItemIndex := rnd(1, COUNT_OF_ENEMIES - 15 + Difficult);
+    trap:
+      GenerateItemIndex := rnd(1, COUNT_OF_TRAPS);
+  else
+    msg('rand ind err');
   end;
 
 end;
 
 function TCard.ChangeHealhOn(Value: integer): integer;
-//Обработка изменение здоровья игрока, после клика по карте
+// Обработка изменение здоровья игрока, после клика по карте
 var
   plP: TPosition;
   dVal, maxHealth: integer;
@@ -904,9 +891,8 @@ begin
   end;
 end;
 
-
 function TCard.isTrapsFacing(trapP: TPosition): integer;
-//Проверка на то, получим ли мы урон от ловушки
+// Проверка на то, получим ли мы урон от ловушки
 var
   plP: TPosition;
   vectorTo, trapCardIndex: integer;
@@ -919,7 +905,7 @@ begin
 end;
 
 function TCard.CardLootGen(KilledCard: TCardGen): TCardGen;
-//Генерация предметов, выпадающих из карт-сундуков и враждебных карт
+// Генерация предметов, выпадающих из карт-сундуков и враждебных карт
 var
   LootGenCard: TCardGen;
 begin
@@ -943,7 +929,7 @@ begin
 end;
 
 function TCard.BonusPick(BonusItemPos: TPosition): integer;
-//Обработка нажатия по карте-бонусу
+// Обработка нажатия по карте-бонусу
 var
   BonusItemCard: TCard;
   CardGen: TCardGen;
